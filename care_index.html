@@ -1,0 +1,1981 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Care Health Insurance — Premium Calculator</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: Arial, Helvetica, sans-serif;
+  background: #f0f4f8;
+  min-height: 100vh;
+  font-size: 14px;
+}
+
+/* ─── Logo bar ─── */
+.logo-bar {
+  background: #fff;
+  padding: 10px 20px 12px;
+  border-bottom: 1px solid #ddd;
+}
+.care-logo-wrap { display: inline-flex; flex-direction: column; }
+.care-logo-box {
+  display: inline-block;
+  background: #F7941D;
+  padding: 6px 12px 5px;
+  border-radius: 4px;
+}
+.care-logo-text {
+  color: #1a2b6b;
+  font-size: 30px;
+  font-weight: 900;
+  font-style: italic;
+  letter-spacing: -1px;
+  line-height: 1;
+  font-family: Georgia, serif;
+}
+.care-logo-text .macron { text-decoration: overline; }
+.health-ins-text {
+  font-size: 9.5px;
+  letter-spacing: 2.5px;
+  color: #1B75BC;
+  font-weight: 700;
+  text-transform: uppercase;
+  margin-top: 4px;
+}
+
+/* ─── Blue header strip ─── */
+.header-strip {
+  background: #1B75BC;
+  padding: 11px 20px;
+  color: #fff;
+  font-size: 18px;
+  font-weight: 400;
+}
+.header-strip .gold { color: #F7941D; font-weight: 700; }
+
+/* ─── Two-column wrapper ─── */
+.main-wrap {
+  display: flex;
+  max-width: 1160px;
+  margin: 0 auto;
+  min-height: calc(100vh - 108px);
+}
+
+/* ─── LEFT: form panel ─── */
+.form-panel {
+  width: 46%;
+  min-width: 340px;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+}
+.form-fields { padding: 18px 24px 0; }
+
+/* ─── Underline field ─── */
+.field-row {
+  display: flex;
+  align-items: baseline;
+  padding: 10px 0;
+  border-bottom: 1px solid #e8ecf0;
+  gap: 8px;
+}
+.field-row:last-of-type { border-bottom: none; }
+.field-label {
+  width: 210px;
+  min-width: 210px;
+  color: #1B75BC;
+  font-size: 13px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.field-label .q-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 15px; height: 15px;
+  border-radius: 50%;
+  border: 1px solid #90a4ae;
+  font-size: 9px;
+  color: #90a4ae;
+  cursor: default;
+  flex-shrink: 0;
+}
+.field-input { flex: 1; }
+.field-input select,
+.field-input input[type="text"],
+.field-input input[type="number"] {
+  width: 100%;
+  border: none;
+  border-bottom: 1.5px solid #b0bec5;
+  background: transparent;
+  font-size: 13.5px;
+  color: #333;
+  padding: 4px 22px 4px 0;
+  outline: none;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+}
+.field-input select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%231B75BC'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 4px center;
+}
+.field-input select:focus,
+.field-input input[type="text"]:focus,
+.field-input input[type="number"]:focus { border-bottom-color: #1B75BC; }
+.field-input input[type="text"].error  { border-bottom-color: #E53935; }
+.field-input input[type="number"] { -moz-appearance: textfield; }
+.field-input input[type="number"]::-webkit-outer-spin-button,
+.field-input input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; }
+
+/* ─── Sum Insured slider ─── */
+.si-section { padding: 12px 24px 0; }
+.si-label { font-size: 13px; color: #1B75BC; font-weight: 500; margin-bottom: 8px; }
+.si-slider-row { display: flex; align-items: center; gap: 10px; }
+.si-val { font-size: 13px; font-weight: 700; color: #1B75BC; min-width: 56px; text-align: right; }
+input[type="range"] {
+  flex: 1;
+  -webkit-appearance: none;
+  height: 4px;
+  background: linear-gradient(to right, #1B75BC 0%, #1B75BC var(--pct,50%), #cfd8dc var(--pct,50%));
+  border-radius: 3px;
+  outline: none;
+  cursor: pointer;
+}
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 16px; height: 16px;
+  border-radius: 50%;
+  background: #1B75BC;
+  border: 2px solid #fff;
+  box-shadow: 0 1px 4px rgba(0,0,0,.3);
+}
+.si-ticks { display: flex; justify-content: space-between; margin-top: 3px; }
+.si-ticks span { font-size: 10px; color: #78909c; }
+
+/* ─── Job Type radios (income plans) ─── */
+.job-type-radios { display: flex; gap: 16px; flex-wrap: wrap; align-items: center; padding: 4px 0; }
+.job-type-radios label { display: flex; align-items: center; gap: 5px; cursor: pointer;
+  font-size: 13px; color: #37474f; }
+.job-type-radios input[type="radio"] { accent-color: #1B75BC; width: 15px; height: 15px; cursor: pointer; }
+
+/* ─── Tenure ─── */
+.tenure-section { padding: 12px 24px 12px; }
+.tenure-label { font-size: 13px; color: #1B75BC; font-weight: 500; margin-bottom: 8px; }
+.tenure-radios { display: flex; gap: 32px; }
+.tenure-radios label {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 13.5px; color: #333; cursor: pointer;
+}
+.tenure-radios input[type="radio"] { accent-color: #1B75BC; width: 15px; height: 15px; cursor: pointer; }
+
+/* ─── Blue premium block ─── */
+.premium-block {
+  background: #1B75BC;
+  padding: 14px 24px 16px;
+  margin-top: 0;
+  flex: 1;
+}
+.pb-header {
+  font-size: 12px;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: .8px;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+
+/* Premium radio row */
+.pb-prem-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.pb-radio {
+  width: 16px; height: 16px;
+  border-radius: 50%;
+  border: 2px solid #fff;
+  background: #fff;
+  margin-top: 2px;
+  flex-shrink: 0;
+  position: relative;
+}
+.pb-radio::after {
+  content: '';
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: #1B75BC;
+  position: absolute;
+  top: 2px; left: 2px;
+}
+.pb-prem-text { color: #fff; font-size: 13.5px; font-weight: 600; line-height: 1.4; }
+.pb-prem-text .amt { font-size: 16px; }
+.pb-prem-text .sub { font-size: 11.5px; font-weight: 400; }
+
+/* Addon checkboxes grid */
+.addon-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px 12px;
+  margin-bottom: 12px;
+}
+.addon-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+}
+.addon-cb {
+  width: 16px; height: 16px;
+  border-radius: 2px;
+  border: 2px solid #fff;
+  background: transparent;
+  flex-shrink: 0;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  position: relative;
+}
+.addon-cb:checked {
+  background: #fff;
+}
+.addon-cb:checked::after {
+  content: '';
+  position: absolute;
+  left: 3px; top: 0px;
+  width: 5px; height: 9px;
+  border: 2px solid #1B75BC;
+  border-top: none;
+  border-left: none;
+  transform: rotate(45deg);
+}
+.addon-label { font-size: 12.5px; color: #fff; cursor: pointer; user-select: none; }
+
+/* Sub-option select */
+.addon-sub {
+  grid-column: span 2;
+  display: none;
+  margin-top: -4px;
+}
+.addon-sub select {
+  background: rgba(255,255,255,.15);
+  border: none;
+  border-bottom: 1px solid rgba(255,255,255,.5);
+  color: #fff;
+  font-size: 12px;
+  padding: 3px 4px;
+  outline: none;
+  cursor: pointer;
+  width: 100%;
+}
+.addon-sub select option { color: #333; background: #fff; }
+
+/* Loading spinner in block */
+.pb-loading {
+  color: rgba(255,255,255,.7);
+  font-size: 12px;
+  font-style: italic;
+  margin-bottom: 10px;
+  display: none;
+}
+
+/* Total premium row */
+.pb-total {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px solid rgba(255,255,255,.3);
+  padding-top: 10px;
+  margin-top: 2px;
+}
+.pb-total-label { color: #fff; font-size: 14px; font-weight: 700; }
+.pb-total-val   { color: #fff; font-size: 14px; font-weight: 700; }
+
+/* Calculate button */
+.calc-btn-wrap { padding: 0 24px 14px; background: #1B75BC; }
+.calc-btn {
+  width: 100%;
+  padding: 11px;
+  background: #fff;
+  color: #1B75BC;
+  border: none;
+  border-radius: 3px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: background .15s, color .15s;
+}
+.calc-btn:hover:not(:disabled) { background: #e3f2fd; }
+.calc-btn:disabled { opacity: .6; cursor: not-allowed; }
+.spin {
+  width: 16px; height: 16px;
+  border: 2px solid rgba(27,117,188,.3);
+  border-top-color: #1B75BC;
+  border-radius: 50%;
+  animation: spin .6s linear infinite;
+  display: none;
+}
+.calc-btn.loading .spin { display: block; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* GST notes in blue block */
+.pb-notes {
+  padding: 0 24px 14px;
+  background: #1B75BC;
+}
+.pb-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  color: rgba(255,255,255,.85);
+  font-size: 11px;
+  line-height: 1.5;
+  margin-bottom: 4px;
+}
+.pb-note .dot {
+  width: 14px; height: 14px;
+  background: rgba(255,255,255,.3);
+  border-radius: 50%;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 8px;
+  color: #fff;
+  font-weight: 700;
+  margin-top: 1px;
+}
+
+/* Error */
+#err-msg {
+  display: none;
+  background: rgba(255,235,59,.15);
+  border-left: 3px solid #FFF176;
+  color: #fff;
+  font-size: 12px;
+  padding: 8px 12px;
+  margin-bottom: 10px;
+  border-radius: 0 3px 3px 0;
+}
+
+/* ─── RIGHT: panel ─── */
+.right-panel {
+  flex: 1;
+  background: #EEF4F9;
+  padding: 20px 24px;
+  border-left: 1px solid #dde8f0;
+}
+.rp-plan-name {
+  font-size: 15px;
+  color: #333;
+  font-weight: 400;
+  margin-bottom: 20px;
+}
+
+/* Premium result card (right panel) */
+.rp-result { display: none; }
+.rp-card {
+  background: #fff;
+  border-radius: 6px;
+  padding: 16px 20px;
+  box-shadow: 0 1px 6px rgba(0,0,0,.08);
+  margin-bottom: 12px;
+}
+.rp-card-label { font-size: 11px; color: #78909c; text-transform: uppercase; letter-spacing: .5px; font-weight: 600; margin-bottom: 4px; }
+.rp-card-val   { font-size: 34px; font-weight: 800; color: #1B75BC; letter-spacing: -1px; }
+.rp-card-sub   { font-size: 12px; color: #90a4ae; margin-top: 3px; }
+.rp-rows { display: flex; flex-direction: column; gap: 6px; }
+.rp-row {
+  display: flex; justify-content: space-between; align-items: center;
+  background: #fff; border-radius: 5px; padding: 9px 14px;
+  box-shadow: 0 1px 3px rgba(0,0,0,.05);
+}
+.rp-row.blue  { background: #E3F2FD; border-left: 3px solid #1B75BC; }
+.rp-row.green { background: #E8F5E9; border-left: 3px solid #43A047; }
+.rp-rk { font-size: 12.5px; color: #546e7a; }
+.rp-rv { font-size: 14px; font-weight: 700; color: #1B75BC; }
+.rp-rv.green { color: #2E7D32; }
+.disc-badge {
+  display: inline-block; background: #43A047; color: #fff;
+  font-size: 9px; font-weight: 700; padding: 1px 5px; border-radius: 8px; margin-left: 4px;
+}
+.rp-foot { font-size: 11px; color: #90a4ae; text-align: center; margin-top: 12px; }
+
+/* Responsive */
+@media (max-width: 760px) {
+  .main-wrap { flex-direction: column; }
+  .form-panel { width: 100%; min-width: 0; }
+}
+</style>
+</head>
+<body>
+
+<!-- ── Logo bar ── -->
+<div class="logo-bar">
+  <div class="care-logo-wrap">
+    <div class="care-logo-box">
+      <div class="care-logo-text">car<span class="macron">e</span></div>
+    </div>
+    <div class="health-ins-text">Health Insurance</div>
+  </div>
+</div>
+
+<!-- ── Blue header ── -->
+<div class="header-strip">Insure within <span class="gold">minutes</span></div>
+
+<!-- ── Two-column layout ── -->
+<div class="main-wrap">
+
+  <!-- ═══ LEFT panel ═══ -->
+  <div class="form-panel">
+    <div class="form-fields">
+
+      <!-- Plan Name -->
+      <div class="field-row">
+        <div class="field-label">Plan Name <span class="q-icon">?</span></div>
+        <div class="field-input">
+          <select id="sel-plan" onchange="onPlanChange()">
+            <option value="7484">POS Care Supreme Shine</option>
+            <option value="7425">POS Secure Child</option>
+            <option value="7424">POS Secure Plus</option>
+            <option value="7218">Care Supreme Shine</option>
+            <option value="7172">Ultimate Care Senior</option>
+            <option value="7159">POS Care Supreme - Super Saver</option>
+            <option value="6740">Secure Child</option>
+            <option value="6725">POS Ultimate Care</option>
+            <option value="6677">POS Care Supreme - VFM 3</option>
+            <option value="6676">Care Supreme - VFM 3</option>
+            <option value="6675">POS Care Supreme - VFM 2</option>
+            <option value="6674">Care Supreme - VFM 2</option>
+            <option value="6619">Ultimate Care</option>
+            <option value="6541">Care Supreme - Super Saver</option>
+            <option value="6434">Supreme Enhance</option>
+            <option value="6395">Surrogacy and Ooctye Donor</option>
+            <option value="6384">Secure Plus</option>
+            <option value="6217">POS Care Supreme - VFM</option>
+            <option value="6196">Care Advantage</option>
+            <option value="6043">Care Supreme - VFM</option>
+            <option value="5955">Joy Tomorrow</option>
+            <option value="5834">POS Explore</option>
+            <option value="5833">New Explore</option>
+            <option value="5674">Student Explore-Health Unlimited</option>
+            <option value="5673">Care Global</option>
+            <option value="5412">Care Freedom</option>
+            <option value="5399">POS Care Supreme</option>
+            <option value="5335">POS Care Smart Select</option>
+            <option value="5334">Care Smart Select</option>
+            <option value="3488">POS Care Senior</option>
+            <option value="3487">Care Senior</option>
+            <option value="3486">POS Care</option>
+            <option value="3485">Care</option>
+            <option value="2813" selected>Care Supreme</option>
+            <option value="2534">Sr Health Advantage - Silver</option>
+            <option value="1992">Care Classic - Instant Cover</option>
+            <option value="1734">Super Care Advantage</option>
+            <option value="1432">Care Classic</option>
+            <option value="1187">Care Plus - Complete Plan</option>
+            <option value="1186">Care Plus - Youth Plan</option>
+            <option value="748">Enhance</option>
+            <option value="585">Cancer Mediclaim (Advance)</option>
+            <option value="573">POS Secure</option>
+            <option value="425">Care Heart</option>
+            <option value="362">Super Mediclaim</option>
+            <option value="188">Secure</option>
+            <option value="107">Student Explore</option>
+            <option value="102">Joy</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Business Type -->
+      <div class="field-row" id="biz-row">
+        <div class="field-label">Business Type <span class="q-icon">?</span></div>
+        <div class="field-input">
+          <select id="sel-biz" onchange="onPricingInputChanged()">
+            <option value="NB">NB</option>
+            <option value="PORT">Portability</option>
+            <option value="RENEW">Renewal</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Plan Type (field_23) — plans with PLAN_TYPE_MAP entries only -->
+      <div class="field-row" id="plan-type-row" style="display:none">
+        <div class="field-label">Plan Type <span class="q-icon">?</span></div>
+        <div class="field-input">
+          <select id="sel-plan-type" onchange="onPricingInputChanged()">
+            <!-- options built dynamically by applyFieldConfig() from PLAN_TYPE_MAP -->
+          </select>
+        </div>
+      </div>
+
+      <!-- Nationality Status (field_NS) — plans: 7172, 6725, 6619, 6196, 5673, 362 -->
+      <div class="field-row" id="ns-row" style="display:none">
+        <div class="field-label">Nationality Status <span class="q-icon">?</span></div>
+        <div class="field-input">
+          <select id="sel-ns" onchange="onPricingInputChanged()">
+            <!-- options built dynamically by applyFieldConfig() from NS_MAP -->
+          </select>
+        </div>
+      </div>
+
+      <!-- Global Coverage (field_GC) — plan 5673 (Care Global) only -->
+      <div class="field-row" id="gc-row" style="display:none">
+        <div class="field-label">Global Coverage <span class="q-icon">?</span></div>
+        <div class="field-input">
+          <select id="sel-gc" onchange="onPricingInputChanged()">
+            <!-- options built dynamically by applyFieldConfig() from GC_MAP -->
+          </select>
+        </div>
+      </div>
+
+      <!-- Pincode -->
+      <div class="field-row">
+        <div class="field-label">Pincode <span class="q-icon">?</span></div>
+        <div class="field-input">
+          <input type="text" id="inp-pin" placeholder="Enter Pincode"
+            maxlength="6" oninput="this.value=this.value.replace(/\D/g,'');this.classList.remove('error')"/>
+        </div>
+      </div>
+
+      <!-- Cover Type -->
+      <div class="field-row" id="cover-row">
+        <div class="field-label">Cover Type <span class="q-icon">?</span></div>
+        <div class="field-input">
+          <select id="sel-cover" onchange="updateMemberFields()">
+            <option value="Individual">Individual</option>
+            <option value="Floater" selected>Floater</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Total Members -->
+      <div class="field-row" id="members-row">
+        <div class="field-label">Total Members <span class="q-icon">?</span></div>
+        <div class="field-input">
+          <select id="sel-members" onchange="updateMemberFields()">
+            <option value="1">1</option>
+            <option value="2" selected>2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Children -->
+      <div class="field-row" id="children-row">
+        <div class="field-label">Children (Less Than 25 Yrs) <span class="q-icon">?</span></div>
+        <div class="field-input">
+          <select id="sel-children" onchange="updateMemberFields()">
+            <option value="0" selected>0</option>
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Age Eldest — standard plans (editable year dropdown) -->
+      <div class="field-row" id="age1-row">
+        <div class="field-label">Age Of Eldest Member <span class="q-icon">?</span></div>
+        <div class="field-input">
+          <select id="sel-age1" onchange="onPricingInputChanged()"></select>
+        </div>
+      </div>
+
+      <!-- Age Eldest — Secure plans (fixed band, not user-selectable) -->
+      <div class="field-row" id="age-band-row" style="display:none">
+        <div class="field-label">Age Of Eldest Member <span class="q-icon">?</span></div>
+        <div class="field-input">
+          <span style="background:#e8f0fe;color:#1B75BC;font-weight:700;padding:4px 10px;
+                       border-radius:4px;font-size:13px;border:1px solid #b3c8f5;">
+            18 - 64 Years
+          </span>
+        </div>
+      </div>
+
+      <!-- Age — Legacy Secure plans 188/573 (two selectable bands: 18-64 or 65-70) -->
+      <div class="field-row" id="age-band2-row" style="display:none">
+        <div class="field-label">Age Of Member <span class="q-icon">?</span></div>
+        <div class="field-input">
+          <select id="sel-age-band2" onchange="onPricingInputChanged()">
+            <option value="18-64">18 - 64 Years</option>
+            <option value="65-70">65 - 70 Years</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Age Member 2 -->
+      <div class="field-row" id="age2-row">
+        <div class="field-label">Age Of Member 2 <span class="q-icon">?</span></div>
+        <div class="field-input">
+          <select id="sel-age2" onchange="onPricingInputChanged()"></select>
+        </div>
+      </div>
+
+      <!-- Age Member 3 -->
+      <div class="field-row" id="age3-row" style="display:none">
+        <div class="field-label">Age Of Member 3 <span class="q-icon">?</span></div>
+        <div class="field-input">
+          <select id="sel-age3" onchange="onPricingInputChanged()"></select>
+        </div>
+      </div>
+
+      <!-- Age Member 4 -->
+      <div class="field-row" id="age4-row" style="display:none">
+        <div class="field-label">Age Of Member 4 <span class="q-icon">?</span></div>
+        <div class="field-input">
+          <select id="sel-age4" onchange="onPricingInputChanged()"></select>
+        </div>
+      </div>
+    </div><!-- /form-fields -->
+
+    <!-- Income fields (Secure family: 7425, 7424, 6740, 6384, 188, 573) -->
+    <div id="income-section" style="display:none">
+      <div class="form-fields" style="padding-top:0; padding-bottom:0">
+
+        <!-- Annual Income -->
+        <div class="field-row" id="annual-income-row">
+          <div class="field-label">Annual Income (In Lakhs) <span class="q-icon">?</span></div>
+          <div class="field-input">
+            <input type="number" id="inp-annual-income" placeholder="e.g. 10"
+                   min="1" max="100" step="1" value="10"/>
+          </div>
+        </div>
+
+        <!-- Job Type -->
+        <div class="field-row" id="job-type-row">
+          <div class="field-label">Job Type <span class="q-icon">?</span></div>
+          <div class="field-input">
+            <div class="job-type-radios">
+              <label><input type="radio" name="job-type" value="Salaried" checked/> Salaried</label>
+              <label><input type="radio" name="job-type" value="Business"/> Business</label>
+              <label><input type="radio" name="job-type" value="Other Source"/> Other Source</label>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Monthly Income slider (only for 7425/7424/6740 — not all Secure plans) -->
+      <div id="monthly-income-wrap" style="display:none">
+        <div class="si-section" style="padding-bottom:12px">
+          <div class="si-label">Monthly Income (₹ In Thousand)</div>
+          <div class="si-slider-row">
+            <input type="range" id="monthly-income-slider" min="30" max="50" step="1"
+                   value="30" oninput="onMonthlyIncome(this.value)"/>
+            <div class="si-val" id="monthly-income-disp">₹30 K</div>
+          </div>
+          <div class="si-ticks" id="monthly-income-ticks"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sum Insured slider -->
+    <div class="si-section" id="si-section-wrap">
+      <div class="si-label" id="si-unit-label">Sum Insured (₹ In Lakhs)</div>
+      <div class="si-slider-row">
+        <input type="range" id="si-slider" min="0" max="6" step="1" value="2" oninput="onSI(this.value)"/>
+        <div class="si-val" id="si-disp">₹10 L</div>
+      </div>
+      <div class="si-ticks" id="si-ticks"></div>
+    </div>
+
+    <!-- Unlimited SI display (plan 5674 — Student Explore-Health Unlimited) -->
+    <div class="si-section" id="si-unlimited-wrap" style="display:none">
+      <div class="si-label">Sum Insured</div>
+      <div style="font-size:18px;font-weight:700;color:#1B75BC;padding:8px 0;">Unlimited Coverage</div>
+    </div>
+
+    <!-- Tenure -->
+    <div class="tenure-section">
+      <div class="tenure-label">Tenure</div>
+      <div class="tenure-radios">
+        <label id="tenure-lbl-1yr"><input type="radio" name="tenure" onchange="onPricingInputChanged()" value="1 Year" checked/> 1 Year</label>
+        <label id="tenure-lbl-2yr"><input type="radio" name="tenure" onchange="onPricingInputChanged()" value="2 Year"/> 2 Year</label>
+        <label id="tenure-lbl-3yr"><input type="radio" name="tenure" onchange="onPricingInputChanged()" value="3 Year"/> 3 Year</label>
+        <label id="tenure-lbl-5yr" style="display:none"><input type="radio" name="tenure" onchange="onPricingInputChanged()" value="5 Year"/> 5 Year</label>
+      </div>
+    </div>
+
+    <!-- ── Blue "YOUR PREMIUM IS" block ── -->
+    <div class="premium-block">
+      <div class="pb-header">Your Premium Is</div>
+
+      <!-- Premium display row -->
+      <div class="pb-prem-row">
+        <div class="pb-radio"></div>
+        <div class="pb-prem-text" id="pb-prem-text">
+          <span class="amt">₹ ----</span><br/>
+          <span class="sub" id="pb-prem-sub">Enter Above Pincode For Premium</span>
+        </div>
+      </div>
+
+      <!-- Loading -->
+      <div class="pb-loading" id="pb-loading">Loading add-ons…</div>
+
+      <!-- Error in block -->
+      <div id="err-msg"></div>
+
+      <!-- Add-on checkboxes -->
+      <div class="addon-grid" id="addon-grid">
+        <!-- rendered by JS -->
+      </div>
+
+      <!-- Total premium -->
+      <div class="pb-total">
+        <span class="pb-total-label">Total Premium</span>
+        <span class="pb-total-val">₹ <span id="pb-total-val">----</span></span>
+      </div>
+
+      <!-- Add to Comparison -->
+      <div style="padding:10px 0 4px;text-align:center">
+        <button id="care-add-btn" onclick="careAddToCompare()"
+          style="display:none;background:#1a7a3a;color:#fff;border:none;padding:9px 22px;border-radius:5px;font-size:13px;font-weight:600;cursor:pointer;letter-spacing:.3px">
+          ➕ Add to Comparison
+        </button>
+      </div>
+    </div><!-- /premium-block -->
+
+    <!-- Calculate button (below blue block, still blue bg) -->
+    <div class="calc-btn-wrap">
+      <button class="calc-btn" id="calc-btn" onclick="calculate()">
+        <div class="spin"></div>
+        <span>Calculate Premium</span>
+      </button>
+    </div>
+
+    <!-- GST notes -->
+    <div class="pb-notes">
+      <div class="pb-note"><span class="dot">i</span><span>Retail Health, PA and Travel policies premium are GST exempted. Rest all policies premium includes 18% GST.</span></div>
+      <div class="pb-note"><span class="dot">i</span><span>Above Premium is only for New Business.</span></div>
+    </div>
+
+  </div><!-- /form-panel -->
+
+  <!-- ═══ RIGHT panel ═══ -->
+  <div class="right-panel">
+    <div class="rp-plan-name" id="rp-plan-name">Care Supreme</div>
+
+    <!-- Premium breakdown (shown after calculate) -->
+    <div class="rp-result" id="rp-result">
+      <div class="rp-card">
+        <div class="rp-card-label">Grand Total Premium</div>
+        <div class="rp-card-val">₹<span id="rp-grand">—</span></div>
+        <div class="rp-card-sub">Per year, as returned by the Care portal (incl. taxes where applicable)</div>
+      </div>
+      <div class="rp-rows">
+        <div class="rp-row">
+          <span class="rp-rk">Base Premium</span>
+          <span class="rp-rv">₹<span id="rp-base">—</span></span>
+        </div>
+        <div class="rp-row blue">
+          <span class="rp-rk">After Discount <span class="disc-badge" id="rp-disc-pct"></span></span>
+          <span class="rp-rv">₹<span id="rp-disc">—</span></span>
+        </div>
+        <div class="rp-row green">
+          <span class="rp-rk">💰 Total Payable</span>
+          <span class="rp-rv green">₹<span id="rp-total">—</span></span>
+        </div>
+      </div>
+      <div class="rp-foot">Source: abacus.careinsurance.com · Figures exactly as returned by the portal</div>
+    </div>
+  </div><!-- /right-panel -->
+
+</div><!-- /main-wrap -->
+
+<script>
+const API = 'http://localhost:3005';
+
+// ── Sum Insured slider ────────────────────────────────────────────────────────
+let SI_VALS = [5, 7, 10, 15, 25, 50, 100];
+let siIdx = 2;
+let SI_UNIT = 'L'; // 'L' = Lakhs (default), 'K' = Thousands (plan 6740)
+
+(function buildTicks() {
+  const t = document.getElementById('si-ticks');
+  t.innerHTML = SI_VALS.map(v => v >= 100 ? `<span>${v/100}Cr</span>` : `<span>${v}L</span>`).join('');
+})();
+
+function onSI(idx) {
+  if (typeof onPricingInputChanged === 'function') onPricingInputChanged();
+  siIdx = +idx;
+  const v = SI_VALS[siIdx];
+  let label;
+  if (SI_UNIT === 'K') {
+    label = `₹${v} K`;
+  } else if (v >= 100) {
+    label = `₹${v / 100} Cr`;
+  } else {
+    label = `₹${v} L`;
+  }
+  document.getElementById('si-disp').textContent = label;
+  const pct = (siIdx / (SI_VALS.length - 1)) * 100;
+  document.getElementById('si-slider').style.setProperty('--pct', pct + '%');
+}
+onSI(2);
+
+// ── Age selectors ─────────────────────────────────────────────────────────────
+function ageOptions(min, max) {
+  return Array.from({length: max - min + 1}, (_, i) => {
+    const a = min + i;
+    return `<option value="${a}">${a}</option>`;
+  }).join('');
+}
+function childAgeOptions() {
+  return `<option value="91 days">91 days</option>` +
+    Array.from({length:24},(_,i)=>`<option value="${i+1}">${i+1}</option>`).join('');
+}
+
+// Init age selects
+document.getElementById('sel-age1').innerHTML = ageOptions(18, 99);
+document.getElementById('sel-age1').value = 30;
+document.getElementById('sel-age2').innerHTML = ageOptions(18, 99);
+document.getElementById('sel-age2').value = 18;
+document.getElementById('sel-age3').innerHTML = ageOptions(18, 99);
+document.getElementById('sel-age3').value = 25;
+document.getElementById('sel-age4').innerHTML = ageOptions(18, 99);
+document.getElementById('sel-age4').value = 25;
+
+function updateMemberFields() {
+  onPricingInputChanged();
+  const cover = document.getElementById('sel-cover').value;
+  const total = cover === 'Individual' ? 1 : +document.getElementById('sel-members').value;
+  const kids  = +document.getElementById('sel-children').value;
+
+  document.getElementById('members-row').style.display  = cover === 'Individual' ? 'none' : '';
+  document.getElementById('children-row').style.display = cover === 'Individual' ? 'none' : '';
+  document.getElementById('age2-row').style.display     = total >= 2 ? '' : 'none';
+  document.getElementById('age3-row').style.display     = total >= 3 ? '' : 'none';
+  document.getElementById('age4-row').style.display     = total >= 4 ? '' : 'none';
+
+  // Adjust member 2-4 age options (adult vs child).
+  //
+  // Two bugs used to live here. The guard compared a boolean to a dataset
+  // STRING, so it was always true and the selects were rebuilt — and reset —
+  // on every single call, i.e. every time the operator touched Cover Type,
+  // Total Members or Children. And even a legitimate rebuild threw away the
+  // age that had been entered. Now the mode is compared as a string, and any
+  // age still valid in the new option set is carried across.
+  setMemberAgeMode('sel-age2', kids >= 1, '18');
+  setMemberAgeMode('sel-age3', kids >= 2, '25');
+  setMemberAgeMode('sel-age4', kids >= 3, '25');
+}
+
+function setMemberAgeMode(selectId, isChild, adultDefault) {
+  const el = document.getElementById(selectId);
+  if (!el) return;
+  const mode = isChild ? 'child' : 'adult';
+  if (el.dataset.ageMode === mode) return;   // already in the right mode — leave the value alone
+
+  const previous = el.value;
+  el.innerHTML = isChild ? childAgeOptions() : ageOptions(18, 99);
+  el.dataset.ageMode = mode;
+
+  // Keep what the operator entered if it is still selectable in the new set.
+  const stillValid = previous &&
+    Array.prototype.some.call(el.options, o => o.value === previous);
+  el.value = stillValid ? previous : (isChild ? el.options[0]?.value : adultDefault);
+}
+updateMemberFields();
+
+// ── Plan change: load add-ons from server ─────────────────────────────────────
+// ALL SETS BELOW CONFIRMED FROM LIVE PORTAL AUDIT (Jul 2026)
+
+// Plans that show the Business Type field (NB / PORT / RENEWAL) — only 16 plans
+const BIZ_PLANS = new Set([
+  '7484','7218','7172','7159',
+  '6725','6677','6676','6675','6674','6619','6541','6217','6196','6043',
+  '5399','2813',
+]);
+
+// Plan Type options (field_23) — offline fallback only. The live copy lives in
+// care_plans.json as each plan's planTypeOptions and is loaded by
+// loadCatalogue() below, so the hub's picker and this form cannot drift apart
+// about what a plan's Plan Type choices are.
+const PLAN_TYPE_MAP = {
+  '2813': ['Care Supreme', 'Senior Premium', 'Senior Super'],  // Care Supreme
+  '5399': ['Care Supreme', 'Senior Premium', 'Senior Super'],  // POS Care Supreme
+  '6434': ['Option 1', 'Option 2'],                           // Supreme Enhance
+  '6395': ['SURROGACY'],                                       // Surrogacy and Oocyte Donor
+  '362':  ['Cancer', 'Critical', 'Operation', 'Heart'],        // Super Mediclaim
+};
+
+// Plans that do NOT show the Cover Type (Individual / Floater) selector
+const NO_COVER_TYPE = new Set([
+  '7425','7424',   // POS Secure Child, POS Secure Plus
+  '6740',          // Secure Child
+  '6395',          // Surrogacy and Oocyte Donor
+  '6384',          // Secure Plus
+  '6196',          // Care Advantage (has Members but no Cover Type)
+  '5834','5833',   // POS Explore, New Explore
+  '5674',          // Student Explore-Health Unlimited
+  '5673',          // Care Global
+  '1992',          // Care Classic - Instant Cover
+  '1734',          // Super Care Advantage
+  '1432',          // Care Classic
+  '585',           // Cancer Mediclaim (Advance)
+  '573',           // POS Secure
+  '362',           // Super Mediclaim
+  '188',           // Secure
+]);
+
+// Plans that do NOT show the Total Members field
+const NO_MEMBERS = new Set([
+  '5834','5833',   // POS Explore, New Explore
+  '573',           // POS Secure
+  '188',           // Secure
+  '107',           // Student Explore
+]);
+
+// Plans that do NOT show the Children field
+const NO_CHILDREN = new Set([
+  '7425','7424',   // POS Secure Child, POS Secure Plus (only child members)
+  '6740',          // Secure Child
+  '6395',          // Surrogacy and Oocyte Donor
+  '6384',          // Secure Plus
+  '5674',          // Student Explore-Health Unlimited
+  '5834','5833',   // POS Explore, New Explore
+  '585',           // Cancer Mediclaim (Advance)
+  '573',           // POS Secure
+  '2534',          // Sr Health Advantage - Silver
+  '362',           // Super Mediclaim
+  '425',           // Care Heart (has Cover + Members, no Children)
+  '188',           // Secure
+  '107',           // Student Explore
+]);
+
+// Plans that do NOT show the Tenure selector
+const NO_TENURE = new Set([
+  '102',           // Joy (confirmed: no tenure field)
+]);
+
+// Plans with 5-year tenure only (not 1/2/3 year)
+const FIVE_YEAR_PLANS = new Set(['7425','6740']);
+
+// Nationality Status (field_NS) — verified from portal audit (Jul 2026)
+// Maps planId → options array (default = first option = "Resident of India")
+const NS_MAP = {
+  // Type A — 5 options
+  '7172': ['Resident of India','NRI','PIO','OCI','Indian Overseas above 182 days'],
+  '6725': ['Resident of India','NRI','PIO','OCI','Indian Overseas above 182 days'],
+  '6619': ['Resident of India','NRI','PIO','OCI','Indian Overseas above 182 days'],
+  // Type B — 6 options
+  '6196': ['Resident of India','NRI/NRO/OCI/PIO','Foreign Citizen/Dual Citizenship',
+           'Out of India employment','Merchant Navy','Education Overseas'],
+  '5673': ['Resident of India','NRI/NRO/OCI/PIO','Foreign Citizen/Dual Citizenship',
+           'Out of India employment','Merchant Navy','Education Overseas'],
+  '362':  ['Resident of India','NRI/NRO/OCI/PIO','Foreign Citizen/Dual Citizenship',
+           'Out of India employment','Merchant Navy','Education Overseas'],
+};
+
+// Global Coverage (field_GC) — verified from portal audit (Jul 2026)
+// Only 5673 (Care Global) is user-selectable; 6196 auto-sends "Not Opted"
+const GC_MAP = {
+  '5673': ['WW Excluding USA','WW Including USA'],
+};
+const GC_AUTO_PLANS = new Set(['6196']); // always send "Not Opted", no UI shown
+
+// All Secure family plans — need Annual Income + Job Type fields
+const INCOME_PLANS = new Set(['7425','7424','6740','6384','188','573']);
+
+// Plans 188 (Secure) and 573 (POS Secure) have a DIFFERENT field structure:
+//   - Age: field_15 SELECT with "18-64" / "65-70" options (NOT field_3 fixed band)
+//   - SI:  user-selectable (10–200L for 188, 10–50L for 573)
+const LEGACY_SECURE_PLANS = new Set(['188','573']);
+
+// Plans where field_2 = Monthly Income — now empty (7425/6740 confirmed to have SI sliders)
+const MONTHLY_INCOME_PLANS = new Set([]);
+
+// Plans where SI is not user-selectable (fixed/unlimited coverage)
+const NO_USER_SI_PLANS = new Set(['5674']); // Student Explore-Health Unlimited — SI is "Unlimited"
+
+// Plans where Sum Insured is in ₹ Thousands (not Lakhs)
+const THOUSANDS_SI_PLANS = new Set(['6740']); // Secure Child: 30K–200K
+
+// Monthly income slider range per plan (₹ in thousands)
+const MONTHLY_INCOME_MAP = {
+  '7425': { min:30, max:50  },   // POS Secure Child: 30K–50K/month
+  '7424': { min:30, max:50  },   // POS Secure Plus (reference — no monthly income slider)
+  '6740': { min:30, max:200 },   // Secure Child: 30K–200K/month
+};
+
+// Income field IDs discovered from server's parseFields (overrides defaults)
+let incomeFieldIds = {};
+
+function onMonthlyIncome(val) {
+  document.getElementById('monthly-income-disp').textContent = `₹${val} K`;
+  const slider = document.getElementById('monthly-income-slider');
+  const pct = ((val - slider.min) / (slider.max - slider.min)) * 100;
+  slider.style.setProperty('--pct', pct + '%');
+}
+
+function buildMonthlyIncomeTicks(min, max) {
+  const ticks = document.getElementById('monthly-income-ticks');
+  const steps = Math.min(6, max - min + 1);
+  const vals  = [];
+  for (let i = 0; i < steps; i++) vals.push(Math.round(min + (i / (steps - 1)) * (max - min)));
+  ticks.innerHTML = [...new Set(vals)].map(v => `<span>${v}</span>`).join('');
+}
+
+let addonState = {}; // { field -> checked }
+
+async function onPlanChange() {
+  const planSel = document.getElementById('sel-plan');
+  const id   = planSel.value;
+  const name = planSel.options[planSel.selectedIndex].text;
+
+  // Update plan name in right panel
+  document.getElementById('rp-plan-name').textContent = name;
+
+  // Reset premium display
+  resetPremiumDisplay();
+
+  // Load add-ons from server
+  await loadAddons(id);
+}
+
+// Blank every premium figure and take "Add to Comparison" out of reach.
+// Called before each calculation, on failure, and whenever an input that
+// affects pricing changes — so the figure on screen always corresponds to
+// the inputs currently shown, or to nothing at all.
+// Any change to a pricing input makes the figure on screen wrong. Blank it
+// rather than let it be read, transcribed or exported.
+function onPricingInputChanged() {
+  const shown = document.getElementById('pb-total-val');
+  if (shown && shown.textContent.trim() !== '----') {
+    invalidatePremium('Inputs changed — click Calculate Premium');
+  }
+}
+
+function invalidatePremium(subText) {
+  document.getElementById('pb-prem-text').innerHTML =
+    '<span class="amt">₹ ----</span><br/><span class="sub" id="pb-prem-sub">'
+    + (subText || 'Enter Above Pincode For Premium') + '</span>';
+  document.getElementById('pb-total-val').textContent = '----';
+  document.getElementById('rp-result').style.display = 'none';
+  document.getElementById('err-msg').style.display   = 'none';
+  // A stale premium must never be exportable to the comparison table.
+  const addBtn = document.getElementById('care-add-btn');
+  if (addBtn) addBtn.style.display = 'none';
+}
+
+function resetPremiumDisplay() {
+  invalidatePremium('Enter Above Pincode For Premium');
+}
+
+async function loadAddons(planId) {
+  const grid    = document.getElementById('addon-grid');
+  const loading = document.getElementById('pb-loading');
+  grid.innerHTML    = '';
+  loading.style.display = 'block';
+  addonState = {};
+
+  try {
+    const resp = await fetch(`${API}/addons`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ abacusId: planId }),
+    });
+    const data = await resp.json();
+    loading.style.display = 'none';
+
+    if (data.ok && data.addons && data.addons.length) {
+      renderAddons(data.addons);
+    } else {
+      renderAddons(defaultAddons(planId));
+    }
+
+    // Apply field config from server — if server parse produced all-false
+    // (likely a parse miss), fall back to our hardcoded defaults.
+    const srvFields = data.fields;
+    const srvValid  = srvFields && (srvFields.hasSI || srvFields.hasBizType || srvFields.hasMembers);
+
+    // Always merge hasIncome from defaults (server might not detect it yet)
+    const defCfg = defaultFieldConfig(planId);
+    const cfg = srvValid ? { ...defCfg, ...srvFields, hasIncome: defCfg.hasIncome } : defCfg;
+
+    // Cache income field IDs discovered by server.
+    // Only accept if the server correctly detected them (annualIncomeField must NOT be field_3,
+    // which is the Age field — a known parse bug in older server versions).
+    if (srvFields) {
+      const safeAnnualField = (srvFields.annualIncomeField && srvFields.annualIncomeField !== 'field_3')
+        ? srvFields.annualIncomeField : null;
+      incomeFieldIds = {
+        annualIncomeField:   safeAnnualField,
+        jobTypeField:        srvFields.jobTypeField       || null,
+        monthlyIncomeField:  srvFields.monthlyIncomeField || null,
+        monthlyIncomeMin:    srvFields.monthlyIncomeMin   || 30,
+        monthlyIncomeMax:    srvFields.monthlyIncomeMax   || 50,
+      };
+      // Update monthly income slider range if server gave us exact bounds
+      if (defCfg.hasIncome && srvFields.monthlyIncomeMin && srvFields.monthlyIncomeMax) {
+        MONTHLY_INCOME_MAP[planId] = {
+          min: srvFields.monthlyIncomeMin,
+          max: srvFields.monthlyIncomeMax,
+        };
+      }
+    }
+
+    console.log('[Care] fieldConfig:', srvValid ? 'server' : 'default', JSON.stringify(cfg));
+    applyFieldConfig(cfg, planId);
+  } catch (e) {
+    console.warn('[Care] loadAddons error:', e.message);
+    loading.style.display = 'none';
+    renderAddons(defaultAddons(planId));
+    applyFieldConfig(defaultFieldConfig(planId), planId);
+  }
+}
+
+function renderAddons(addons) {
+  const grid = document.getElementById('addon-grid');
+  grid.innerHTML = '';
+  addonState = {};
+
+  addons.forEach(a => {
+    addonState[a.field] = a.checked;
+
+    const item = document.createElement('label');
+    item.className = 'addon-item';
+
+    const cb = document.createElement('input');
+    cb.type      = 'checkbox';
+    cb.className = 'addon-cb';
+    cb.checked   = a.checked;
+    cb.dataset.field = a.field;
+    cb.addEventListener('change', () => {
+      addonState[a.field] = cb.checked;
+      // The portal reprices on every add-on change. Until the operator
+      // recalculates, the displayed premium no longer matches the ticked
+      // add-ons — so blank it rather than let it be read or exported.
+      invalidatePremium('Add-ons changed — click Calculate Premium');
+    });
+
+    const lbl = document.createElement('span');
+    lbl.className   = 'addon-label';
+    lbl.textContent = a.label;
+
+    item.appendChild(cb);
+    item.appendChild(lbl);
+    grid.appendChild(item);
+  });
+}
+
+// Fallback add-ons per plan (from real portal observation)
+function defaultAddons(planId) {
+
+  // POS plans (confirmed from live portal: POS Care Supreme Shine)
+  const POS_IDS = new Set(['7484','7425','7424','7159','6725','6677','6675','6217',
+                            '5399','5335','3488','3486','5834','573','6384']);
+  // Care Supreme non-POS variants
+  const SUPREME_IDS = new Set(['2813','6043','6541','6674','6676','6619','6434',
+                                 '7218','7172','5412','1734','748']);
+  // Ultimate Care / Shine variants
+  const ULTIMATE_IDS = new Set(['6619','7172']);
+
+  if (POS_IDS.has(planId)) {
+    return [
+      { field:'field_35',    label:'Air Ambulance',          checked:true  },
+      { field:'field_WB',    label:'Wellness Benefit',       checked:true  },
+      { field:'field_COPAY', label:'Co Payment',             checked:true  },
+      { field:'field_SL',    label:'Sub Limit',              checked:true  },
+      { field:'field_RR',    label:'Recharge Remover',       checked:true  },
+      { field:'field_BR',    label:'Bonus Remover',          checked:true  },
+      { field:'field_34',    label:'Room Rent Modification', checked:true  },
+      { field:'field_AHC',   label:'Annual Health Check-up', checked:false },
+      { field:'field_BFB',   label:'Be-Fit Benefit',         checked:false },
+      { field:'field_OPD',   label:'Care OPD',               checked:false },
+      { field:'field_PB',    label:'Plus Benefit',           checked:true  },
+    ];
+  }
+
+  if (SUPREME_IDS.has(planId)) {
+    return [
+      { field:'field_35',  label:'Air Ambulance',          checked:false },
+      { field:'field_WB',  label:'Wellness Benefit',       checked:true  },
+      { field:'field_BFB', label:'Be-Fit Benefit',         checked:false },
+      { field:'field_AHC', label:'Annual Health Check-up', checked:false },
+      { field:'field_43',  label:'PED Modification',       checked:false },
+      { field:'field_OPD', label:'Care OPD',               checked:false },
+      { field:'field_NCB', label:'Bonus Benefits',         checked:true  },
+      { field:'field_UC',  label:'Unlimited Care',         checked:false },
+      { field:'field_IC',  label:'Instant Cover',          checked:false },
+      { field:'field_CS',  label:'Claim Shield',           checked:false },
+      { field:'field_SS',  label:'Super Restore',          checked:false },
+    ];
+  }
+
+  // Care / POS Care (3485, 3486) and Care Senior (3487, 3488)
+  if (['3485','3486','3487','3488'].includes(planId)) {
+    return [
+      { field:'field_WB',    label:'Wellness Benefit',       checked:true  },
+      { field:'field_COPAY', label:'Co Payment',             checked:true  },
+      { field:'field_SL',    label:'Sub Limit',              checked:true  },
+      { field:'field_NCB',   label:'Bonus Benefits',         checked:true  },
+      { field:'field_AHC',   label:'Annual Health Check-up', checked:false },
+      { field:'field_OPD',   label:'Care OPD',               checked:false },
+    ];
+  }
+
+  // Care Classic / Care Classic Instant Cover
+  if (['1432','1992'].includes(planId)) {
+    return [
+      { field:'field_WB',    label:'Wellness Benefit',       checked:true  },
+      { field:'field_NCB',   label:'Bonus Benefits',         checked:true  },
+      { field:'field_IC',    label:'Instant Cover',          checked:false },
+      { field:'field_AHC',   label:'Annual Health Check-up', checked:false },
+      { field:'field_OPD',   label:'Care OPD',               checked:false },
+    ];
+  }
+
+  // Explore plans
+  if (['5833','5834'].includes(planId)) {
+    return [
+      { field:'field_WB',    label:'Wellness Benefit',       checked:true  },
+      { field:'field_NCB',   label:'Bonus Benefits',         checked:true  },
+      { field:'field_AHC',   label:'Annual Health Check-up', checked:false },
+    ];
+  }
+
+  // Generic fallback
+  return [
+    { field:'field_WB',  label:'Wellness Benefit', checked:true  },
+    { field:'field_NCB', label:'Bonus Benefits',   checked:true  },
+    { field:'field_OPD', label:'Care OPD',         checked:false },
+  ];
+}
+
+// ── Field config per plan (fallback when server parse fails) ─────────────────
+// NOTE: INDIVIDUAL_ONLY and NO_CHILDREN are defined above with BIZ_PLANS
+
+// Sum Insured values per plan (in Lakhs, except Care Global which is in USD thousands)
+const SI_MAP = {
+  // ── Care Supreme family ─────────────────────────────────────────────────────
+  '2813':  [5,7,10,15,25,50,100],   // Care Supreme
+  '6043':  [5,7,10,15,25,50,100],   // Care Supreme - VFM
+  '6541':  [5,7,10,15,25,50,100],   // Care Supreme - Super Saver
+  '6674':  [5,7,10,15,25,50,100],   // Care Supreme - VFM 2
+  '6676':  [5,7,10,15,25,50,100],   // Care Supreme - VFM 3
+  '6619':  [5,7,10,15,25,50,100],   // Ultimate Care
+  '6725':  [5,7,10,15,25,50,100],   // POS Ultimate Care
+  '7218':  [5,7,10,15,25,50,100],   // Care Supreme Shine
+  '7172':  [5,7,10,15,25,50,100],   // Ultimate Care Senior
+  '6434':  [5,7,10,15,20,25,30,45,50,75,100], // Supreme Enhance (top-up; portal def=45L)
+  '5412':  [3,5,7,10,15,25,50,100],          // Care Freedom (portal def=3L)
+  '1734':  [5,7,10,15,25,50,100],   // Super Care Advantage
+  '748':   [2,3,5,7,10,15,25],       // Enhance (audit default=2L)
+
+  // ── POS Care Supreme family ─────────────────────────────────────────────────
+  '5399':  [5,7,10,15,25,50,100],   // POS Care Supreme
+  '6217':  [5,7,10,15,25,50,100],   // POS Care Supreme - VFM
+  '6675':  [5,7,10,15,25,50,100],   // POS Care Supreme - VFM 2
+  '6677':  [5,7,10,15,25,50,100],   // POS Care Supreme - VFM 3
+  '7159':  [5,7,10,15,25,50,100],   // POS Care Supreme - Super Saver
+
+  // ── POS (capped at 15L) ─────────────────────────────────────────────────────
+  '7484':  [5,7,10,15],             // POS Care Supreme Shine (confirmed from portal)
+  '5335':  [5,7,10,15],             // POS Care Smart Select
+  '6384':  [30,50,100,200,300,500], // Secure Plus (30–500L)
+  '7424':  [30,50],                 // POS Secure Plus (30–50L)
+  '188':   [10,50,100,200,300,500], // Secure (portal def=300L)
+  '573':   [10,25,50],              // POS Secure (10–50L)
+
+  // ── Care Smart Select ───────────────────────────────────────────────────────
+  '5334':  [5,10,15,20,25,50,100],  // Care Smart Select (audit default=20L)
+
+  // ── Care / POS Care ────────────────────────────────────────────────────────
+  '3485':  [3,4,5,7,10,15,25,50],   // Care
+  '3486':  [3,4,5,7,10,15,25,50],   // POS Care
+
+  // ── Senior plans ───────────────────────────────────────────────────────────
+  '3487':  [3,5,7,10,15],           // Care Senior
+  '3488':  [3,5,7,10,15],           // POS Care Senior
+  '2534':  [3,5,7,10,15,25],        // Sr Health Advantage - Silver
+
+  // ── Classic / Advantage ────────────────────────────────────────────────────
+  '1432':  [3,5,7,10,15,25],        // Care Classic
+  '1992':  [3,5,7,10,15,25],        // Care Classic - Instant Cover
+  '1187':  [3,5,7,10,15,25],        // Care Plus - Complete Plan
+  '1186':  [3,5,7,10,15,25],        // Care Plus - Youth Plan
+  '6196':  [3,5,7,10,15,25],        // Care Advantage
+
+  // ── Explore ────────────────────────────────────────────────────────────────
+  '5833':  [5,7,10,15,25],          // New Explore
+  '5834':  [5,7,10,15,25],          // POS Explore
+
+  // ── Individual / specialised ────────────────────────────────────────────────
+  '5673':  [50,100,200,300,500],    // Care Global (in $000s — displayed differently)
+  // '5674' omitted — SI is "Unlimited" (in NO_USER_SI_PLANS, slider not shown)
+  '107':   [30],                    // Student Explore (fixed 30L — short-term student plan)
+  '102':   [3,5],                   // Joy (audit default=3L)
+  '5955':  [3,5],                   // Joy Tomorrow (audit default=3L)
+  '425':   [3,5,7,10,15],           // Care Heart (audit default=3L)
+  '585':   [10,15,25,50],           // Cancer Mediclaim Advance (audit default=25L)
+  '362':   [5,7,10,15,25],          // Super Mediclaim (audit default=10L)
+  // 188/573 defined earlier in Secure family section (10–200L / 10–50L)
+  '6395':  [5,7,10,15,25],          // Surrogacy and Oocyte Donor
+
+  // ── Child plans ────────────────────────────────────────────────────────────
+  '6740':  [30,50,100,200],         // Secure Child — SI in ₹K (30K–200K), shown via THOUSANDS_SI_PLANS
+  '7425':  [30,50],                 // POS Secure Child — SI in ₹L (30L–50L)
+};
+const DEFAULT_SI = [5,7,10,15,25,50,100];
+
+function defaultFieldConfig(planId) {
+  return {
+    hasBizType:   BIZ_PLANS.has(planId),
+    hasCoverType: !NO_COVER_TYPE.has(planId),
+    hasMembers:   !NO_MEMBERS.has(planId),
+    hasChildren:  !NO_CHILDREN.has(planId),
+    hasSI:        true,
+    hasTenure:    !NO_TENURE.has(planId),
+    hasIncome:    INCOME_PLANS.has(planId),
+    siValues:     SI_MAP[planId] || DEFAULT_SI,
+  };
+}
+
+function applyFieldConfig(cfg, planId) {
+  if (!cfg) return;
+
+  // 1. Business Type
+  document.getElementById('biz-row').style.display = cfg.hasBizType ? '' : 'none';
+
+  // 1b. Plan Type (field_23) — only for plans with entries in PLAN_TYPE_MAP
+  const planTypeOpts = PLAN_TYPE_MAP[planId] || [];
+  const planTypeRow = document.getElementById('plan-type-row');
+  if (planTypeRow) planTypeRow.style.display = planTypeOpts.length ? '' : 'none';
+  if (planTypeOpts.length) {
+    const sel = document.getElementById('sel-plan-type');
+    sel.innerHTML = planTypeOpts.map(v => `<option value="${v}">${v}</option>`).join('');
+  }
+
+  // 1c. Nationality Status (field_NS) — only for plans in NS_MAP
+  const nsOpts = NS_MAP[planId] || [];
+  const nsRow = document.getElementById('ns-row');
+  if (nsRow) {
+    nsRow.style.display = nsOpts.length ? '' : 'none';
+    if (nsOpts.length) {
+      document.getElementById('sel-ns').innerHTML =
+        nsOpts.map(v => `<option value="${v}">${v}</option>`).join('');
+    }
+  }
+
+  // 1d. Global Coverage (field_GC) — user-selectable only for plans in GC_MAP
+  const gcOpts = GC_MAP[planId] || [];
+  const gcRow = document.getElementById('gc-row');
+  if (gcRow) {
+    gcRow.style.display = gcOpts.length ? '' : 'none';
+    if (gcOpts.length) {
+      document.getElementById('sel-gc').innerHTML =
+        gcOpts.map(v => `<option value="${v}">${v}</option>`).join('');
+    }
+  }
+
+  const coverSel = document.getElementById('sel-cover');
+
+  // 2. Cover Type row
+  document.getElementById('cover-row').style.display = cfg.hasCoverType ? '' : 'none';
+
+  // 3. Set internal cover value — this drives updateMemberFields() behaviour
+  if (!cfg.hasCoverType) {
+    // No Cover Type selector: fix internally to Floater (if plan has Members) or Individual
+    // Mark as forced so switching to a plan WITH cover type resets it
+    coverSel.value = cfg.hasMembers ? 'Floater' : 'Individual';
+    coverSel.dataset.forcedInd = '1';
+  } else {
+    // Cover Type selector visible — if it was previously forced, reset to Floater
+    if (coverSel.dataset.forcedInd === '1') {
+      coverSel.value = 'Floater';
+      delete coverSel.dataset.forcedInd;
+    }
+  }
+
+  // 4. Age field — three display modes based on plan type:
+  //    Standard plans:               age1-row (individual year dropdown)
+  //    6384/7424/7425/6740:          age-band-row (fixed "18-64 Years" badge)
+  //    188/573 (LEGACY_SECURE):      age-band2-row (SELECT: "18-64" / "65-70")
+  const isLegacySecure  = LEGACY_SECURE_PLANS.has(planId);
+  const isSingleBand    = INCOME_PLANS.has(planId) && !isLegacySecure;
+  document.getElementById('age1-row').style.display     = (!isSingleBand && !isLegacySecure) ? '' : 'none';
+  document.getElementById('age-band-row').style.display  = isSingleBand    ? '' : 'none';
+  document.getElementById('age-band2-row').style.display = isLegacySecure  ? '' : 'none';
+
+  // 4b. Age rows for members 2/3/4
+  if (INCOME_PLANS.has(planId)) {
+    // All Secure plans: hide extra member age rows (band applies to whole plan)
+    document.getElementById('age2-row').style.display = 'none';
+    document.getElementById('age3-row').style.display = 'none';
+    document.getElementById('age4-row').style.display = 'none';
+  } else if (cfg.hasMembers) {
+    updateMemberFields(); // handles age2/age3/age4 rows
+  } else {
+    // No members at all — hide all age-2+ rows
+    document.getElementById('age2-row').style.display = 'none';
+    document.getElementById('age3-row').style.display = 'none';
+    document.getElementById('age4-row').style.display = 'none';
+  }
+
+  // 5. Members / Children rows — cfg is authoritative (overrides updateMemberFields)
+  document.getElementById('members-row').style.display  = cfg.hasMembers  ? '' : 'none';
+  document.getElementById('children-row').style.display = cfg.hasChildren ? '' : 'none';
+
+  // 6. SI slider — all plans show SI; 6740 uses ₹K units; 5674 is Unlimited
+  const siSection    = document.getElementById('si-section-wrap');
+  const siUnlimited  = document.getElementById('si-unlimited-wrap');
+  const isUnlimited  = NO_USER_SI_PLANS.has(planId);
+  if (siSection)   siSection.style.display   = isUnlimited ? 'none' : '';
+  if (siUnlimited) siUnlimited.style.display = isUnlimited ? '' : 'none';
+  if (!isUnlimited) {
+    const isKUnit = THOUSANDS_SI_PLANS.has(planId);
+    const siLabel = document.getElementById('si-unit-label');
+    if (siLabel) siLabel.textContent = isKUnit ? 'Sum Insured (₹ In Thousands)' : 'Sum Insured (₹ In Lakhs)';
+    // Ladder precedence: values genuinely read off the portal this session,
+    // then the catalogue (merged from the v1 live scrape + the portal audit),
+    // then the generic default. cfg.siValues is only trusted when the server
+    // says where it came from — it no longer contains a fabricated list.
+    const cat    = PLAN_INFO[planId] || null;
+    const scraped = (cfg.siValues && cfg.siValues.length && cfg.siSource) ? cfg.siValues : null;
+    const siVals = scraped || (cat && cat.sumInsured) || SI_MAP[planId] || DEFAULT_SI;
+    rebuildSISlider(siVals, isKUnit ? 'K' : 'L', cat ? cat.defaultSumInsured : null);
+  }
+
+  // 7. Tenure section
+  const tenureSec = document.querySelector('.tenure-section');
+  if (tenureSec) tenureSec.style.display = (cfg.hasTenure === false) ? 'none' : '';
+  const isFiveYearOnly = FIVE_YEAR_PLANS.has(planId);
+  document.getElementById('tenure-lbl-1yr').style.display = isFiveYearOnly ? 'none' : '';
+  document.getElementById('tenure-lbl-2yr').style.display = isFiveYearOnly ? 'none' : '';
+  document.getElementById('tenure-lbl-3yr').style.display = isFiveYearOnly ? 'none' : '';
+  document.getElementById('tenure-lbl-5yr').style.display = isFiveYearOnly ? '' : 'none';
+  if (isFiveYearOnly) {
+    document.querySelector('input[name="tenure"][value="5 Year"]').checked = true;
+  } else {
+    document.querySelector('input[name="tenure"][value="1 Year"]').checked = true;
+  }
+
+  // 8. Income section (Annual Income + Job Type)
+  const incomeSec = document.getElementById('income-section');
+  const hasIncome = cfg.hasIncome || INCOME_PLANS.has(planId);
+  if (incomeSec) incomeSec.style.display = hasIncome ? '' : 'none';
+
+  // 9. Monthly Income slider — only for plans confirmed to have it (not all Secure plans)
+  const monthlySliderWrap = document.getElementById('monthly-income-wrap');
+  const hasMonthlyIncome  = MONTHLY_INCOME_PLANS.has(planId);
+  if (monthlySliderWrap) monthlySliderWrap.style.display = hasMonthlyIncome ? '' : 'none';
+  if (hasMonthlyIncome) {
+    const incConf = MONTHLY_INCOME_MAP[planId] || { min:30, max:50 };
+    const slider  = document.getElementById('monthly-income-slider');
+    slider.min    = incConf.min;
+    slider.max    = incConf.max;
+    slider.value  = incConf.min;
+    onMonthlyIncome(incConf.min);
+    buildMonthlyIncomeTicks(incConf.min, incConf.max);
+  }
+}
+
+// ── SI slider rebuild ─────────────────────────────────────────────────────────
+function rebuildSISlider(vals, unit = 'L', portalDefault = null) {
+  const previous = (SI_VALS && SI_VALS.length && siIdx != null) ? SI_VALS[siIdx] : null;
+  SI_UNIT = unit;
+  SI_VALS = vals;                              // reassign the let — all callers see new array
+  const slider = document.getElementById('si-slider');
+  slider.min   = 0;
+  slider.max   = vals.length - 1;
+  slider.step  = 1;
+
+  // Pick the starting value, best first:
+  //   1. the sum insured the operator already had, if this plan sells it
+  //   2. the portal's own default for this plan
+  //   3. failing both, the middle-ish option
+  // It used to be (3) unconditionally, which reset the slider on every plan
+  // change and disagreed with the real portal on 26 of the 48 plans.
+  let defIdx = Math.min(2, vals.length - 1);
+  const nearest = (target) => {
+    let bi = -1, bd = Infinity;
+    vals.forEach((v, i) => {
+      const d = Math.abs(Number(v) - Number(target));
+      if (isFinite(d) && d < bd) { bd = d; bi = i; }
+    });
+    return { idx: bi, exact: bd === 0 };
+  };
+  if (previous != null) {
+    const n = nearest(previous);
+    if (n.exact) defIdx = n.idx;
+    else if (portalDefault != null) {
+      const p = nearest(portalDefault);
+      if (p.idx >= 0) defIdx = p.idx;
+    }
+  } else if (portalDefault != null) {
+    const p = nearest(portalDefault);
+    if (p.idx >= 0) defIdx = p.idx;
+  }
+
+  slider.value = defIdx;
+  siIdx = defIdx;
+
+  // Rebuild ticks
+  const ticks = document.getElementById('si-ticks');
+  ticks.innerHTML = vals.map(v => {
+    if (unit === 'K') return `<span>${v}K</span>`;
+    if (v >= 100)     return `<span>${v / 100}Cr</span>`;
+    return `<span>${v}L</span>`;
+  }).join('');
+
+  // Update display label
+  onSI(defIdx);
+}
+
+// Initial load
+// ── Plan catalogue ──────────────────────────────────────────────────────────
+// The 48-plan list and every per-plan capability used to be hardcoded here,
+// and in four other files. They are now fetched from care_plans.json via the
+// server, so there is one copy to keep correct. The literals above remain as
+// an offline fallback and are overwritten the moment the catalogue loads.
+let PLAN_INFO = {};
+
+async function loadCatalogue() {
+  const banner = document.getElementById('err-msg');
+  try {
+    const resp = await fetch(`${API}/plans`);
+    const cat  = await resp.json();
+    if (!cat || !Array.isArray(cat.plans) || !cat.plans.length) throw new Error('empty catalogue');
+
+    PLAN_INFO = Object.fromEntries(cat.plans.map(p => [p.id, p]));
+
+    // Rebuild the plan dropdown from the catalogue, preserving any selection.
+    const sel = document.getElementById('sel-plan');
+    const keep = sel.value;
+    sel.innerHTML = cat.plans
+      .map(p => `<option value="${p.id}">${p.name.replace(/</g,'&lt;')}</option>`).join('');
+    if (keep && cat.plans.some(p => p.id === keep)) sel.value = keep;
+
+    // Re-derive the capability sets from the catalogue. Mutated in place so
+    // every existing consumer picks the values up without further changes.
+    const fill = (set, pred) => { set.clear(); cat.plans.forEach(p => { if (pred(p)) set.add(p.id); }); };
+    fill(BIZ_PLANS,           p => p.businessType);
+    fill(NO_COVER_TYPE,       p => !p.coverType);
+    fill(NO_MEMBERS,          p => !p.members);
+    fill(NO_CHILDREN,         p => !p.children);
+    fill(NO_TENURE,           p => !p.tenure);
+    fill(FIVE_YEAR_PLANS,     p => p.fiveYearOnly);
+    fill(INCOME_PLANS,        p => p.annualIncome);
+    fill(MONTHLY_INCOME_PLANS,p => p.monthlyIncome);
+    fill(NO_USER_SI_PLANS,    p => !p.userSelectableSI);
+    fill(THOUSANDS_SI_PLANS,  p => p.sumInsuredUnit === 'thousands');
+    fill(LEGACY_SECURE_PLANS, p => p.legacyAgeBand);
+
+    Object.keys(SI_MAP).forEach(k => delete SI_MAP[k]);
+    cat.plans.forEach(p => { if (p.sumInsured) SI_MAP[p.id] = p.sumInsured; });
+
+    // Plan Type (field_23) options — the catalogue wins, but only if it
+    // actually carries them. planTypeOptions is newer than some deployed
+    // copies of care_plans.json, and a server still holding the old catalogue
+    // in memory (it reads the file once at boot) would otherwise clear this
+    // map to nothing and silently hide the Plan Type row for every plan.
+    if (cat.plans.some(p => Array.isArray(p.planTypeOptions))) {
+      Object.keys(PLAN_TYPE_MAP).forEach(k => delete PLAN_TYPE_MAP[k]);
+      cat.plans.forEach(p => {
+        if (Array.isArray(p.planTypeOptions) && p.planTypeOptions.length)
+          PLAN_TYPE_MAP[p.id] = p.planTypeOptions.slice();
+      });
+    } else {
+      console.warn('[Care] catalogue carries no planTypeOptions — keeping the built-in Plan Type map. '
+        + 'Restart care_server.js so it re-reads care_plans.json.');
+    }
+
+    console.log(`[Care] catalogue loaded: ${cat.plans.length} plans (${cat._auditSource || 'n/a'})`);
+    return true;
+  } catch (e) {
+    console.warn('[Care] catalogue fetch failed, using built-in fallback:', e.message);
+    if (banner) {
+      banner.style.display = 'block';
+      banner.textContent = '⚠️ Could not load the plan catalogue from the server — '
+        + 'using the built-in list, which may be out of date. Is care_server.js running on port 3005?';
+    }
+    return false;
+  }
+}
+
+// Boot: catalogue first, then the plan cascade, so the slider and capability
+// rows are built from real data rather than being rebuilt a moment later.
+(async function bootCare() {
+  await loadCatalogue();
+  await onPlanChange();
+})();
+
+// ── Calculate ─────────────────────────────────────────────────────────────────
+async function calculate() {
+  const btn    = document.getElementById('calc-btn');
+  const errDiv = document.getElementById('err-msg');
+
+  // Validate pincode
+  const pincode = document.getElementById('inp-pin').value.trim();
+  if (!pincode || pincode.length < 6) {
+    document.getElementById('inp-pin').classList.add('error');
+    errDiv.style.display = 'block';
+    errDiv.textContent   = '⚠️ Please enter a valid 6-digit pincode.';
+    document.getElementById('inp-pin').focus();
+    return;
+  }
+
+  btn.disabled = true;
+  btn.classList.add('loading');
+  errDiv.style.display = 'none';
+  // Clear the previous result up front. Without this, a failed calculation
+  // leaves the previous plan's figures on screen next to the error message.
+  invalidatePremium('Calculating…');
+
+  const planSel  = document.getElementById('sel-plan');
+  const abacusId = planSel.value;
+  const planName = planSel.options[planSel.selectedIndex].text;
+  const cover    = document.getElementById('sel-cover').value;
+  const total    = cover === 'Individual' ? 1 : +document.getElementById('sel-members').value;
+  const tenure   = document.querySelector('input[name="tenure"]:checked').value;
+
+  // Build addons object: raw field name → boolean
+  // Server accepts { 'field_WB': true, 'field_COPAY': false, ... }
+  const addons = {};
+  document.querySelectorAll('.addon-cb').forEach(cb => {
+    if (cb.dataset.field) addons[cb.dataset.field] = cb.checked;
+  });
+
+  const body = {
+    abacusId,
+    pincode,
+    coverType:    cover,
+    totalMembers: String(total),
+    children:     cover === 'Individual' ? '0' : document.getElementById('sel-children').value,
+    eldestAge:    document.getElementById('sel-age1').value,
+    member2Age:   total >= 2 ? document.getElementById('sel-age2').value : undefined,
+    member3Age:   total >= 3 ? document.getElementById('sel-age3').value : undefined,
+    member4Age:   total >= 4 ? document.getElementById('sel-age4').value : undefined,
+    sumInsured:   NO_USER_SI_PLANS.has(abacusId) ? 'Unlimited' : String(SI_VALS[siIdx]),
+    tenure,
+    businessType: document.getElementById('sel-biz') && document.getElementById('biz-row').style.display !== 'none'
+                  ? document.getElementById('sel-biz').value : 'NB',
+    planType: (PLAN_TYPE_MAP[abacusId] && document.getElementById('plan-type-row').style.display !== 'none')
+              ? document.getElementById('sel-plan-type').value
+              : '',
+    nationalityStatus: (NS_MAP[abacusId] && document.getElementById('ns-row').style.display !== 'none')
+                       ? document.getElementById('sel-ns').value : '',
+    globalCoverage:    (GC_MAP[abacusId] && document.getElementById('gc-row').style.display !== 'none')
+                       ? document.getElementById('sel-gc').value
+                       : (GC_AUTO_PLANS.has(abacusId) ? 'Not Opted' : ''),
+    addons,
+  };
+
+  // Income fields for Secure family plans
+  if (INCOME_PLANS.has(abacusId)) {
+    body.annualIncome  = document.getElementById('inp-annual-income').value || '10';
+    body.jobType       = document.querySelector('input[name="job-type"]:checked')?.value || 'Salaried';
+    body.monthlyIncome = document.getElementById('monthly-income-slider').value || '30';
+    body.incomeFieldIds = { ...incomeFieldIds };
+  }
+
+  // Age band for legacy Secure plans (188/573) — user picks "18-64" or "65-70"
+  if (LEGACY_SECURE_PLANS.has(abacusId)) {
+    body.ageBand = document.getElementById('sel-age-band2')?.value || '18-64';
+  }
+
+  try {
+    const resp = await fetch(`${API}/calculate`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    });
+    const data = await resp.json();
+
+    if (!data.ok) {
+      invalidatePremium('No premium returned');
+      errDiv.style.display = 'block';
+      // The server extracts the portal's own message and a hint on 422 —
+      // show them, they are far more actionable than the generic error.
+      errDiv.textContent   = '⚠️ ' + [data.error, data.portalMessage, data.hint]
+        .filter(Boolean).join(' — ');
+      _emitStatus('failed');
+      return;
+    }
+
+    showPremium(data, planName);
+    _emitStatus('ready');
+    if (_hubAutoAdd) { try { careAddToCompare(); } catch(e){} }
+  } catch (e) {
+    invalidatePremium('Calculation failed');
+    errDiv.style.display = 'block';
+    errDiv.textContent   = '⚠️ Cannot reach server. Is care_server.js running on port 3005?';
+    _emitStatus('down');
+  } finally {
+    btn.disabled = false;
+    btn.classList.remove('loading');
+  }
+}
+
+function showPremium(data, planName) {
+  const { grandTotal, basePremium, discountedPremium, discountPct } = data;
+  const displayAmt = grandTotal || discountedPremium || basePremium || '—';
+
+  // Update blue block premium display
+  document.getElementById('pb-prem-text').innerHTML =
+    `<span class="amt">₹ ${displayAmt}</span><br/><span class="sub">Per Year (incl. taxes where applicable)</span>`;
+  document.getElementById('pb-total-val').textContent = displayAmt;
+  // Show Add to Comparison button after a successful premium result
+  const careAddBtn = document.getElementById('care-add-btn');
+  if (careAddBtn) careAddBtn.style.display = 'inline-block';
+
+  // Update right panel
+  document.getElementById('rp-grand').textContent = grandTotal || displayAmt;
+  document.getElementById('rp-base').textContent  = basePremium || displayAmt;
+  document.getElementById('rp-disc').textContent  = discountedPremium || displayAmt;
+
+  const pct   = parseFloat(discountPct);
+  const badge = document.getElementById('rp-disc-pct');
+  badge.textContent    = (!isNaN(pct) && pct > 0) ? pct + '% off' : '';
+  badge.style.display  = badge.textContent ? 'inline-block' : 'none';
+
+  document.getElementById('rp-total').textContent = grandTotal || displayAmt;
+  document.getElementById('rp-result').style.display = 'block';
+
+  if (window.innerWidth < 760) {
+    document.getElementById('rp-result').scrollIntoView({ behavior: 'smooth' });
+  }
+}
+
+// ── Add to Comparison (postMessage to parent unified.html) ─────────────────
+function careAddToCompare() {
+  const planSel  = document.getElementById('sel-plan');
+  const planName = planSel ? planSel.options[planSel.selectedIndex]?.text || '' : '';
+  const siDisp   = document.getElementById('si-disp')?.textContent || '';
+  const premVal  = document.getElementById('pb-total-val')?.textContent || '----';
+  if (premVal === '----') return;
+
+  // Collect checked addon labels
+  const addons = [];
+  document.querySelectorAll('#addon-grid input[type="checkbox"]:checked').forEach(cb => {
+    const lbl = cb.closest('label')?.querySelector('.addon-name')?.textContent
+             || cb.closest('.addon-item')?.textContent?.trim()
+             || cb.value;
+    if (lbl) addons.push(lbl.trim());
+  });
+
+  // Report the tenure and cover type this quote was actually priced with,
+  // rather than leaving the hub to infer them from whatever its own controls
+  // say at the moment the quote is added.
+  const tenureRaw = document.querySelector('input[name="tenure"]:checked')?.value || '';
+  const tenureYrs = parseInt(String(tenureRaw).replace(/[^0-9]/g, ''), 10) || 1;
+  const coverType = document.getElementById('sel-cover')?.value || '';
+
+  window.parent.postMessage({
+    type:       'add-quote',
+    company:    'Care Health',
+    planName,
+    sumAssured: siDisp,
+    premium:    '₹ ' + premVal,
+    addons:     addons.join(', ') || '—',
+    tenure:     tenureYrs,
+    coverType:  coverType
+  }, '*');
+}
+
+// ══════════════════════════════════════════════════════════════════
+//  HUB INTEGRATION — receive set-params from parent insurance_hub
+// ══════════════════════════════════════════════════════════════════
+// Additive: remember hub "auto-add" intent + emit lightweight status to hub
+var _hubAutoAdd = false;
+function _emitStatus(s){ try { window.parent.postMessage({ type:'calc-status', calculator:'care', status:s }, '*'); } catch(e){} }
+// Tell the hub exactly which values were taken and which had to be changed,
+// so it can stop reporting "Parameters sent" when half of them were clamped.
+function _emitApplied(accepted, clamped) {
+  try {
+    window.parent.postMessage({
+      type: 'params-applied', calculator: 'care',
+      accepted: accepted, clamped: clamped
+    }, '*');
+  } catch (e) {}
+}
+
+// Only accept instructions from a page served by our own local servers.
+// Every receiver here used to take a message from any origin.
+var _ALLOWED_ORIGINS = ['http://localhost:3002','http://127.0.0.1:3002',
+  'http://localhost:3003','http://127.0.0.1:3003','http://localhost:3004',
+  'http://127.0.0.1:3004','http://localhost:3005','http://127.0.0.1:3005'];
+function _originAllowed(o){ return !o || o === 'null' || _ALLOWED_ORIGINS.indexOf(o) !== -1; }
+window.addEventListener('message', async function(ev) {
+  if (!_originAllowed(ev.origin)) return;
+  const accepted = [], clamped = [];
+  try {
+    const msg = (typeof ev.data === 'string') ? JSON.parse(ev.data) : ev.data;
+    if (!msg || msg.type !== 'set-params') return;
+    const d = msg.data || {};
+    _hubAutoAdd = !!msg.autoAdd;
+
+    // ── Plan selection — AWAIT it ──────────────────────────────
+    // onPlanChange() fetches add-ons and then rebuilds the sum-insured
+    // slider, the tenure radios and the member rows. It used to be fired
+    // without awaiting, so everything below landed first and was then
+    // overwritten by the cascade — the hub's ages and SI were silently
+    // replaced by this plan's defaults.
+    if (d.plan) {
+      const planSel = document.getElementById('sel-plan');
+      if (planSel && Array.from(planSel.options).some(function(o){ return o.value === String(d.plan); })) {
+        planSel.value = String(d.plan);
+        accepted.push('plan');
+        if (typeof onPlanChange === 'function') await onPlanChange();
+      } else {
+        clamped.push({ field:'plan', requested:d.plan, used:planSel ? planSel.value : null,
+                       reason:'plan not offered by this calculator' });
+      }
+    }
+
+    // ── Plan Type (field_23) ───────────────────────────────────
+    // Must come after the plan cascade above, which is what reveals and
+    // repopulates this row. The hub could not set it before, so the portal
+    // took the first option — "Cancer" on Super Mediclaim, "Option 1" on
+    // Supreme Enhance — whatever the operator actually wanted.
+    if (d.planType) {
+      const ptRow = document.getElementById('plan-type-row');
+      const ptSel = document.getElementById('sel-plan-type');
+      const shown = ptRow && ptRow.style.display !== 'none';
+      const match = ptSel && Array.from(ptSel.options)
+        .find(function(o){ return o.value === String(d.planType); });
+      if (shown && match) {
+        ptSel.value = match.value;
+        accepted.push('planType');
+      } else if (shown) {
+        clamped.push({ field:'planType', requested:d.planType,
+                       used:(ptSel && ptSel.value) || '(portal default)',
+                       reason:'this plan does not offer that plan type' });
+      } else {
+        clamped.push({ field:'planType', requested:d.planType, used:'(no such field)',
+                       reason:'this plan has no Plan Type field on the portal' });
+      }
+    }
+
+    // ── Pincode ────────────────────────────────────────────────
+    const pinEl = document.getElementById('inp-pin');
+    if (pinEl && d.pincode) { pinEl.value = d.pincode; accepted.push('pincode'); }
+
+    // ── Cover type ─────────────────────────────────────────────
+    const coverSel = document.getElementById('sel-cover');
+    if (coverSel && d.coverType) {
+      coverSel.value = (d.coverType === 'individual') ? 'Individual' : 'Floater';
+      accepted.push('coverType');
+      if (d.coverType === 'mi') {
+        clamped.push({ field:'coverType', requested:'mi', used:'Floater',
+                       reason:'Care prices individual or floater only' });
+      }
+    }
+
+    // ── Member count ───────────────────────────────────────────
+    const adults   = Math.max(1, d.members?.adults   || 1);
+    const children = Math.max(0, d.members?.children || 0);
+    const wanted   = adults + children;
+    const totalM   = Math.min(4, wanted);
+    if (wanted > 4) {
+      clamped.push({ field:'members', requested:wanted, used:totalM,
+                     reason:'this calculator supports at most 4 members' });
+    } else if (d.members) { accepted.push('members'); }
+    const memberSel = document.getElementById('sel-members');
+    if (memberSel) memberSel.value = String(totalM);
+    const childSel = document.getElementById('sel-children');
+    if (childSel) {
+      childSel.value = String(Math.min(3, children));
+      if (children > 3) {
+        clamped.push({ field:'children', requested:children, used:3,
+                       reason:'at most 3 children' });
+      }
+    }
+    if (typeof updateMemberFields === 'function') updateMemberFields();
+
+    // ── Ages — no timer needed now that the plan cascade has finished ──
+    const aA = d.members?.adultAges || [];
+    const cA = d.members?.childAges || [];
+    const allAges = [...aA, ...cA];
+    const clamp = (v, mn, mx) => Math.max(mn, Math.min(mx, Number(v)||mn));
+
+    const a1 = document.getElementById('sel-age1');
+    if (a1 && aA[0] != null) a1.value = String(clamp(aA[0], 18, 99));
+    const a2 = document.getElementById('sel-age2');
+    if (a2 && totalM >= 2) {
+      const v = (aA[1] != null) ? aA[1] : (cA[0] != null ? cA[0] : null);
+      if (v != null) a2.value = String(clamp(v, 0, 99));
+    }
+    const a3 = document.getElementById('sel-age3');
+    if (a3 && totalM >= 3) {
+      const v = (aA[2] != null) ? aA[2] : (cA[children===0?0:1] != null ? cA[children===0?0:1] : null);
+      if (v != null) a3.value = String(clamp(v, 0, 99));
+    }
+    const a4 = document.getElementById('sel-age4');
+    if (a4 && totalM >= 4 && allAges[3] != null) {
+      a4.value = String(clamp(allAges[3], 0, 99));
+    }
+    if (allAges.length) accepted.push('ages');
+
+    // ── Sum Insured — SI_VALS is now the NEW plan's ladder ─────
+    if (d.si) {
+      const siSlider = document.getElementById('si-slider');
+      if (siSlider && typeof SI_VALS !== 'undefined' && SI_VALS.length) {
+        const siLakhs = d.si / 100000;
+        let bestIdx = 0, bestDiff = Infinity;
+        SI_VALS.forEach(function(v, i) {
+          const diff = Math.abs(v - siLakhs);
+          if (diff < bestDiff) { bestDiff = diff; bestIdx = i; }
+        });
+        siSlider.value = String(bestIdx);
+        siSlider.dispatchEvent(new Event('input'));
+        if (Math.abs(SI_VALS[bestIdx] - siLakhs) > 0.01) {
+          clamped.push({ field:'si', requested:siLakhs + ' L', used:SI_VALS[bestIdx] + ' L',
+                         reason:'this plan does not offer the requested sum insured' });
+        } else { accepted.push('si'); }
+      }
+    }
+
+    // ── Tenure ─────────────────────────────────────────────────
+    if (d.tenure) {
+      const tv = String(d.tenure);
+      let matched = false;
+      document.querySelectorAll('input[name="tenure"]').forEach(function(r) {
+        const hit = (r.value === tv + ' Year' || r.value === tv + ' Years');
+        r.checked = hit;
+        if (hit) matched = true;
+      });
+      if (matched) { accepted.push('tenure'); }
+      else {
+        // Never leave every radio unchecked — calculate() reads .checked.value
+        const fallback = document.querySelector('input[name="tenure"]');
+        if (fallback) fallback.checked = true;
+        clamped.push({ field:'tenure', requested:tv + ' Year',
+                       used:fallback ? fallback.value : null,
+                       reason:'tenure not offered for this plan' });
+      }
+    }
+
+    _emitApplied(accepted, clamped);
+
+    // ── Auto-calculate ─────────────────────────────────────────
+    if (msg.autoCalc && typeof calculate === 'function') {
+      await calculate();
+    }
+  } catch (e) {
+    // Never fail silently — the hub used to be told everything was fine.
+    console.error('[Care] set-params failed:', e);
+    _emitApplied(accepted, clamped.concat([{ field:'(handler)', reason:String(e && e.message || e) }]));
+    _emitStatus('failed');
+  }
+});
+
+// Signal to parent that this calculator is loaded and ready
+try { window.parent.postMessage({ type: 'calc-ready', calculator: 'care' }, '*'); } catch(e) {}
+</script>
+</body>
+</html>

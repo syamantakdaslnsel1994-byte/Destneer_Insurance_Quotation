@@ -1,0 +1,369 @@
+{
+  "_comment": "Feature comparison content for the Feature Comparison sheet. Seeded from Vivek Bhaia_Quote.xlsx (7 Aug 2026). No insurer API supplies this — it is maintained product knowledge, so every value here is a manual entry that ages. Each entry under \"plans\" is a column: label is the header, provider is one of care/niva/mc/star (or another insurer, which the report drops because the hub cannot quote it), plan is the product the column actually describes, and planMatch holds lowercase fragments used to decide whether that is the plan being quoted.",
+  "plans": [
+    {
+      "label": "Manipal Cigna Sarvah Param",
+      "provider": "mc",
+      "plan": "Sarvah Param",
+      "planMatch": [
+        "sarvah"
+      ],
+      "fill": {
+        "theme": 7,
+        "tint": 0.8
+      },
+      "width": 18.0
+    },
+    {
+      "label": "MANIPAL CIGNA_Lifetime Plan",
+      "provider": "mc",
+      "plan": "Lifetime Health",
+      "planMatch": [
+        "lifetime"
+      ],
+      "fill": {
+        "theme": 7,
+        "tint": 0.8
+      },
+      "width": 18.7
+    },
+    {
+      "label": "Niva Bupa ReAssure 2.0 Bronze",
+      "provider": "niva",
+      "plan": "ReAssure 2.0 Bronze",
+      "planMatch": [
+        "reassure2.0",
+        "reassure 2.0"
+      ],
+      "fill": {
+        "theme": 6,
+        "tint": 0.6
+      },
+      "width": 17.4
+    },
+    {
+      "label": "Care Supreme",
+      "provider": "care",
+      "plan": "Care Supreme",
+      "planMatch": [
+        "care supreme"
+      ],
+      "fill": {
+        "theme": 8,
+        "tint": 0.6
+      },
+      "width": 19.1
+    },
+    {
+      "label": "HDFC ERGO - \nOptima Secure Easy-health-family & Individual",
+      "provider": "hdfc",
+      "plan": "Optima Secure",
+      "planMatch": [
+        "optima secure"
+      ],
+      "fill": {
+        "theme": 2,
+        "tint": -0.25
+      },
+      "width": 21.0
+    }
+  ],
+  "features": [
+    {
+      "feature": "Room Rent",
+      "rows": [
+        {
+          "sub": "Shared",
+          "values": [
+            "Allowed",
+            "Allowed",
+            "Allowed",
+            "Allowed",
+            "Covered up to Sum Insured"
+          ]
+        },
+        {
+          "sub": "Single AC room",
+          "values": [
+            "Allowed",
+            "Allowed",
+            "Allowed",
+            "Allowed",
+            "Covered up to Sum Insured"
+          ]
+        },
+        {
+          "sub": "Suite",
+          "values": [
+            "Allowed",
+            "Allowed",
+            "Allowed",
+            "Allowed",
+            "Covered up to Sum Insured"
+          ]
+        }
+      ]
+    },
+    {
+      "feature": "Pre hospitalization",
+      "rows": [
+        {
+          "sub": null,
+          "values": [
+            "90 days",
+            "60 days",
+            "60 DAYS",
+            "60 days",
+            "60 days"
+          ]
+        }
+      ]
+    },
+    {
+      "feature": "Post Hospitalisation",
+      "rows": [
+        {
+          "sub": null,
+          "values": [
+            "180 days",
+            "180 days",
+            "180 days",
+            "180 days",
+            "90 days"
+          ]
+        }
+      ]
+    },
+    {
+      "feature": "AYUSH Cover",
+      "rows": [
+        {
+          "sub": null,
+          "values": [
+            "Ayurveda, Yoga, unani,siddha, naturopathy, homeopathy covered up to sum insured",
+            "Ayurveda, Yoga, unani,siddha, naturopathy, homeopathy covered up to sum insured",
+            "Ayurveda, Yoga, unani,siddha, naturopathy, homeopathy covered up to sum insured",
+            "Ayurveda,unani,Siddha,homeopathy covered up to sa",
+            "Ayurveda, Yoga, unani,siddha, naturopathy, homeopathy covered up to sum insured"
+          ]
+        }
+      ]
+    },
+    {
+      "feature": "Day Care Treatments",
+      "rows": [
+        {
+          "sub": null,
+          "values": [
+            "All day care treatment covered upto sum assure",
+            "All day care treatment covered upto sum assure",
+            "All day care treatment covered upto sum assure",
+            "All day care treatment covered upto sum assure",
+            "Covered up to Sum Insured"
+          ]
+        }
+      ]
+    },
+    {
+      "feature": "Domiciliary",
+      "rows": [
+        {
+          "sub": null,
+          "values": [
+            "Covered up to sum insured",
+            "Covered up to sum insured",
+            "Covered up to sum insured",
+            "Covered up to sum insured",
+            "Covered up to Sum Insured"
+          ]
+        }
+      ]
+    },
+    {
+      "feature": "Ambulance Cover",
+      "rows": [
+        {
+          "sub": null,
+          "values": [
+            "Road and Air ambulance expenses covered up to Sum insured",
+            "Road and Air ambulance expenses covered up to Sum insured",
+            "Road Ambulance: Covered up to Sum Insured Air Ambulance: up to INR 2,50,000 per Hospitalisation",
+            "Up to Rs.10,000 per year for SI=15 Lacs,Upto sum insured per year for SI more than 15 Lacs",
+            "Up to `2000 per hospitalisation"
+          ]
+        }
+      ]
+    },
+    {
+      "feature": "Organ Donor Cover",
+      "rows": [
+        {
+          "sub": null,
+          "values": [
+            "Covered upto sum insured",
+            "Covered upto sum insured",
+            "Covered upto sum insured",
+            "Covered upto sum insured",
+            "Covered up to Sum Insured"
+          ]
+        }
+      ]
+    },
+    {
+      "feature": "Annual Health Check-Up",
+      "rows": [
+        {
+          "sub": null,
+          "values": [
+            "Available from first policy year",
+            "Available from first policy year",
+            "Available once anually",
+            "Available from first policy year",
+            "Available, once in a policy year"
+          ]
+        }
+      ]
+    },
+    {
+      "feature": "Recharge Of Sum Insured",
+      "rows": [
+        {
+          "sub": null,
+          "values": [
+            "Multiple restoration is available for related and unrelated illness",
+            "Multiple restoration is available for related and unrelated illness",
+            "Multiple restoration is available for related and unrelated illness",
+            "Multiple restoration is available for related and unrelated illness",
+            "Available (up to 100% of Sum Insured)"
+          ]
+        }
+      ]
+    },
+    {
+      "feature": "Modern Treatments",
+      "rows": [
+        {
+          "sub": null,
+          "values": [
+            "Covered",
+            "Covered",
+            "Covered",
+            "Covered",
+            "Up to Sum Insured for Listed Procedures"
+          ]
+        }
+      ]
+    },
+    {
+      "feature": "Co-pay",
+      "rows": [
+        {
+          "sub": null,
+          "values": [
+            "N/A",
+            "N/A",
+            "NA",
+            "NA",
+            "NA"
+          ]
+        }
+      ]
+    },
+    {
+      "feature": "ICU Charges",
+      "rows": [
+        {
+          "sub": null,
+          "values": [
+            "Covered",
+            "Covered",
+            "Covered",
+            "Covered",
+            "ICU charges covered up to Sum Insured"
+          ]
+        }
+      ]
+    },
+    {
+      "feature": "Zone wise Co-pay",
+      "rows": [
+        {
+          "sub": null,
+          "values": [
+            "N/A",
+            "N/A",
+            "NA",
+            "NA",
+            "NA"
+          ]
+        }
+      ]
+    },
+    {
+      "feature": "Waiting Period for PED",
+      "rows": [
+        {
+          "sub": null,
+          "values": [
+            "N/A",
+            "2 years",
+            "3 years",
+            "4 years",
+            "3 years"
+          ]
+        }
+      ]
+    },
+    {
+      "feature": "Add ons",
+      "rows": [
+        {
+          "sub": null,
+          "values": [
+            "Consumables",
+            "Shield ,Advance",
+            "safeguard",
+            "Claim Shield",
+            "NA"
+          ]
+        }
+      ]
+    }
+  ],
+  "style": {
+    "labelFill": {
+      "theme": 9,
+      "tint": 0.4
+    },
+    "featureFill": {
+      "theme": 5,
+      "tint": 0.8
+    },
+    "rowHeights": {
+      "1": 60.0,
+      "2": 30.0,
+      "3": 30.0,
+      "4": 30.0,
+      "5": null,
+      "6": null,
+      "7": 90.0,
+      "8": 45.0,
+      "9": 30.0,
+      "10": 103.5,
+      "11": 30.0,
+      "12": 30.0,
+      "13": 75.0,
+      "14": 30.0,
+      "15": 42.75,
+      "16": 30.0,
+      "17": 36.0,
+      "18": 31.5,
+      "19": 109.5
+    },
+    "labelColWidths": {
+      "A": 13.1,
+      "B": 13.4
+    }
+  },
+  "_providerNote": "Star Health has no column. Its features have never been captured, so the report shows a Star column saying so rather than leaving the insurer silently absent."
+}

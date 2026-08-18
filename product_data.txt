@@ -1,0 +1,14 @@
+ProductCode | ProductName | HasPlanType | PlanType Options (value:label, ...)
+-----------------------------------------------------------------------------------------------
+57 | Aspire Individual | Yes | 1:Gold+, 2:Diamond+, 3:Platinum+, 4:Titanium+
+54 | ReAssure2.0 Individual | Yes | T:Titanium+, P:Platinum+, B:Bronze+, H:Gold, C:Bronze
+41 | ReAssure Individual | No | (null options)
+49 | HC Health Insurance Plan Individual | Yes | 7:Variant 2022, 1:Variant 1, 2:Variant 2, 3:Variant 3
+45 | Senior First Individual | Yes | 1:Gold, 2:Platinum
+33 | Heart BeatV5 Individual | Yes | 2:Gold, 3:Platinum
+30 | Health Premia Individual | Yes | 1:Silver, 2:Gold, 3:Platinum
+28 | Health Pulse Individual | Yes | 1:Classic, 2:Enhanced
+13 | GoActive Individual | No | (null options)
+39 | Arogya Sanjeevani Individual | No | (null options)
+61 | Rise Individual | No | (null options)
+63 | ReAssure3.0 Individual | No | (no planSubCategory)

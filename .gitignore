@@ -1,0 +1,37 @@
+# Secrets — never commit
+.env
+.env.local
+
+# Captured ManipalCigna payloads. These hold real pincodes and dates of birth
+# from whatever quote was run to produce them. See docs_mc_plan_type_capture.md.
+mc_captures.txt
+
+# Dependencies
+node_modules/
+
+# Generated quotations and reports
+*.xls
+*.xlsx
+*.pdf
+!Vivek Bhaia_Quote.xlsx
+
+# Saved quotation history. Holds real client names, dates of birth and pincodes
+# for every quotation anyone has generated on this machine — never commit it.
+quotations/
+
+# Generated audit output (regenerate with: node care_audit.js)
+# care_audit_report.html is deliberately NOT ignored — it is the only
+# record of several portal fields the live code does not handle.
+
+# Editor / OS noise
+.vscode/
+.idea/
+*.iml
+Thumbs.db
+desktop.ini
+.DS_Store
+
+# Logs and scratch
+*.log
+npm-debug.log*
+/tmp/

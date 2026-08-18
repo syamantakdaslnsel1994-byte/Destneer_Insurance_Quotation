@@ -1,0 +1,851 @@
+{
+  "report_metadata": {
+    "generated_date": "2026-06-22",
+    "purpose": "Niva Bupa premium calculator research for building a mirror of https://uno.nivabupa.com/uno/#/new-premiumcalculator",
+    "api_base": "https://otc.nivabupa.com/NewInstaAPI/api/Premium"
+  },
+
+  "kolkata_city": {
+    "cityId": "594",
+    "label": "Kolkata",
+    "ZoneCode": "Z1",
+    "note": "Zone Z1 is the primary zone. Zone Z2 description mentions 20% copayment applies in Mumbai, NCR, Kolkata and Gujarat for that zone."
+  },
+
+  "products_by_plan_type": {
+
+    "Individual": {
+      "endpoint_used": "/ProductConfiguration/?ChannelName=&ProductCode=0&PlanType=Individual&IsPos=false&UserType=undefined",
+      "total_products": 12,
+      "products": [
+        {
+          "value": "63",
+          "label": "ReAssure3.0 Individual",
+          "ProductType": "Individual",
+          "planSubCategory": {
+            "InsuredAdultMember": { "AdultMinAge": "18", "AdultMaxAge": "65", "ChildMinAgeInDays": null, "ChildMaxAge": null, "options": ["1"] },
+            "InsuredChildMember": { "AdultMinAge": null, "AdultMaxAge": null, "ChildMinAgeInDays": "91", "ChildMaxAge": "25", "options": ["0"] },
+            "individualCover": { "options": ["500000","1000000","1500000","2000000","2500000","3000000","4000000","5000000"], "default": "500000" },
+            "deductable": { "options": ["0","100000","200000","300000","400000","500000"], "default": "0" },
+            "plantype": { "options": null, "note": "No variant tiers" }
+          }
+        },
+        {
+          "value": "57",
+          "label": "Aspire Individual",
+          "ProductType": "Individual",
+          "planSubCategory": {
+            "InsuredAdultMember": { "AdultMinAge": "18", "AdultMaxAge": "65", "ChildMinAgeInDays": null, "ChildMaxAge": null, "options": ["1"] },
+            "InsuredChildMember": { "ChildMinAgeInDays": null, "ChildMaxAge": null, "options": ["0"], "note": "No child cover" },
+            "individualCover": { "options": ["300000","500000","750000","1000000","1500000","2000000","2500000","5000000","10000000"], "default": "300000" },
+            "deductable": { "options": ["0","100000"], "default": "0" },
+            "plantype": { "options": [{"value":"1","label":"Gold+"},{"value":"2","label":"Diamond+"},{"value":"3","label":"Platinum+"},{"value":"4","label":"Titanium+"}] },
+            "plantypeSI": {
+              "Gold+": ["300000","500000","750000","1000000","1500000","2000000","2500000"],
+              "Diamond+": ["500000","750000","1000000","1500000","2000000","2500000","5000000"],
+              "Platinum+": ["750000","1000000","1500000","2000000","2500000","5000000","10000000"],
+              "Titanium+": ["1000000","1500000","2000000","2500000","5000000","10000000"]
+            }
+          }
+        },
+        {
+          "value": "54",
+          "label": "ReAssure2.0 Individual",
+          "ProductType": "Individual",
+          "planSubCategory": {
+            "InsuredAdultMember": { "AdultMinAge": "18", "AdultMaxAge": "99", "ChildMinAgeInDays": null, "ChildMaxAge": null, "options": ["1"] },
+            "InsuredChildMember": { "ChildMinAgeInDays": "91", "ChildMaxAge": "65", "options": ["0"] },
+            "individualCover": { "options": ["500000","750000","1000000","1500000","2000000","2500000","3000000","5000000","7500000","10000000"] },
+            "deductable": { "options": ["0","100000"] },
+            "plantype": { "options": [{"value":"1","label":"Titanium+"},{"value":"2","label":"Platinum+"},{"value":"3","label":"Bronze+"},{"value":"4","label":"Gold"},{"value":"5","label":"Bronze"}] },
+            "plantypeSI": {
+              "Titanium+": ["500000","750000","1000000","1500000","2000000","2500000","3000000","5000000","7500000","10000000"],
+              "Platinum+": ["500000","750000","1000000","1500000","2000000","2500000","3000000","5000000","7500000","10000000"],
+              "Bronze+": ["500000","750000","1000000","1500000","2000000","2500000","3000000","5000000","7500000","10000000"],
+              "Gold": ["500000","750000","1000000","1500000","2000000","2500000","3000000","5000000"],
+              "Bronze": ["500000","750000","1000000","1500000","2000000","2500000","3000000"]
+            }
+          }
+        },
+        {
+          "value": "41",
+          "label": "ReAssure Individual",
+          "ProductType": "Individual",
+          "planSubCategory": {
+            "InsuredAdultMember": { "AdultMinAge": "18", "AdultMaxAge": "99", "options": ["1"] },
+            "InsuredChildMember": { "ChildMinAgeInDays": "91", "ChildMaxAge": null, "options": ["0"] },
+            "individualCover": { "options": ["300000","500000","750000","1000000","1250000","1500000","2000000","2500000","3000000","5000000","7500000","10000000"] },
+            "deductable": { "options": ["0","100000"] },
+            "plantype": { "options": null }
+          }
+        },
+        {
+          "value": "49",
+          "label": "HC Health Insurance Plan Individual",
+          "ProductType": "Individual",
+          "planSubCategory": {
+            "InsuredAdultMember": { "AdultMinAge": "18", "AdultMaxAge": "99", "options": ["1"] },
+            "InsuredChildMember": { "ChildMinAgeInDays": "91", "ChildMaxAge": null, "options": ["0"] },
+            "individualCover": { "options": ["100000","200000","300000","400000","500000","1000000"] },
+            "floatercover": { "options": ["300000","400000","500000","1000000","1500000","2000000"] },
+            "deductable": { "options": ["0","10000","20000","30000","50000","100000"] },
+            "plantype": { "options": [{"value":"1","label":"Variant 2022"},{"value":"2","label":"Variant 1"},{"value":"3","label":"Variant 2"},{"value":"4","label":"Variant 3"}] }
+          }
+        },
+        {
+          "value": "45",
+          "label": "Senior First Individual",
+          "ProductType": "Individual",
+          "note": "SENIOR CITIZEN PLAN — also appears under SeniorCitizen ProductCode=45",
+          "planSubCategory": {
+            "InsuredAdultMember": { "AdultMinAge": "61", "AdultMaxAge": "75", "options": ["1","2"] },
+            "InsuredChildMember": { "ChildMinAgeInDays": null, "ChildMaxAge": null, "options": ["0"], "note": "No children" },
+            "individualCover": { "options": ["500000","1000000","1500000","2000000","2500000"], "note": "25000000 appears in raw data likely typo for 2500000" },
+            "deductable": { "options": ["0","100000"] },
+            "plantype": { "options": [{"value":"1","label":"Gold"},{"value":"2","label":"Platinum"}] },
+            "plantypeSI": {
+              "Gold": ["500000","1000000"],
+              "Platinum": ["500000","1000000","1500000","2000000","2500000"]
+            }
+          }
+        },
+        {
+          "value": "33",
+          "label": "Heart BeatV5 Individual",
+          "ProductType": "Individual",
+          "planSubCategory": {
+            "InsuredAdultMember": { "AdultMinAge": "18", "AdultMaxAge": "65", "options": ["1"] },
+            "InsuredChildMember": { "ChildMinAgeInDays": "91", "ChildMaxAge": null, "options": ["0"] },
+            "individualCover": { "options": ["500000","1000000","1500000","2000000","3000000","5000000","7500000","10000000","15000000","20000000","30000000","50000000"] },
+            "deductable": { "options": ["0","100000"] },
+            "plantype": { "options": [{"value":"1","label":"Gold"},{"value":"2","label":"Platinum"}] },
+            "plantypeSI": {
+              "Gold": ["500000","750000","1000000","1500000","2000000","3000000","5000000"],
+              "Platinum": ["1500000","2000000","3000000","5000000","7500000","10000000"]
+            }
+          }
+        },
+        {
+          "value": "30",
+          "label": "Health Premia Individual",
+          "ProductType": "Individual",
+          "planSubCategory": {
+            "InsuredAdultMember": { "AdultMinAge": "18", "AdultMaxAge": "65", "options": ["1"] },
+            "InsuredChildMember": { "ChildMinAgeInDays": "91", "ChildMaxAge": null, "options": ["0"] },
+            "individualCover": { "options": ["500000"] },
+            "deductable": { "options": ["0","100000"] },
+            "plantype": { "options": [{"value":"1","label":"Silver"},{"value":"2","label":"Gold"},{"value":"3","label":"Platinum"}] },
+            "plantypeSI": {
+              "Silver": ["500000"],
+              "Gold": ["500000","600000","700000","800000","900000","1000000"],
+              "Platinum": ["10000000","11000000","12000000","13000000","14000000","15000000"]
+            }
+          }
+        },
+        {
+          "value": "28",
+          "label": "Health Pulse Individual",
+          "ProductType": "Individual",
+          "planSubCategory": {
+            "InsuredAdultMember": { "AdultMinAge": "18", "AdultMaxAge": "65", "options": ["1"] },
+            "InsuredChildMember": { "ChildMinAgeInDays": "91", "ChildMaxAge": null, "options": ["0"] },
+            "individualCover": { "options": ["500000","1000000","1500000","2000000","2500000"] },
+            "deductable": { "options": ["0","100000"] },
+            "plantype": { "options": [{"value":"1","label":"Classic"},{"value":"2","label":"Enhanced"}] },
+            "plantypeSI": {
+              "Classic": ["500000"],
+              "Enhanced": ["500000","1000000","1500000","2000000","2500000"]
+            }
+          }
+        },
+        {
+          "value": "13",
+          "label": "GoActive Individual",
+          "ProductType": "Individual",
+          "planSubCategory": {
+            "InsuredAdultMember": { "AdultMinAge": "18", "AdultMaxAge": "65", "options": ["1"] },
+            "InsuredChildMember": { "ChildMinAgeInDays": null, "ChildMaxAge": null, "options": ["0"] },
+            "individualCover": { "options": ["300000","500000","750000","1000000","1500000","2000000","2500000","3000000","5000000","7500000","10000000"] },
+            "deductable": { "options": ["0","100000"] },
+            "plantype": { "options": null }
+          }
+        },
+        {
+          "value": "39",
+          "label": "Arogya Sanjeevani Individual",
+          "ProductType": "Individual",
+          "planSubCategory": {
+            "InsuredAdultMember": { "AdultMinAge": "18", "AdultMaxAge": "65", "options": ["1","2","3","4","5","6"] },
+            "InsuredChildMember": { "ChildMinAgeInDays": "91", "ChildMaxAge": "25", "options": ["0","1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19"] },
+            "individualCover": { "options": ["50000","100000","200000","300000","500000","1000000"] },
+            "deductable": { "options": ["0","100000"] },
+            "plantype": { "options": null }
+          }
+        },
+        {
+          "value": "61",
+          "label": "Rise Individual",
+          "ProductType": "Individual",
+          "planSubCategory": {
+            "InsuredAdultMember": { "AdultMinAge": "18", "AdultMaxAge": "65", "options": ["1"] },
+            "InsuredChildMember": { "ChildMinAgeInDays": "91", "ChildMaxAge": null, "options": ["0"] },
+            "individualCover": { "options": ["500000","1000000","1500000","2000000","2500000","3000000","5000000","7500000","10000000"] },
+            "deductable": { "options": ["0","100000","200000","300000","400000","500000"], "note": "Extended deductible up to 5L" },
+            "plantype": { "options": null }
+          }
+        }
+      ]
+    },
+
+    "Floater": {
+      "endpoint_used": "/ProductConfiguration/?ChannelName=&ProductCode=0&PlanType=Floater&IsPos=false&UserType=undefined",
+      "total_products": 12,
+      "products": [
+        {
+          "value": "64",
+          "label": "ReAssure3.0 Family Floater",
+          "ProductType": "Floater",
+          "planSubCategory": {
+            "InsuredAdultMember": { "AdultMinAge": "18", "AdultMaxAge": "99", "options": ["1","2"] },
+            "InsuredChildMember": { "ChildMinAgeInDays": "91", "ChildMaxAge": "30", "options": ["0","1","2","3","4"] },
+            "floatercover": { "options": ["500000","1000000","1500000","2000000","2500000","3000000","4000000","5000000"] },
+            "deductable": { "options": ["0","100000","200000","300000","400000","500000"] },
+            "plantype": { "options": null }
+          }
+        },
+        {
+          "value": "58",
+          "label": "Aspire Family Floater",
+          "ProductType": "Floater",
+          "planSubCategory": {
+            "InsuredAdultMember": { "AdultMinAge": "18", "AdultMaxAge": "65", "options": ["1","2"] },
+            "InsuredChildMember": { "ChildMinAgeInDays": "0", "ChildMaxAge": "65", "options": ["0","1","2","3","4"], "note": "Unusual - newborns (0 days) allowed, ChildMaxAge 65" },
+            "floatercover": { "options": ["300000","500000","750000","1000000","1500000","2000000","2500000","5000000","10000000"] },
+            "deductable": { "options": ["0","100000"] },
+            "plantype": { "options": [{"value":"1","label":"Gold+"},{"value":"2","label":"Diamond+"},{"value":"3","label":"Platinum+"},{"value":"4","label":"Titanium+"}] }
+          }
+        },
+        {
+          "value": "55",
+          "label": "ReAssure2.0 Family Floater",
+          "ProductType": "Floater",
+          "planSubCategory": {
+            "InsuredAdultMember": { "AdultMinAge": "18", "AdultMaxAge": "99", "options": ["1","2"] },
+            "InsuredChildMember": { "ChildMinAgeInDays": "91", "ChildMaxAge": "30", "options": ["0","1","2","3","4"] },
+            "floatercover": { "options": ["500000","750000","1000000","1500000","2000000","2500000","3000000","5000000","7500000","10000000"] },
+            "deductable": { "options": ["0","100000"] },
+            "plantype": { "options": [{"value":"1","label":"Titanium+"},{"value":"2","label":"Platinum+"},{"value":"3","label":"Bronze+"},{"value":"4","label":"Gold"},{"value":"5","label":"Bronze"}] }
+          }
+        },
+        {
+          "value": "42",
+          "label": "ReAssure Family Floater",
+          "ProductType": "Floater",
+          "planSubCategory": {
+            "InsuredAdultMember": { "AdultMinAge": "18", "AdultMaxAge": "99", "options": ["1","2"] },
+            "InsuredChildMember": { "ChildMinAgeInDays": "91", "ChildMaxAge": "30", "options": ["0","1","2","3","4"] },
+            "floatercover": { "options": ["300000","500000","750000","1000000","1250000","1500000","2000000","2500000","3000000","5000000","7500000","10000000"] },
+            "deductable": { "options": ["0","100000"] },
+            "plantype": { "options": null }
+          }
+        },
+        {
+          "value": "50",
+          "label": "HC Health Insurance Plan Family Floater",
+          "ProductType": "Floater",
+          "planSubCategory": {
+            "InsuredAdultMember": { "AdultMinAge": "18", "AdultMaxAge": "99", "options": ["1","2"] },
+            "InsuredChildMember": { "ChildMinAgeInDays": "91", "ChildMaxAge": "25", "options": ["0","1","2","3","4"] },
+            "floatercover": { "options": ["300000","400000","500000","1000000","1500000","2000000"] },
+            "deductable": { "options": ["0","10000","20000","30000","50000","100000"] },
+            "plantype": { "options": [{"value":"1","label":"Variant 2022"},{"value":"2","label":"Variant 1"},{"value":"3","label":"Variant 2"},{"value":"4","label":"Variant 3"}] },
+            "plantypeSI": {
+              "Variant 2022": ["300000","400000","500000","750000","1000000","1250000","1500000","2000000","2500000","3000000","4000000","5000000","7500000","10000000"],
+              "Variant 1": ["300000","400000"],
+              "Variant 2": ["500000","750000","1000000","1250000"],
+              "Variant 3": ["1500000","2000000","2500000","3000000","4000000","5000000","7500000","10000000"]
+            }
+          }
+        },
+        {
+          "value": "46",
+          "label": "Senior First Floater",
+          "ProductType": "Floater",
+          "note": "SENIOR CITIZEN PLAN — also appears under SeniorCitizen ProductCode=46",
+          "planSubCategory": {
+            "InsuredAdultMember": { "AdultMinAge": "61", "AdultMaxAge": "75", "options": ["1","2"] },
+            "InsuredChildMember": { "ChildMinAgeInDays": null, "ChildMaxAge": null, "options": ["0"], "note": "No children" },
+            "floatercover": { "options": ["500000","1000000","1500000","2000000","2500000"] },
+            "deductable": { "options": ["0","100000"] },
+            "plantype": { "options": [{"value":"1","label":"Gold"},{"value":"2","label":"Platinum"}] },
+            "plantypeSI": {
+              "Gold": ["500000","1000000"],
+              "Platinum": ["500000","1000000","1500000","2000000","2500000"]
+            }
+          }
+        },
+        {
+          "value": "34",
+          "label": "Heart BeatV5 Family Floater",
+          "ProductType": "Floater",
+          "planSubCategory": {
+            "InsuredAdultMember": { "AdultMinAge": "18", "AdultMaxAge": "99", "options": ["1","2"] },
+            "InsuredChildMember": { "ChildMinAgeInDays": "91", "ChildMaxAge": "21", "options": ["0","1","2","3","4"] },
+            "floatercover": { "options": ["500000","750000","1000000","1500000","2000000","3000000","5000000","7500000","10000000","15000000","20000000","30000000","50000000","100000000"] },
+            "deductable": { "options": null },
+            "plantype": { "options": [{"value":"1","label":"Gold"},{"value":"2","label":"Platinum"}] },
+            "plantypeSI": {
+              "Gold": ["500000","750000","1000000","1500000","2000000","3000000","5000000"],
+              "Platinum": ["1500000","2000000","3000000","5000000","7500000","10000000","15000000","20000000","30000000","50000000","100000000"]
+            }
+          }
+        },
+        {
+          "value": "29",
+          "label": "Health Pulse Family Floater",
+          "ProductType": "Floater",
+          "planSubCategory": {
+            "InsuredAdultMember": { "AdultMinAge": "18", "AdultMaxAge": "65", "options": ["1","2"] },
+            "InsuredChildMember": { "ChildMinAgeInDays": "91", "ChildMaxAge": "25", "options": ["0","1","2","3","4"] },
+            "floatercover": { "options": ["500000","1000000","1500000","2000000","2500000"] },
+            "deductable": { "options": ["0","100000"] },
+            "plantype": { "options": [{"value":"1","label":"Classic"},{"value":"2","label":"Enhanced"}] },
+            "plantypeSI": {
+              "Classic": ["500000"],
+              "Enhanced": ["500000","1000000","1500000","2000000","2500000"]
+            }
+          }
+        },
+        {
+          "value": "14",
+          "label": "GoActive Family Floater",
+          "ProductType": "Floater",
+          "planSubCategory": {
+            "InsuredAdultMember": { "AdultMinAge": "18", "AdultMaxAge": "65", "options": ["1","2"] },
+            "InsuredChildMember": { "ChildMinAgeInDays": "91", "ChildMaxAge": "21", "options": ["0","1","2"] },
+            "floatercover": { "options": ["300000","500000","750000","1000000","1500000","2000000","2500000","3000000","5000000","7500000","10000000"] },
+            "deductable": { "options": ["0","100000"] },
+            "plantype": { "options": null }
+          }
+        },
+        {
+          "value": "31",
+          "label": "Health Premia Family Floater",
+          "ProductType": "Floater",
+          "planSubCategory": {
+            "InsuredAdultMember": { "AdultMinAge": "18", "AdultMaxAge": "65", "options": ["1","2"] },
+            "InsuredChildMember": { "ChildMinAgeInDays": "91", "ChildMaxAge": "30", "options": ["0","1","2","3","4"] },
+            "floatercover": { "options": null },
+            "deductable": { "options": null },
+            "plantype": { "options": [{"value":"1","label":"Silver"},{"value":"2","label":"Gold"},{"value":"3","label":"Platinum"}] },
+            "plantypeSI": {
+              "Silver": ["500000","750000"],
+              "Gold": ["1000000","1500000","2000000","3000000","5000000"],
+              "Platinum": ["10000000","15000000","20000000","30000000"]
+            }
+          }
+        },
+        {
+          "value": "40",
+          "label": "Arogya Sanjeevani Family Floater",
+          "ProductType": "Floater",
+          "planSubCategory": {
+            "InsuredAdultMember": { "AdultMinAge": "18", "AdultMaxAge": "65", "options": ["1","2","3","4","5","6"] },
+            "InsuredChildMember": { "ChildMinAgeInDays": "91", "ChildMaxAge": "30", "options": ["0","1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19"] },
+            "floatercover": { "options": ["50000","100000","200000","300000","500000","1000000"] },
+            "deductable": { "options": ["0","100000"] },
+            "plantype": { "options": null }
+          }
+        },
+        {
+          "value": "62",
+          "label": "Rise Family Floater",
+          "ProductType": "Floater",
+          "planSubCategory": {
+            "InsuredAdultMember": { "AdultMinAge": "18", "AdultMaxAge": "65", "options": ["1","2"] },
+            "InsuredChildMember": { "ChildMinAgeInDays": "91", "ChildMaxAge": "30", "options": ["0","1","2","3","4"] },
+            "floatercover": { "options": ["500000","1000000","1500000","2000000","2500000","3000000","5000000","7500000","10000000"] },
+            "deductable": { "options": ["0","100000","200000","300000","400000","500000"] },
+            "plantype": { "options": null }
+          }
+        }
+      ]
+    },
+
+    "TopUp": {
+      "endpoint_used": "/ProductConfiguration/?ChannelName=&ProductCode=0&PlanType=TopUp&IsPos=false&UserType=undefined",
+      "total_products": 2,
+      "products": [
+        {
+          "value": "36",
+          "label": "HealthRechargeV2 Individual",
+          "ProductType": "TopUp Recharge",
+          "planSubCategory": {
+            "InsuredAdultMember": { "AdultMinAge": "18", "AdultMaxAge": "65", "options": ["1"] },
+            "InsuredChildMember": { "ChildMinAgeInDays": "91", "ChildMaxAge": "25", "options": ["0"] },
+            "individualCover": { "options": ["750000","1000000","1500000","2500000","4000000","4500000","6500000","7000000","9000000","9500000"] },
+            "floatercover": { "options": ["200000","300000","400000","500000","750000","1000000","1500000","2500000","4000000","4500000","6500000","7000000","9000000","9500000"] },
+            "deductable": { "options": ["0","300000"] },
+            "plantype": { "options": null }
+          }
+        },
+        {
+          "value": "37",
+          "label": "HealthRechargeV2 Family Floater",
+          "ProductType": "TopUp Recharge",
+          "planSubCategory": {
+            "InsuredAdultMember": { "AdultMinAge": "18", "AdultMaxAge": "65", "options": ["1","2"] },
+            "InsuredChildMember": { "ChildMinAgeInDays": "91", "ChildMaxAge": "25", "options": ["0","1","2","3","4"] },
+            "individualCover": { "options": ["750000","1000000","1500000","2500000","4000000","4500000","6500000","7000000","9000000","9500000"] },
+            "floatercover": { "options": ["200000","300000","400000","500000","750000","1000000","1500000","2500000","4000000","4500000","6500000","7000000","9000000","9500000"] },
+            "deductable": { "options": ["0","300000"] },
+            "plantype": { "options": null }
+          }
+        }
+      ]
+    },
+
+    "FamilyFirst": {
+      "endpoint_used": "/ProductConfiguration/?ChannelName=&ProductCode=0&PlanType=FamilyFirst&IsPos=false&UserType=undefined",
+      "total_products": 3,
+      "products": [
+        {
+          "value": "51",
+          "label": "HC Health Insurance Plan Family First",
+          "ProductType": "Family First",
+          "planSubCategory": {
+            "InsuredAdultMember": { "AdultMinAge": "18", "AdultMaxAge": "99", "options": ["1","2","3","4","5","6","7","8","9","10","11","12","13","14","15"] },
+            "InsuredChildMember": { "ChildMinAgeInDays": "91", "ChildMaxAge": "25", "options": ["0","1","2","3","4","5","6","7","8","9","10","11","12","13","14","15"] },
+            "individualCover": { "options": ["100000","200000","300000","400000","500000","1000000"] },
+            "floatercover": { "options": ["300000","400000","500000","1000000","1500000","2000000"] },
+            "deductable": { "options": ["0","10000","20000","30000","50000","100000"] },
+            "plantype": { "options": null }
+          }
+        },
+        {
+          "value": "35",
+          "label": "Heart BeatV5 Family First",
+          "ProductType": "Family First",
+          "planSubCategory": {
+            "InsuredAdultMember": { "AdultMinAge": "18", "AdultMaxAge": "99", "options": ["1","2","3","4","5","6","7","8","9","10","11","12","13","14","15"] },
+            "InsuredChildMember": { "ChildMinAgeInDays": "91", "ChildMaxAge": "21", "options": ["0","1","2","3","4","5","6","7","8","9","10","11","12","13","14","15"] },
+            "individualCover": { "options": ["500000","1000000","1500000"] },
+            "floatercover": { "options": ["1500000","2000000","3000000","5000000"] },
+            "deductable": { "options": null },
+            "plantype": { "options": [{"value":"1","label":"Silver"},{"value":"2","label":"Gold"},{"value":"3","label":"Platinum"}] },
+            "plantypeSI": {
+              "Silver": ["500000","750000","1000000","1500000","2000000","3000000","5000000"],
+              "Gold": ["500000","750000","1000000","1500000","2000000","3000000","5000000"],
+              "Platinum": ["1500000","2000000","3000000","5000000"]
+            }
+          }
+        },
+        {
+          "value": "32",
+          "label": "Health Premia Family First",
+          "ProductType": "Family First",
+          "planSubCategory": {
+            "InsuredAdultMember": { "AdultMinAge": "18", "AdultMaxAge": "65", "options": ["1","2","3","4","5","6","7","8","9","10","11","12","13","14","15"] },
+            "InsuredChildMember": { "ChildMinAgeInDays": "91", "ChildMaxAge": "30", "options": ["0","1","2","3","4","5","6","7","8","9","10","11","12","13","14","15"] },
+            "individualCover": { "options": ["500000"] },
+            "floatercover": { "options": null },
+            "deductable": { "options": null },
+            "plantype": { "options": [{"value":"1","label":"Silver"},{"value":"2","label":"Gold"},{"value":"3","label":"Platinum"}] },
+            "plantypeSI": {
+              "Silver": ["500000"],
+              "Gold": ["500000","600000","700000","800000","900000","1000000"],
+              "Platinum": ["10000000","11000000","12000000","13000000","14000000","15000000"]
+            }
+          }
+        }
+      ]
+    },
+
+    "PersonalAccident": {
+      "endpoint_used": "/ProductConfiguration/?ChannelName=&ProductCode=0&PlanType=PersonalAccident&IsPos=false&UserType=undefined",
+      "total_products": 3,
+      "products": [
+        {
+          "value": "47",
+          "label": "Personal Accident Personal Accident",
+          "ProductType": "Personal Accident",
+          "planSubCategory": {
+            "InsuredAdultMember": { "AdultMinAge": "18", "AdultMaxAge": "65", "options": ["1","2"] },
+            "InsuredChildMember": { "ChildMinAgeInDays": "91", "ChildMaxAge": "25", "options": ["0","1","2","3","4"] },
+            "individualCover": { "options": null },
+            "floatercover": { "options": null },
+            "deductable": { "options": null },
+            "plantype": { "options": null },
+            "note": "SI is set via PAInsuredSumInsured field in planDetails, not SumINsured"
+          }
+        },
+        {
+          "value": "9",
+          "label": "Health Assurance Criti care",
+          "ProductType": "Personal Accident",
+          "planSubCategory": {
+            "InsuredAdultMember": { "AdultMinAge": "18", "AdultMaxAge": "65", "options": ["1","2"] },
+            "InsuredChildMember": { "ChildMinAgeInDays": "91", "ChildMaxAge": "30", "options": ["0"] },
+            "individualCover": { "options": ["500000","750000","1000000","1500000","2000000","2500000","3000000","3500000","4000000","4500000","5000000","6000000","7500000","10000000","12500000","15000000","17500000","20000000"] },
+            "floatercover": { "options": null },
+            "plantype": { "options": null }
+          }
+        },
+        {
+          "value": "10",
+          "label": "Health Assurance Accidental Care",
+          "ProductType": "Personal Accident",
+          "planSubCategory": {
+            "InsuredAdultMember": { "AdultMinAge": "18", "AdultMaxAge": "65", "options": ["1","2"] },
+            "InsuredChildMember": { "ChildMinAgeInDays": "91", "ChildMaxAge": "21", "options": ["0","1","2"] },
+            "individualCover": { "options": ["500000","1000000","1500000","2000000","2500000","3000000","3500000","4000000","4500000","5000000","6000000","7500000","10000000","12500000","15000000","17500000","20000000","22500000","25000000","27500000","30000000","35000000","40000000","45000000","50000000"] },
+            "floatercover": { "options": null },
+            "plantype": { "options": null }
+          }
+        }
+      ]
+    },
+
+    "SeniorCitizen": {
+      "note": "PlanType=SeniorCitizen with ProductCode=0 returns empty. Senior plans are accessed by ProductCode=45 and ProductCode=46",
+      "endpoint_used_for_45": "/ProductConfiguration/?ChannelName=&ProductCode=45&PlanType=SeniorCitizen&IsPos=false&UserType=undefined",
+      "endpoint_used_for_46": "/ProductConfiguration/?ChannelName=&ProductCode=46&PlanType=SeniorCitizen&IsPos=false&UserType=undefined",
+      "products": [
+        {
+          "value": "45",
+          "label": "Senior First Individual",
+          "ProductType": "Individual",
+          "note": "Same product also returned in Individual PlanType list",
+          "planSubCategory": {
+            "InsuredAdultMember": { "AdultMinAge": "61", "AdultMaxAge": "75", "options": ["1","2"] },
+            "InsuredChildMember": { "ChildMinAgeInDays": null, "ChildMaxAge": null, "options": ["0"] },
+            "individualCover": { "options": ["500000","1000000","1500000","2000000","2500000"] },
+            "deductable": { "options": ["0","100000"] },
+            "plantype": { "options": [{"value":"1","label":"Gold"},{"value":"2","label":"Platinum"}] },
+            "plantypeSI": {
+              "Gold": ["500000","1000000"],
+              "Platinum": ["500000","1000000","1500000","2000000","2500000"]
+            }
+          }
+        },
+        {
+          "value": "46",
+          "label": "Senior First Floater",
+          "ProductType": "Floater",
+          "note": "Same product also returned in Floater PlanType list",
+          "planSubCategory": {
+            "InsuredAdultMember": { "AdultMinAge": "61", "AdultMaxAge": "75", "options": ["1","2"] },
+            "InsuredChildMember": { "ChildMinAgeInDays": null, "ChildMaxAge": null, "options": ["0"] },
+            "floatercover": { "options": ["500000","1000000","1500000","2000000","2500000"] },
+            "deductable": { "options": ["0","100000"] },
+            "plantype": { "options": [{"value":"1","label":"Gold"},{"value":"2","label":"Platinum"}] },
+            "plantypeSI": {
+              "Gold": ["500000","1000000"],
+              "Platinum": ["500000","1000000","1500000","2000000","2500000"]
+            }
+          }
+        }
+      ]
+    }
+  },
+
+  "get_premium_api_tests": {
+    "endpoint": "POST https://otc.nivabupa.com/NewInstaAPI/api/Premium/GetPremium",
+    "test_date": "2026-06-22",
+    "tests": [
+      {
+        "test_id": 1,
+        "plan_type": "Individual",
+        "product_code": "63",
+        "product_label": "ReAssure3.0 Individual",
+        "params": { "Adult": "1", "Child": "0", "SumINsured": "500000", "PlanType": "1", "CityId": "594", "dob": "01/01/1990" },
+        "result": "SUCCESS",
+        "statusCode": "200",
+        "BasePremium": 6143,
+        "TotalPremium_Annual": 5743,
+        "TotalPremium_HalfYearly": 2913,
+        "TotalPremium_Quarterly": 1465,
+        "TotalPremium_Monthly": 494,
+        "error": null
+      },
+      {
+        "test_id": 2,
+        "plan_type": "Floater",
+        "product_code": "64",
+        "product_label": "ReAssure3.0 Family Floater",
+        "params": { "Adult": "2", "Child": "0", "SumINsured": "500000", "PlanType": "1", "CityId": "594", "dob_adult1": "01/01/1990", "dob_adult2": "01/01/1988" },
+        "result": "SUCCESS",
+        "statusCode": "200",
+        "BasePremium": 9925,
+        "TotalPremium_Annual": 9280,
+        "error": null
+      },
+      {
+        "test_id": 3,
+        "plan_type": "SeniorCitizen_Individual",
+        "product_code": "45",
+        "product_label": "Senior First Individual",
+        "params": { "Adult": "1", "Child": "0", "SumINsured": "500000", "PlanType": "1", "CityId": "594", "dob": "01/01/1960" },
+        "result": "SUCCESS",
+        "statusCode": "200",
+        "BasePremium": 20012,
+        "TotalPremium_Annual": 37172,
+        "note": "Higher TotalPremium vs BasePremium likely includes riders",
+        "error": null
+      },
+      {
+        "test_id": 4,
+        "plan_type": "SeniorCitizen_Floater",
+        "product_code": "46",
+        "product_label": "Senior First Floater",
+        "params": { "Adult": "2", "Child": "0", "SumINsured": "500000", "PlanType": "1", "CityId": "594", "dob_adult1": "01/01/1960", "dob_adult2": "01/01/1962" },
+        "result": "SUCCESS",
+        "statusCode": "200",
+        "BasePremium": 27539,
+        "TotalPremium_Annual": 51154,
+        "error": null
+      },
+      {
+        "test_id": 5,
+        "plan_type": "Individual",
+        "product_code": "54",
+        "product_label": "ReAssure2.0 Individual",
+        "params": { "PlanType": "1", "SumINsured": "500000" },
+        "result": "FAILED",
+        "statusCode": "400",
+        "error": "Plan not found!."
+      },
+      {
+        "test_id": 6,
+        "plan_type": "Individual",
+        "product_code": "57",
+        "product_label": "Aspire Individual",
+        "params": { "PlanType": "1", "SumINsured": "300000" },
+        "result": "FAILED",
+        "statusCode": "400",
+        "error": "Plan not found!."
+      },
+      {
+        "test_id": 7,
+        "plan_type": "Floater",
+        "product_code": "58",
+        "product_label": "Aspire Family Floater",
+        "params": { "PlanType": "1", "SumINsured": "300000" },
+        "result": "FAILED",
+        "statusCode": "400",
+        "error": "Plan not found!."
+      },
+      {
+        "test_id": 8,
+        "plan_type": "TopUp",
+        "product_code": "36",
+        "product_label": "HealthRechargeV2 Individual",
+        "params": { "PlanType": "1", "SumINsured": "750000", "Deductible": "0" },
+        "result": "FAILED",
+        "statusCode": "400",
+        "error": "Plan not found!."
+      },
+      {
+        "test_id": 9,
+        "plan_type": "TopUp",
+        "product_code": "37",
+        "product_label": "HealthRechargeV2 Family Floater",
+        "params": { "PlanType": "1", "SumINsured": "750000", "Deductible": "0" },
+        "result": "FAILED",
+        "statusCode": "400",
+        "error": "Plan not found!."
+      },
+      {
+        "test_id": 10,
+        "plan_type": "FamilyFirst",
+        "product_code": "51",
+        "product_label": "HC Health Insurance Plan Family First",
+        "params": { "PlanType": "1", "SumINsured": "300000", "Adult": "2", "Child": "1" },
+        "result": "FAILED",
+        "statusCode": "400",
+        "error": "Plan not found!."
+      },
+      {
+        "test_id": 11,
+        "plan_type": "FamilyFirst",
+        "product_code": "35",
+        "product_label": "Heart BeatV5 Family First",
+        "params": { "PlanType": "1", "SumINsured": "500000" },
+        "result": "FAILED",
+        "statusCode": "400",
+        "error": "Plan not found!. (tried PlanType 1 Silver and 2 Gold)"
+      },
+      {
+        "test_id": 12,
+        "plan_type": "PersonalAccident",
+        "product_code": "47",
+        "product_label": "Personal Accident",
+        "params": { "PlanType": "1", "SumINsured": "500000" },
+        "result": "FAILED",
+        "statusCode": "400",
+        "error": "Plan not found!."
+      },
+      {
+        "test_id": 13,
+        "plan_type": "PersonalAccident",
+        "product_code": "9",
+        "product_label": "Health Assurance Criti care",
+        "params": { "PlanType": "1", "SumINsured": "500000" },
+        "result": "FAILED",
+        "statusCode": "400",
+        "error": "Plan not found!."
+      },
+      {
+        "test_id": 14,
+        "plan_type": "Individual",
+        "product_code": "41",
+        "product_label": "ReAssure Individual",
+        "result": "FAILED",
+        "statusCode": "400",
+        "error": "Plan not found!."
+      },
+      {
+        "test_id": 15,
+        "plan_type": "Individual",
+        "product_code": "49",
+        "product_label": "HC Health Insurance Plan Individual",
+        "result": "FAILED",
+        "statusCode": "400",
+        "error": "Plan not found!."
+      },
+      {
+        "test_id": 16,
+        "plan_type": "Individual",
+        "product_code": "13",
+        "product_label": "GoActive Individual",
+        "result": "FAILED",
+        "statusCode": "400",
+        "error": "Plan not found!."
+      },
+      {
+        "test_id": 17,
+        "plan_type": "Individual",
+        "product_code": "30",
+        "product_label": "Health Premia Individual",
+        "result": "FAILED",
+        "statusCode": "400",
+        "error": "Plan not found!."
+      },
+      {
+        "test_id": 18,
+        "plan_type": "Individual",
+        "product_code": "33",
+        "product_label": "Heart BeatV5 Individual",
+        "result": "FAILED",
+        "statusCode": "400",
+        "error": "Plan not found!."
+      },
+      {
+        "test_id": 19,
+        "plan_type": "Individual",
+        "product_code": "61",
+        "product_label": "Rise Individual",
+        "result": "FAILED",
+        "statusCode": "400",
+        "error": "Plan not found!."
+      },
+      {
+        "test_id": 20,
+        "plan_type": "Individual",
+        "product_code": "28",
+        "product_label": "Health Pulse Individual",
+        "result": "FAILED",
+        "statusCode": "400",
+        "error": "Plan not found!."
+      },
+      {
+        "test_id": 21,
+        "plan_type": "Individual",
+        "product_code": "39",
+        "product_label": "Arogya Sanjeevani Individual",
+        "result": "FAILED",
+        "statusCode": "400",
+        "error": "Plan not found!."
+      }
+    ],
+    "summary": {
+      "total_tested": 21,
+      "successful": 4,
+      "failed": 17,
+      "successful_products": [
+        { "code": "63", "label": "ReAssure3.0 Individual", "TotalPremium_Annual": 5743 },
+        { "code": "64", "label": "ReAssure3.0 Family Floater", "TotalPremium_Annual": 9280 },
+        { "code": "45", "label": "Senior First Individual", "TotalPremium_Annual": 37172 },
+        { "code": "46", "label": "Senior First Floater", "TotalPremium_Annual": 51154 }
+      ]
+    }
+  },
+
+  "api_behavior_analysis": {
+    "http_behavior": "All API requests return HTTP 200. Success/failure is determined by statusCode field inside JSON body ('200' = success, '400' = error)",
+    "error_pattern": "Plan not found!. — returned for 17 of 21 products tested",
+    "working_pattern": {
+      "observation": "Only the two most recently launched products work: ReAssure3.0 (codes 63/64) and Senior First (codes 45/46). These appear to be the currently active products on the OTC portal.",
+      "hypothesis": {
+        "primary": "The GetPremium API endpoint uses a planId lookup internally. The payload sends planId='0' which is a wildcard — it may only resolve correctly for active/newest products. Older product codes (13, 28, 29, 30, 31, 33, 34, 36, 37, 39, 40, 41, 42, 47, 49, 50, 51, 54, 55, 57, 58, 61, 62) may require a specific non-zero planId obtained from a separate pre-call.",
+        "secondary": "Some products (Aspire 57/58, ReAssure2.0 54/55) may be newer products not yet live on the OTC environment at time of testing.",
+        "tertiary": "The ProductConfiguration API returns product codes correctly, but GetPremium may be connected to a different product database that has fewer active entries."
+      }
+    },
+    "key_observations": [
+      "ReAssure3.0 (63/64) — newest product, works perfectly with planId=0",
+      "Senior First (45/46) — dedicated senior product, works perfectly",
+      "All other products across all plan types fail with same error",
+      "The payload structure itself is correct (no auth errors, no validation errors — pure 'plan not found')",
+      "No authentication headers required — the API accepts unauthenticated requests",
+      "The billCycle parameter is set to '3' (Annual). Other values: '1'=Annual, '2'=Half-Yearly, '3'=Quarterly(?)",
+      "WithRiders:true gives a TotalPremium that differs from BasePremium (includes rider premiums)",
+      "GST appears to be included in the premium or returned separately — returned as 0 in tested calls"
+    ],
+    "recommendations_for_calculator": [
+      "For the 4 working products, implement full premium calculation immediately",
+      "For other products, the ProductConfiguration data is correct for UI rendering (dropdowns, age limits, SI options)",
+      "Consider intercepting actual browser traffic from the live uno.nivabupa.com portal to discover if additional headers or a pre-call endpoint is needed",
+      "The premiumCalculationDate must use DD/MM/YYYY format with today's date",
+      "For plans with plantype variants, PlanType in planDetails must match the variant value (1, 2, 3...)",
+      "For FamilyFirst/Floater plans with 2 adults, Adult2IncomeType must be set (not empty string)",
+      "memberDetails array length must match Adult + Child count exactly"
+    ]
+  },
+
+  "response_structure_example": {
+    "for": "Successful GetPremium response (from ProdCode 63)",
+    "structure": {
+      "statusCode": "200",
+      "error": "",
+      "data": {
+        "premiumResponseDto1": [
+          {
+            "PremiumYear": 1,
+            "PlanId": 0,
+            "BasePremium": "6143",
+            "TotalPremium": "5743",
+            "PersonalAccidentPremium": 0,
+            "HospitalCashPremium": 0,
+            "MedicalPractitionerDiscount": 0,
+            "SafeGaurdPlusPremium": 0,
+            "GSTTax": 0,
+            "multipaymentMode": [
+              { "ModeOfPayment": "Anually", "NetPremium": 5743 },
+              { "ModeOfPayment": "HalfYearly", "NetPremium": 2913 },
+              { "ModeOfPayment": "Quarterly", "NetPremium": 1465 },
+              { "ModeOfPayment": "Monthly", "NetPremium": 494 }
+            ]
+          }
+        ],
+        "listBenefits": "...",
+        "ErrorMessage": "",
+        "StatusCode": "200",
+        "ProductCode": "63",
+        "ProductName": "ReAssure3.0",
+        "SumInsured": "500000",
+        "PlanType": "1"
+      }
+    }
+  }
+}

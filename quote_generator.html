@@ -1,0 +1,1021 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Quote Report Generator</title>
+<script src="https://cdn.jsdelivr.net/npm/exceljs@4.3.0/dist/es5/exceljs.browser.min.js"></script>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Segoe UI', system-ui, sans-serif; background: #f0f4f8; color: #1e293b; font-size: 14px; }
+
+/* ── Page Header ─────────────────────────────────── */
+.page-hdr {
+  background: #0f172a;
+  color: #fff;
+  padding: 0 28px;
+  height: 58px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+}
+.hdr-left { display: flex; align-items: center; gap: 12px; }
+.hdr-icon { font-size: 22px; }
+.hdr-title { font-size: 16px; font-weight: 700; letter-spacing: -.3px; }
+.hdr-sub { font-size: 11px; color: #64748b; margin-top: 1px; }
+.gen-btn {
+  background: linear-gradient(135deg, #16a34a, #15803d);
+  color: #fff; border: none; border-radius: 9px;
+  padding: 9px 20px; font-family: inherit; font-size: 13px; font-weight: 700;
+  cursor: pointer; display: flex; align-items: center; gap: 8px;
+  box-shadow: 0 2px 8px rgba(22,163,74,0.4);
+  transition: all .2s;
+}
+.gen-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 14px rgba(22,163,74,0.5); }
+.gen-btn:disabled { opacity: .6; cursor: not-allowed; transform: none; }
+
+/* ── Container ──────────────────────────────────── */
+.container { max-width: 1100px; margin: 0 auto; padding: 24px 20px 80px; }
+
+/* ── Section ────────────────────────────────────── */
+.section {
+  background: #fff;
+  border-radius: 14px;
+  border: 1px solid #e2e8f0;
+  margin-bottom: 20px;
+  overflow: hidden;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+}
+.section-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 20px;
+  border-bottom: 1px solid #f1f5f9;
+  background: #fafbfc;
+}
+.sec-num {
+  width: 26px; height: 26px; border-radius: 50%;
+  background: #0f172a; color: #fff;
+  font-size: 12px; font-weight: 800;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.sec-title { font-size: 14px; font-weight: 700; color: #0f172a; }
+.sec-hint { font-size: 11px; color: #94a3b8; margin-left: auto; }
+.section-body { padding: 18px 20px; }
+
+/* ── Form elements ──────────────────────────────── */
+.form-row { display: flex; gap: 14px; flex-wrap: wrap; margin-bottom: 12px; }
+.form-row:last-child { margin-bottom: 0; }
+.form-field { display: flex; flex-direction: column; gap: 5px; flex: 1; min-width: 160px; }
+.form-field.flex2 { flex: 2; }
+.form-field.flex3 { flex: 3; }
+label { font-size: 11px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: .4px; }
+input[type=text], input[type=number], input[type=date], select, textarea {
+  border: 1px solid #e2e8f0;
+  border-radius: 7px;
+  padding: 7px 10px;
+  font-family: inherit;
+  font-size: 13px;
+  color: #0f172a;
+  background: #fff;
+  transition: border-color .15s, box-shadow .15s;
+  width: 100%;
+}
+input:focus, select:focus, textarea:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59,130,246,.12);
+}
+textarea { resize: vertical; min-height: 54px; }
+
+/* ── Tables ─────────────────────────────────────── */
+.tbl-wrap { overflow-x: auto; }
+.data-tbl {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12.5px;
+}
+.data-tbl th {
+  background: #f1f5f9;
+  color: #475569;
+  font-weight: 700;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: .4px;
+  padding: 8px 10px;
+  text-align: left;
+  border-bottom: 1px solid #e2e8f0;
+  white-space: nowrap;
+}
+.data-tbl td {
+  padding: 6px 8px;
+  border-bottom: 1px solid #f1f5f9;
+  vertical-align: middle;
+}
+.data-tbl tbody tr:last-child td { border-bottom: none; }
+.data-tbl input, .data-tbl select, .data-tbl textarea {
+  padding: 5px 8px;
+  font-size: 12px;
+}
+.data-tbl textarea { min-height: 36px; }
+.company-lbl {
+  display: flex; align-items: center; gap: 7px;
+  font-weight: 600; color: #1e293b; white-space: nowrap;
+}
+.company-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--c, #94a3b8); flex-shrink: 0;
+}
+
+/* ── Add member button ──────────────────────────── */
+.add-btn {
+  margin-left: auto;
+  background: #eff6ff;
+  color: #2563eb;
+  border: 1px solid #bfdbfe;
+  border-radius: 7px;
+  padding: 5px 13px;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all .15s;
+}
+.add-btn:hover { background: #dbeafe; }
+.del-btn {
+  background: #fef2f2;
+  color: #ef4444;
+  border: 1px solid #fecaca;
+  border-radius: 6px;
+  padding: 3px 9px;
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.del-btn:hover { background: #fee2e2; }
+
+/* ── Toggle ─────────────────────────────────────── */
+.toggle-wrap { display: flex; align-items: center; gap: 8px; margin-left: auto; }
+.toggle-wrap label { font-size: 12px; font-weight: 600; color: #475569; text-transform: none; letter-spacing: 0; }
+input[type=checkbox] { width: 16px; height: 16px; cursor: pointer; }
+
+/* ── SI Tabs ─────────────────────────────────────── */
+.si-tabs { display: flex; gap: 6px; margin-bottom: 16px; flex-wrap: wrap; }
+.si-tab {
+  padding: 6px 16px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  background: #fff;
+  color: #475569;
+  font-family: inherit;
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all .15s;
+}
+.si-tab.active {
+  background: #0f172a;
+  border-color: #0f172a;
+  color: #fff;
+}
+.si-tab:hover:not(.active) { border-color: #94a3b8; color: #1e293b; }
+.si-panel { display: none; }
+.si-panel.active { display: block; }
+
+/* ── Premium grid ───────────────────────────────── */
+.prem-grid-head {
+  display: grid;
+  grid-template-columns: 140px repeat(6, 1fr);
+  gap: 6px;
+  margin-bottom: 6px;
+}
+.prem-grid-row {
+  display: grid;
+  grid-template-columns: 140px repeat(6, 1fr);
+  gap: 6px;
+  margin-bottom: 6px;
+  align-items: center;
+}
+.prem-col-hdr {
+  font-size: 10px;
+  font-weight: 700;
+  color: #64748b;
+  text-align: center;
+  letter-spacing: .3px;
+  text-transform: uppercase;
+}
+.prem-sub-hdrs {
+  display: grid;
+  grid-template-columns: 140px 1fr 1fr 1fr 1fr 1fr 1fr;
+  gap: 6px;
+  margin-bottom: 4px;
+}
+.prem-group-hdr {
+  grid-column: span 3;
+  font-size: 10.5px;
+  font-weight: 700;
+  text-align: center;
+  padding: 4px 0;
+  border-radius: 5px;
+}
+.prem-group-hdr.ff { background: #eff6ff; color: #2563eb; }
+.prem-group-hdr.mi { background: #f0fdf4; color: #16a34a; }
+.prem-input {
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  padding: 5px 8px;
+  font-size: 12px;
+  font-family: inherit;
+  text-align: right;
+  color: #0f172a;
+  width: 100%;
+  transition: border-color .15s;
+}
+.prem-input:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 0 2px rgba(59,130,246,.12); }
+.prem-input::placeholder { color: #cbd5e1; }
+
+/* ── Section note ───────────────────────────────── */
+.note {
+  display: flex; align-items: center; gap: 8px;
+  background: #fefce8; border: 1px solid #fde047;
+  border-radius: 8px; padding: 9px 14px;
+  font-size: 12px; color: #713f12;
+  margin-bottom: 14px;
+}
+
+/* ── Sticky footer ──────────────────────────────── */
+.sticky-foot {
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  background: rgba(255,255,255,0.95);
+  backdrop-filter: blur(8px);
+  border-top: 1px solid #e2e8f0;
+  padding: 12px 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  z-index: 90;
+  box-shadow: 0 -4px 16px rgba(0,0,0,0.08);
+}
+.gen-btn.lg { font-size: 14px; padding: 11px 28px; }
+
+/* ── Toast ──────────────────────────────────────── */
+.toast {
+  position: fixed; bottom: 70px; left: 50%;
+  transform: translateX(-50%) translateY(12px);
+  background: #0f172a; color: #fff;
+  padding: 10px 20px; border-radius: 10px;
+  font-size: 13px; font-weight: 600;
+  box-shadow: 0 8px 24px rgba(0,0,0,.25);
+  opacity: 0; transition: all .25s; z-index: 999;
+  pointer-events: none; white-space: nowrap;
+}
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* ── Divider ────────────────────────────────────── */
+.divider { height: 1px; background: #f1f5f9; margin: 14px 0; }
+</style>
+</head>
+<body>
+
+<!-- ── Page Header ─────────────────────────────── -->
+<div class="page-hdr">
+  <div class="hdr-left">
+    <div class="hdr-icon">📄</div>
+    <div>
+      <div class="hdr-title">Quote Report Generator</div>
+      <div class="hdr-sub">Generate a formatted Excel quotation report for your client</div>
+    </div>
+  </div>
+  <button class="gen-btn" id="mainGenBtn" onclick="generateReport()">📥 Generate Excel Report</button>
+</div>
+
+<div class="container">
+
+<!-- ── Section 1: Branding ────────────────────── -->
+<div class="section">
+  <div class="section-head">
+    <div class="sec-num">1</div>
+    <div class="sec-title">Report Branding</div>
+  </div>
+  <div class="section-body">
+    <div class="form-row">
+      <div class="form-field">
+        <label>Company / Advisor Name</label>
+        <input type="text" id="brandName" value="Desteneer" placeholder="Your company name"/>
+      </div>
+      <div class="form-field flex2">
+        <label>Greeting Line</label>
+        <input type="text" id="greetLine" value="Greetings from Plan my life." placeholder="Greeting text"/>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-field flex3">
+        <label>Report Intro Line</label>
+        <input type="text" id="introLine" value="As per your requirement we have drafted quotation that will suit your needs." placeholder="Introductory line"/>
+      </div>
+      <div class="form-field">
+        <label>File Name (without .xlsx)</label>
+        <input type="text" id="fileName" value="Insurance_Quote_Report" placeholder="Report filename"/>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── Section 2: Members ─────────────────────── -->
+<div class="section">
+  <div class="section-head">
+    <div class="sec-num">2</div>
+    <div class="sec-title">Member Details</div>
+    <button class="add-btn" onclick="addMember()">+ Add Member</button>
+  </div>
+  <div class="section-body" style="padding:0">
+    <div class="tbl-wrap">
+      <table class="data-tbl">
+        <thead>
+          <tr>
+            <th style="width:160px">Name</th>
+            <th style="width:110px">Relation</th>
+            <th style="width:120px">Date of Birth</th>
+            <th style="width:60px">Age</th>
+            <th>PED (Pre-Existing Disease)</th>
+            <th style="width:90px">Pin Code</th>
+            <th style="width:50px"></th>
+          </tr>
+        </thead>
+        <tbody id="membersBody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ── Section 3: Existing Policy ─────────────── -->
+<div class="section">
+  <div class="section-head">
+    <div class="sec-num">3</div>
+    <div class="sec-title">Existing Policy</div>
+    <div class="toggle-wrap">
+      <input type="checkbox" id="hasPolicy" onchange="togglePolicy(this.checked)"/>
+      <label for="hasPolicy">Client has existing policy</label>
+    </div>
+  </div>
+  <div class="section-body" id="policyFields" style="display:none">
+    <div class="form-row">
+      <div class="form-field flex2">
+        <label>Insurance Company</label>
+        <input type="text" id="epCompany" value="The New India Assurance Co. Ltd."/>
+      </div>
+      <div class="form-field flex3">
+        <label>Plan Name</label>
+        <input type="text" id="epPlan" value="New India Flexi Floater Group Mediclaim Policy"/>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-field">
+        <label>Sum Assured (₹)</label>
+        <input type="number" id="epSA" value="1000000"/>
+      </div>
+      <div class="form-field">
+        <label>Current Premium (₹)</label>
+        <input type="number" id="epPrem" value="43319"/>
+      </div>
+      <div class="form-field">
+        <label>Renewal Date</label>
+        <input type="date" id="epDate"/>
+      </div>
+      <div class="form-field">
+        <label>Renewal Premium (₹)</label>
+        <input type="number" id="epRenPrem" value="43319"/>
+      </div>
+      <div class="form-field">
+        <label>Type of Cover</label>
+        <select id="epType">
+          <option>Floater</option>
+          <option>Individual</option>
+          <option>Group</option>
+        </select>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── Section 4: Plan Names & Addons ─────────── -->
+<div class="section">
+  <div class="section-head">
+    <div class="sec-num">4</div>
+    <div class="sec-title">Plan Names &amp; Add-ons</div>
+    <span class="sec-hint">Addons appear in blue in the Excel output</span>
+  </div>
+  <div class="section-body" style="padding:0">
+    <div class="tbl-wrap">
+      <table class="data-tbl" id="plansTable">
+        <thead>
+          <tr>
+            <th style="width:130px">Company</th>
+            <th>Family Floater — Plan Name</th>
+            <th>Family Floater — Add-ons</th>
+            <th>Multi Individual — Plan Name</th>
+            <th>Multi Individual — Add-ons</th>
+          </tr>
+        </thead>
+        <tbody id="plansBody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ── Section 5: Premiums ────────────────────── -->
+<div class="section">
+  <div class="section-head">
+    <div class="sec-num">5</div>
+    <div class="sec-title">Premium Amounts</div>
+    <span class="sec-hint">Enter ₹ amounts (leave blank for NA)</span>
+  </div>
+  <div class="section-body">
+    <div class="note">
+      💡 Enter the premium amount in rupees for each insurer, sum assured, and policy year. Leave blank if the plan is not available for that combination.
+    </div>
+
+    <!-- SI Amount Tabs -->
+    <div class="si-tabs" id="siTabs">
+      <button class="si-tab active" onclick="switchSI(this,'10')">10 Lacs</button>
+      <button class="si-tab" onclick="switchSI(this,'15')">15 Lacs</button>
+      <button class="si-tab" onclick="switchSI(this,'25')">25 Lacs</button>
+      <button class="si-tab" onclick="switchSI(this,'50')">50 Lacs</button>
+      <button class="si-tab" onclick="switchSI(this,'100')">1 Crore</button>
+    </div>
+
+    <!-- Premium panels (one per SI) -->
+    <div id="premPanels"></div>
+  </div>
+</div>
+
+</div><!-- /container -->
+
+<!-- ── Sticky Footer ───────────────────────────── -->
+<div class="sticky-foot">
+  <button class="gen-btn lg" id="footGenBtn" onclick="generateReport()">
+    📥 Generate Excel Report
+  </button>
+</div>
+
+<!-- ── Toast ───────────────────────────────────── -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ════════════════════════════════════════════════
+//  CONSTANTS
+// ════════════════════════════════════════════════
+const INSURERS = [
+  {
+    key: 'mc', label: 'Manipal Cigna', color: '#0284c7',
+    ff: { plan: 'Sarvah Param',        addon: "Coverage for Non-Medical Items and Durable Medical Equipment's, Room Rent Modification" },
+    mi: { plan: 'Sarvah Param',        addon: "Coverage for Non-Medical Items and Durable Medical Equipment's" }
+  },
+  {
+    key: 'niva', label: 'Niva Bupa', color: '#e05c00',
+    ff: { plan: 'Reassure2.0 Bronze',  addon: 'safeguard plus,' },
+    mi: { plan: 'Reassure2.0 Bronze',  addon: 'safeguard plus,' }
+  },
+  {
+    key: 'care', label: 'Care', color: '#f97316',
+    ff: { plan: 'Care Supreme',        addon: 'Air Ambulance, Annual Health Checkup, Wellness Benefit, Bonus Benefit, Claim Shield' },
+    mi: { plan: 'Care Supreme',        addon: 'Air Ambulance, Annual Health Checkup, Wellness Benefit, Bonus Benefit, Claim Shield' }
+  },
+  {
+    key: 'star', label: 'Star Health', color: '#dc2626',
+    ff: { plan: 'Assure',              addon: 'NA' },
+    mi: { plan: 'Assure',              addon: 'NA' }
+  },
+  {
+    key: 'hdfc', label: 'Hdfc Ergo', color: '#7c3aed',
+    ff: { plan: 'Optima secure',       addon: 'Unlimited Restore' },
+    mi: { plan: 'Optima secure',       addon: 'Unlimited Restore' }
+  },
+];
+
+const SI_LIST = [
+  { key: '10',  label: '10 Lacs',  value: 1000000  },
+  { key: '15',  label: '15 Lacs',  value: 1500000  },
+  { key: '25',  label: '25 Lacs',  value: 2500000  },
+  { key: '50',  label: '50 Lacs',  value: 5000000  },
+  { key: '100', label: '1 Cr',     value: 10000000 },
+];
+
+// ════════════════════════════════════════════════
+//  INIT — Members
+// ════════════════════════════════════════════════
+function addMember(name='', relation='Self', dob='', age='', ped='NA', pin='') {
+  const tbody = document.getElementById('membersBody');
+  const idx = tbody.rows.length;
+  const tr = tbody.insertRow();
+  tr.innerHTML = `
+    <td><input type="text" value="${name}" placeholder="Full name"/></td>
+    <td>
+      <select>
+        <option ${relation==='Self'?'selected':''}>Self</option>
+        <option ${relation==='Wife'?'selected':''}>Wife</option>
+        <option ${relation==='Husband'?'selected':''}>Husband</option>
+        <option ${relation==='Son'?'selected':''}>Son</option>
+        <option ${relation==='Daughter'?'selected':''}>Daughter</option>
+        <option ${relation==='Father'?'selected':''}>Father</option>
+        <option ${relation==='Mother'?'selected':''}>Mother</option>
+      </select>
+    </td>
+    <td><input type="date" value="${dob}"/></td>
+    <td><input type="number" value="${age}" min="0" max="99" style="width:56px"/></td>
+    <td><input type="text" value="${ped}" placeholder="NA if none"/></td>
+    <td><input type="text" value="${pin}" placeholder="700001" maxlength="6"/></td>
+    <td><button class="del-btn" onclick="this.closest('tr').remove()">✕</button></td>
+  `;
+}
+
+// ════════════════════════════════════════════════
+//  INIT — Plans Table
+// ════════════════════════════════════════════════
+function initPlansTable() {
+  const tbody = document.getElementById('plansBody');
+  INSURERS.forEach(ins => {
+    const tr = tbody.insertRow();
+    tr.innerHTML = `
+      <td>
+        <div class="company-lbl">
+          <div class="company-dot" style="--c:${ins.color}"></div>
+          ${ins.label}
+        </div>
+      </td>
+      <td><input type="text" id="ff_plan_${ins.key}" value="${ins.ff.plan}"/></td>
+      <td><textarea id="ff_addon_${ins.key}" rows="2">${ins.ff.addon}</textarea></td>
+      <td><input type="text" id="mi_plan_${ins.key}" value="${ins.mi.plan}"/></td>
+      <td><textarea id="mi_addon_${ins.key}" rows="2">${ins.mi.addon}</textarea></td>
+    `;
+  });
+}
+
+// ════════════════════════════════════════════════
+//  INIT — Premium Panels
+// ════════════════════════════════════════════════
+function initPremiumPanels() {
+  const container = document.getElementById('premPanels');
+
+  SI_LIST.forEach((si, si_i) => {
+    const panel = document.createElement('div');
+    panel.className = 'si-panel' + (si_i === 0 ? ' active' : '');
+    panel.id = 'sipanel_' + si.key;
+
+    let html = `
+      <div style="display:grid; grid-template-columns: 140px 1fr 1fr 1fr 1fr 1fr 1fr; gap:6px; margin-bottom:6px; align-items:center;">
+        <div></div>
+        <div class="prem-group-hdr ff" style="grid-column:span 3; font-size:10.5px; font-weight:700; text-align:center; padding:4px; background:#eff6ff; color:#2563eb; border-radius:5px;">
+          🏠 Family Floater
+        </div>
+        <div class="prem-group-hdr mi" style="grid-column:span 3; font-size:10.5px; font-weight:700; text-align:center; padding:4px; background:#f0fdf4; color:#16a34a; border-radius:5px;">
+          👤 Multi Individual
+        </div>
+      </div>
+      <div style="display:grid; grid-template-columns: 140px repeat(6,1fr); gap:6px; margin-bottom:4px;">
+        <div></div>
+        <div class="prem-col-hdr">1 Year</div>
+        <div class="prem-col-hdr">2 Years</div>
+        <div class="prem-col-hdr">3 Years</div>
+        <div class="prem-col-hdr">1 Year</div>
+        <div class="prem-col-hdr">2 Years</div>
+        <div class="prem-col-hdr">3 Years</div>
+      </div>`;
+
+    INSURERS.forEach(ins => {
+      html += `
+      <div style="display:grid; grid-template-columns: 140px repeat(6,1fr); gap:6px; margin-bottom:6px; align-items:center;">
+        <div class="company-lbl">
+          <div class="company-dot" style="--c:${ins.color}"></div>
+          ${ins.label}
+        </div>
+        <input class="prem-input" type="number" id="p_${si.key}_${ins.key}_ff_1" placeholder="e.g. 60041"/>
+        <input class="prem-input" type="number" id="p_${si.key}_${ins.key}_ff_2" placeholder="e.g. 113789"/>
+        <input class="prem-input" type="number" id="p_${si.key}_${ins.key}_ff_3" placeholder="e.g. 170159"/>
+        <input class="prem-input" type="number" id="p_${si.key}_${ins.key}_mi_1" placeholder="e.g. 71853"/>
+        <input class="prem-input" type="number" id="p_${si.key}_${ins.key}_mi_2" placeholder="e.g. 135038"/>
+        <input class="prem-input" type="number" id="p_${si.key}_${ins.key}_mi_3" placeholder="e.g. 200548"/>
+      </div>`;
+    });
+
+    panel.innerHTML = html;
+    container.appendChild(panel);
+  });
+}
+
+function switchSI(btn, key) {
+  document.querySelectorAll('.si-tab').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.si-panel').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('sipanel_' + key).classList.add('active');
+}
+
+function togglePolicy(checked) {
+  document.getElementById('policyFields').style.display = checked ? '' : 'none';
+}
+
+// ════════════════════════════════════════════════
+//  COLLECT FORM DATA
+// ════════════════════════════════════════════════
+function collectData() {
+  // Members
+  const members = [];
+  document.querySelectorAll('#membersBody tr').forEach(tr => {
+    const inputs = tr.querySelectorAll('input, select');
+    const dob = inputs[2].value;
+    // Format DOB as DD.MM.YYYY
+    let dobFmt = '';
+    if (dob) {
+      const [y, m, d] = dob.split('-');
+      dobFmt = `${d}.${m}.${y}`;
+    }
+    members.push({
+      name: inputs[0].value,
+      relation: tr.querySelector('select').value,
+      dob: dobFmt,
+      age: inputs[3].value,
+      ped: inputs[4].value || 'NA',
+      pin: inputs[5].value
+    });
+  });
+
+  // Existing policy
+  let existingPolicy = null;
+  if (document.getElementById('hasPolicy').checked) {
+    const epDate = document.getElementById('epDate').value;
+    let epDateFmt = '';
+    if (epDate) {
+      const [y, m, d] = epDate.split('-');
+      epDateFmt = `${d}.${m}.${y}`;
+    }
+    existingPolicy = {
+      company: document.getElementById('epCompany').value,
+      plan: document.getElementById('epPlan').value,
+      sa: parseInt(document.getElementById('epSA').value) || 0,
+      prem: parseInt(document.getElementById('epPrem').value) || 0,
+      date: epDateFmt,
+      renPrem: parseInt(document.getElementById('epRenPrem').value) || 0,
+      type: document.getElementById('epType').value,
+    };
+  }
+
+  // Insurer plans + premiums
+  const insurers = INSURERS.map(ins => {
+    const premiums = {};
+    SI_LIST.forEach(si => {
+      premiums[si.key] = {};
+      ['ff', 'mi'].forEach(type => {
+        [1, 2, 3].forEach(yr => {
+          const el = document.getElementById(`p_${si.key}_${ins.key}_${type}_${yr}`);
+          const v = el ? el.value.trim() : '';
+          premiums[si.key][`${type}_${yr}`] = v;
+        });
+      });
+    });
+    return {
+      key: ins.key,
+      label: ins.label,
+      ff_plan:  document.getElementById(`ff_plan_${ins.key}`)?.value || ins.ff.plan,
+      ff_addon: document.getElementById(`ff_addon_${ins.key}`)?.value || ins.ff.addon,
+      mi_plan:  document.getElementById(`mi_plan_${ins.key}`)?.value || ins.mi.plan,
+      mi_addon: document.getElementById(`mi_addon_${ins.key}`)?.value || ins.mi.addon,
+      premiums
+    };
+  });
+
+  return {
+    brand: document.getElementById('brandName').value || 'Desteneer',
+    greet: document.getElementById('greetLine').value,
+    intro: document.getElementById('introLine').value,
+    fileName: (document.getElementById('fileName').value || 'Insurance_Quote_Report').replace(/\.xlsx$/i, ''),
+    members,
+    existingPolicy,
+    insurers,
+  };
+}
+
+// ════════════════════════════════════════════════
+//  EXCEL GENERATION
+// ════════════════════════════════════════════════
+const YLW = 'FFFFFF00';   // Yellow fill
+const BLU = 'FF0070C0';   // Blue (addon/link text)
+const BLK = 'FF000000';   // Black text
+const DRK = 'FF1F3864';   // Dark blue text
+const GRY = 'FF808080';   // Grey text
+const WHT = 'FFFFFFFF';   // White
+const THIN = { style: 'thin' };
+
+function border(cell) {
+  cell.border = { top: THIN, left: THIN, bottom: THIN, right: THIN };
+}
+
+function yCell(ws, r, c, val, center = true) {
+  const cell = ws.getCell(r, c);
+  cell.value = val;
+  cell.fill  = { type: 'pattern', pattern: 'solid', fgColor: { argb: YLW } };
+  cell.font  = { bold: true, color: { argb: BLK } };
+  cell.border = { top: THIN, left: THIN, bottom: THIN, right: THIN };
+  cell.alignment = { horizontal: center ? 'center' : 'left', vertical: 'middle', wrapText: true };
+  return cell;
+}
+
+function dCell(ws, r, c, val, opts = {}) {
+  const cell = ws.getCell(r, c);
+  cell.value = val;
+  cell.border = { top: THIN, left: THIN, bottom: THIN, right: THIN };
+  cell.alignment = { horizontal: opts.center ? 'center' : 'left', vertical: 'middle', wrapText: !!opts.wrap };
+  if (opts.blue) cell.font = { color: { argb: BLU }, underline: !!opts.underline };
+  if (opts.bold) cell.font = { ...(cell.font || {}), bold: true };
+  if (opts.grey) cell.font = { color: { argb: GRY } };
+  return cell;
+}
+
+function merge(ws, r1, c1, r2, c2) {
+  try { ws.mergeCells(r1, c1, r2, c2); } catch(e) {}
+}
+
+function fmtPrem(v) {
+  const n = parseInt(v);
+  return (!v || isNaN(n) || n === 0) ? 'NA' : n;
+}
+
+function buildSheet(ws, data, sheetType) {
+  // Column widths (17 cols: A..Q)
+  // Left (FF):  A Company, B Plan, C SA, D P1, E P2, F P3, G-H Addon
+  // Sep:        I spacer
+  // Right (MI): J Company, K Plan, L SA, M P1, N P2, O P3, P-Q Addon
+  const widths = [16, 22, 13, 14, 14, 14, 22, 6, 2, 16, 22, 13, 14, 14, 14, 22, 6];
+  widths.forEach((w, i) => ws.getColumn(i + 1).width = w);
+
+  // Row heights
+  ws.properties.defaultRowHeight = 15;
+
+  let r = 1;
+
+  // ── Greeting ───────────────────────────────
+  ws.getCell(r, 1).value = 'Dear Sir/Madam,';
+  r++;
+  r++; // blank
+  ws.getCell(r, 1).value = data.greet;
+  ws.getCell(r, 1).font = { italic: true, color: { argb: GRY } };
+  r++;
+  r++; // blank
+  ws.getCell(r, 1).value = data.intro;
+  ws.getCell(r, 1).font = { italic: true };
+  r++;
+  r++; // blank
+
+  // ── Member Details ─────────────────────────
+  const mHdrs = ['Name', 'Relation', 'D.O.B', 'Age', 'PED', 'Pin Code'];
+  mHdrs.forEach((h, i) => yCell(ws, r, i + 1, h));
+  r++;
+  data.members.forEach(m => {
+    dCell(ws, r, 1, m.name);
+    dCell(ws, r, 2, m.relation);
+    dCell(ws, r, 3, m.dob);
+    dCell(ws, r, 4, m.age ? parseInt(m.age) : '', { center: true });
+    dCell(ws, r, 5, m.ped);
+    dCell(ws, r, 6, m.pin);
+    r++;
+  });
+  r++; // blank
+
+  // ── Existing Policy ────────────────────────
+  if (data.existingPolicy) {
+    const ep = data.existingPolicy;
+    ws.getCell(r, 1).value = 'Existing Policy Details';
+    ws.getCell(r, 1).font = { bold: true, underline: true };
+    r++;
+
+    yCell(ws, r, 1, 'Company');   yCell(ws, r, 2, 'Plan name', false);
+    yCell(ws, r, 3, 'Sum Assure'); yCell(ws, r, 4, 'Premium');
+    yCell(ws, r, 5, 'Renewal date'); yCell(ws, r, 6, 'Renewal Premium');
+    yCell(ws, r, 7, 'Type of Cover'); merge(ws, r, 7, r, 9);
+    r++;
+
+    dCell(ws, r, 1, ep.company);
+    dCell(ws, r, 2, ep.plan, { blue: true, underline: true });
+    dCell(ws, r, 3, ep.sa);
+    dCell(ws, r, 4, ep.prem);
+    dCell(ws, r, 5, ep.date);
+    dCell(ws, r, 6, ep.renPrem);
+    dCell(ws, r, 7, ep.type); merge(ws, r, 7, r, 9);
+    r++;
+    r++; r++; // blanks
+  } else {
+    r++; r++; // blanks
+  }
+
+  // ── SI Sections ────────────────────────────
+  const qHdrs = ['Company', 'Plan name', 'Sum Assure', 'Premium for 1 Year', 'Premium for 2 Years', 'Premium for 3 Years', 'Addon'];
+
+  SI_LIST.forEach(si => {
+    // Section title row (both sides)
+    yCell(ws, r, 1,  `Family Floater Quotation For ${si.label}`);
+    merge(ws, r, 1, r, 8);
+    yCell(ws, r, 10, `Multi Individual Quotation For ${si.label}`);
+    merge(ws, r, 10, r, 17);
+    ws.getRow(r).height = 18;
+    r++;
+
+    // Column headers (both sides)
+    [1,2,3,4,5,6].forEach((c, i) => yCell(ws, r, c, qHdrs[i]));
+    yCell(ws, r, 7, 'Addon'); merge(ws, r, 7, r, 8);
+    [10,11,12,13,14,15].forEach((c, i) => yCell(ws, r, c, qHdrs[i]));
+    yCell(ws, r, 16, 'Addon'); merge(ws, r, 16, r, 17);
+    ws.getRow(r).height = 16;
+    r++;
+
+    // Insurer rows
+    data.insurers.forEach(ins => {
+      const p = ins.premiums[si.key];
+
+      // Left (FF)
+      dCell(ws, r, 1, ins.label);
+      dCell(ws, r, 2, ins.ff_plan, { blue: true, underline: true });
+      dCell(ws, r, 3, si.value, { center: true });
+      dCell(ws, r, 4, fmtPrem(p[`ff_1`]), { center: true });
+      dCell(ws, r, 5, fmtPrem(p[`ff_2`]), { center: true });
+      dCell(ws, r, 6, fmtPrem(p[`ff_3`]), { center: true });
+      const aff = ins.ff_addon;
+      dCell(ws, r, 7, aff, { blue: aff !== 'NA', wrap: true });
+      merge(ws, r, 7, r, 8);
+
+      // Right (MI)
+      dCell(ws, r, 10, ins.label);
+      dCell(ws, r, 11, ins.mi_plan, { blue: true, underline: true });
+      dCell(ws, r, 12, si.value, { center: true });
+      dCell(ws, r, 13, fmtPrem(p[`mi_1`]), { center: true });
+      dCell(ws, r, 14, fmtPrem(p[`mi_2`]), { center: true });
+      dCell(ws, r, 15, fmtPrem(p[`mi_3`]), { center: true });
+      const ami = ins.mi_addon;
+      dCell(ws, r, 16, ami, { blue: ami !== 'NA', wrap: true });
+      merge(ws, r, 16, r, 17);
+
+      ws.getRow(r).height = 16;
+      r++;
+    });
+
+    r++; // blank between SI groups
+  });
+}
+
+// ════════════════════════════════════════════════
+//  GENERATE REPORT
+// ════════════════════════════════════════════════
+async function generateReport() {
+  const data = collectData();
+
+  if (data.members.length === 0) {
+    showToast('⚠️ Please add at least one member');
+    return;
+  }
+
+  const [btn1, btn2] = [document.getElementById('mainGenBtn'), document.getElementById('footGenBtn')];
+  btn1.disabled = btn2.disabled = true;
+  btn1.textContent = btn2.textContent = '⏳ Generating...';
+
+  try {
+    const wb = new ExcelJS.Workbook();
+    wb.creator = data.brand;
+    wb.created = new Date();
+
+    // Main sheet: all members together
+    const memberNames = data.members.map(m => m.name).join(' & ');
+    const ws1 = wb.addWorksheet(memberNames.substring(0, 30) || 'Quote');
+    buildSheet(ws1, data, 'main');
+
+    // Individual sheets for each member (if more than one)
+    if (data.members.length > 1) {
+      data.members.forEach(m => {
+        if (!m.name) return;
+        const wsI = wb.addWorksheet((m.name + ' ' + m.relation).substring(0, 30));
+        const memberData = { ...data, members: [m] };
+        buildSheet(wsI, memberData, 'individual');
+      });
+    }
+
+    // Generate and download
+    const buffer = await wb.xlsx.writeBuffer();
+    const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement('a');
+    a.href     = url;
+    a.download = data.fileName + '.xlsx';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+
+    showToast('✅ Report downloaded: ' + data.fileName + '.xlsx');
+  } catch(err) {
+    console.error(err);
+    showToast('❌ Error generating report: ' + err.message);
+  } finally {
+    btn1.disabled = btn2.disabled = false;
+    btn1.innerHTML = '📥 Generate Excel Report';
+    btn2.innerHTML = '📥 Generate Excel Report';
+  }
+}
+
+// ════════════════════════════════════════════════
+//  TOAST
+// ════════════════════════════════════════════════
+let _tt;
+function showToast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(_tt);
+  _tt = setTimeout(() => el.classList.remove('show'), 3000);
+}
+
+// ════════════════════════════════════════════════
+//  PRE-POPULATE FROM HUB (postMessage)
+// ════════════════════════════════════════════════
+window.addEventListener('message', function(e) {
+  if (e.data && e.data.type === 'populate-quotes') {
+    populateFromHubQuotes(e.data.quotes || []);
+  }
+});
+
+function populateFromHubQuotes(hubQuotes) {
+  if (!hubQuotes.length) return;
+  let filled = 0;
+
+  hubQuotes.forEach(q => {
+    // ── Match insurer key ─────────────────────
+    const c = (q.company || '').toLowerCase();
+    let key = null;
+    if (c.includes('care'))                         key = 'care';
+    else if (c.includes('niva'))                    key = 'niva';
+    else if (c.includes('manipal') || c.includes('cigna')) key = 'mc';
+    else if (c.includes('star'))                    key = 'star';
+    else if (c.includes('hdfc') || c.includes('ergo'))     key = 'hdfc';
+    if (!key) return;
+
+    // ── Match SI amount ───────────────────────
+    // sumAssured from hub: e.g. "₹10,00,000" or "10,00,000" or "1000000"
+    const saVal = parseInt((q.sumAssured || '').replace(/[^0-9]/g, ''));
+    let siKey = null;
+    if      (saVal >= 900000   && saVal <= 1100000)  siKey = '10';
+    else if (saVal >= 1400000  && saVal <= 1600000)  siKey = '15';
+    else if (saVal >= 2400000  && saVal <= 2600000)  siKey = '25';
+    else if (saVal >= 4900000  && saVal <= 5100000)  siKey = '50';
+    else if (saVal >= 9000000)                       siKey = '100';
+    if (!siKey) return;
+
+    // ── Pre-fill 1-Year FF premium ────────────
+    const premVal = parseInt((q.premium || '').replace(/[^0-9]/g, ''));
+    if (premVal > 0) {
+      const el = document.getElementById(`p_${siKey}_${key}_ff_1`);
+      if (el && !el.value) { el.value = premVal; filled++; }
+    }
+
+    // ── Pre-fill plan name if still default ───
+    const ins = INSURERS.find(i => i.key === key);
+    if (q.planName && ins) {
+      const planEl = document.getElementById(`ff_plan_${key}`);
+      if (planEl && planEl.value === ins.ff.plan) planEl.value = q.planName;
+    }
+  });
+
+  // Switch to first SI tab that has data
+  const firstSI = hubQuotes.map(q => {
+    const v = parseInt((q.sumAssured || '').replace(/[^0-9]/g, ''));
+    if (v >= 900000  && v <= 1100000)  return '10';
+    if (v >= 1400000 && v <= 1600000)  return '15';
+    if (v >= 2400000 && v <= 2600000)  return '25';
+    if (v >= 4900000 && v <= 5100000)  return '50';
+    if (v >= 9000000)                  return '100';
+    return null;
+  }).find(k => k);
+  if (firstSI) {
+    const tab = document.querySelector(`.si-tab[onclick*="'${firstSI}'"]`);
+    if (tab) switchSI(tab, firstSI);
+  }
+
+  // Show banner
+  if (filled > 0) {
+    showToast(`✅ ${filled} premium(s) pre-filled from Hub comparison!`);
+  }
+}
+
+// ════════════════════════════════════════════════
+//  INIT
+// ════════════════════════════════════════════════
+addMember('', 'Self', '', '', 'NA', '');
+initPlansTable();
+initPremiumPanels();
+</script>
+</body>
+</html>

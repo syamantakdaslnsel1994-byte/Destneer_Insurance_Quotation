@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<title>ManipalCigna API Availability Test</title>
+<style>
+  body { font-family: Arial, sans-serif; background: #f5f5f5; padding: 24px; color: #333; }
+  h1 { color: #103f7e; margin-bottom: 4px; }
+  p  { color: #777; margin-bottom: 20px; font-size: 13px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 16px; }
+  .card { background: #fff; border-radius: 8px; border: 1.5px solid #e0e0e0; padding: 18px 20px; transition: border-color .2s; }
+  .card.ok       { border-color: #27ae60; }
+  .card.fail     { border-color: #e74c3c; }
+  .card.checking { border-color: #1a7abf; }
+  .plan-name  { font-size: 15px; font-weight: 700; margin-bottom: 4px; }
+  .plan-svc   { font-size: 11px; color: #999; margin-bottom: 10px; font-family: monospace; }
+  .status-row { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
+  .badge { font-size: 12px; font-weight: 700; padding: 4px 12px; border-radius: 20px; white-space: nowrap; }
+  .badge.ok       { background: #e8f8f0; color: #1a7f4b; border: 1px solid #a8d5b5; }
+  .badge.fail     { background: #fdecea; color: #c0392b; border: 1px solid #f5c6cb; }
+  .badge.checking { background: #e8f4fd; color: #1a7abf; border: 1px solid #aad4f0; }
+  .detail { font-size: 12px; color: #555; line-height: 1.6; }
+  .detail.err { color: #c0392b; }
+  .http-code { font-size: 11px; color: #999; }
+  .cards-found { font-weight: 700; color: #1a7f4b; }
+  .btn { margin-top: 20px; padding: 12px 28px; background: #e8632a; color: #fff; border: none; border-radius: 5px; font-size: 14px; font-weight: 700; cursor: pointer; }
+  .btn:hover { background: #cf5523; }
+  .summary { margin-bottom: 20px; padding: 14px 18px; background: #fff; border-radius: 8px; border: 1.5px solid #e0e0e0; font-size: 14px; }
+  .summary strong { color: #103f7e; }
+</style>
+</head>
+<body>
+
+<h1>🔬 ManipalCigna API Availability Test</h1>
+<p>Tests all 8 plan APIs via your local server (localhost:3003). Make sure the mc_server is running before clicking Test.</p>
+
+<div class="summary" id="summary">Ready to test — click the button below.</div>
+<button class="btn" onclick="runAllTests()">▶ Run All Tests</button>
+
+<br/><br/>
+<div class="grid" id="grid"></div>
+
+<script>
+const API = 'http://localhost:3003';
+
+const PLANS = [
+  { id: 'lifetime-health',   name: 'Lifetime Health',    svc: 'sellonlineltappformservice',           si: 5000000,  age: 35 },
+  { id: 'prime-senior',      name: 'Prime Senior',        svc: 'sellonlineseniorquickquoteservice',    si: 500000,   age: 60 },
+  { id: 'prohealth-prime',   name: 'ProHealth Prime',     svc: 'sellonlineprimequickquoteservice',     si: 500000,   age: 35 },
+  { id: 'sarvah',            name: 'Sarvah',              svc: 'sellonlineprohealthquickquoteservice', si: 500000,   age: 35 },
+  { id: 'super-top-up',      name: 'Super Top Up',        svc: 'sellonlinestuquickquoteservice',       si: 500000,   age: 35 },
+  { id: 'critical-illness',  name: 'Critical Illness',    svc: 'sellonlineccquickquoteservice',        si: 1000000,  age: 35 },
+  { id: 'personal-accident', name: 'Personal Accident',   svc: 'sellonlinepaquickquoteservice',        si: 500000,   age: 35 },
+  { id: 'accident-shield',   name: 'Accident Shield',     svc: 'sellonlineasquickquoteservice',        si: 200000,   age: 35 },
+];
+
+function renderGrid() {
+  document.getElementById('grid').innerHTML = PLANS.map(p => `
+    <div class="card checking" id="card-${p.id}">
+      <div class="plan-name">${p.name}</div>
+      <div class="plan-svc">${p.svc}</div>
+      <div class="status-row">
+        <span class="badge checking" id="badge-${p.id}">⏳ Waiting...</span>
+        <span class="http-code" id="http-${p.id}"></span>
+      </div>
+      <div class="detail" id="detail-${p.id}">—</div>
+    </div>`).join('');
+}
+
+function setResult(id, ok, httpCode, detail) {
+  const card  = document.getElementById('card-' + id);
+  const badge = document.getElementById('badge-' + id);
+  const http  = document.getElementById('http-' + id);
+  const det   = document.getElementById('detail-' + id);
+
+  card.className  = 'card ' + (ok ? 'ok' : 'fail');
+  badge.className = 'badge ' + (ok ? 'ok' : 'fail');
+  badge.textContent = ok ? '✅ Working' : '❌ API Error';
+  http.textContent  = httpCode ? `HTTP ${httpCode}` : '';
+  det.className     = 'detail' + (ok ? '' : ' err');
+  det.innerHTML     = detail;
+}
+
+function setBusy(id) {
+  const badge = document.getElementById('badge-' + id);
+  const det   = document.getElementById('detail-' + id);
+  badge.className   = 'badge checking';
+  badge.textContent = '⏳ Checking...';
+  det.textContent   = 'Calling localhost:3003...';
+}
+
+async function testPlan(plan) {
+  setBusy(plan.id);
+  try {
+    const payload = {
+      members:     [{ type: 'adult', age: plan.age, gender: 'M' }],
+      sumInsured:  plan.si,
+      pincode:     '400001',
+      tenure:      '1',
+      portability: false,
+      frequency:   'single',
+    };
+
+    const resp = await fetch(`${API}/api/premium/${plan.id}`, {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify(payload),
+      signal:  AbortSignal.timeout(20000),
+    });
+
+    const data  = await resp.json();
+    const rBody = data.response || data;
+    const cards = (rBody.Card || []).filter(c => c.Status === 'Success' || !c.Status);
+
+    if (data.error) {
+      setResult(plan.id, false, resp.status,
+        `Error: ${data.error.substring(0, 120)}`);
+    } else if (cards.length > 0) {
+      const names = cards.slice(0, 3).map(c => c.SuggestionName || '?').join(', ');
+      const prems = cards.slice(0, 3).map(c => {
+        const pt = c.FinalPremiumTable?.[0] || {};
+        return pt.MODAL_PREM_TAX || pt.TOTAL_PREM || '?';
+      }).join(', ');
+      setResult(plan.id, true, resp.status,
+        `<span class="cards-found">${cards.length} plan(s) found</span><br>
+         Plans: ${names}<br>
+         Premiums: ${prems}`);
+    } else {
+      const msg = Array.isArray(rBody.ErrorMessage)
+        ? rBody.ErrorMessage.join('; ')
+        : (rBody.ErrorMessage || rBody.Status || 'No cards returned');
+      setResult(plan.id, false, resp.status,
+        `No plans in response. API said: ${msg.substring(0, 150)}`);
+    }
+  } catch (e) {
+    if (e.name === 'TimeoutError') {
+      setResult(plan.id, false, null, 'Request timed out (20s). Server may be slow or down.');
+    } else {
+      setResult(plan.id, false, null,
+        e.message.includes('Failed to fetch')
+          ? 'Cannot reach localhost:3003 — is mc_server.js running?'
+          : e.message);
+    }
+  }
+}
+
+async function runAllTests() {
+  renderGrid();
+  document.getElementById('summary').innerHTML = '⏳ Testing all 8 plans sequentially (400ms gap between each)...';
+  document.querySelector('.btn').disabled = true;
+
+  let ok = 0, fail = 0;
+  for (let i = 0; i < PLANS.length; i++) {
+    if (i > 0) await new Promise(r => setTimeout(r, 400));
+    await testPlan(PLANS[i]);
+    const badge = document.getElementById('badge-' + PLANS[i].id);
+    if (badge.textContent.includes('✅')) ok++; else fail++;
+    document.getElementById('summary').innerHTML =
+      `Testing... ${i+1}/${PLANS.length} done — <strong style="color:#1a7f4b">${ok} working</strong>, <strong style="color:#c0392b">${fail} error</strong>`;
+  }
+
+  document.getElementById('summary').innerHTML =
+    `✅ Test complete — <strong style="color:#1a7f4b">${ok} plan(s) working</strong> &nbsp;|&nbsp; <strong style="color:#c0392b">${fail} plan(s) with API errors</strong>`;
+  document.querySelector('.btn').disabled = false;
+  document.querySelector('.btn').textContent = '🔄 Re-run Tests';
+}
+
+renderGrid();
+</script>
+</body>
+</html>

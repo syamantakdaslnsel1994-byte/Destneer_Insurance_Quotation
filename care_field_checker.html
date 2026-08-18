@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<title>Care Health — Field Checker (What the Calculator Shows)</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: Arial, sans-serif; font-size: 13px; background: #f0f4f8; padding: 16px; }
+h1 { color: #1B75BC; margin-bottom: 4px; }
+.sub { color: #78909c; font-size: 12px; margin-bottom: 16px; }
+
+/* Plan selector */
+.top-bar { display: flex; align-items: center; gap: 12px; background: #fff;
+  padding: 12px 16px; border-radius: 6px; box-shadow: 0 1px 4px rgba(0,0,0,.1);
+  margin-bottom: 16px; flex-wrap: wrap; }
+.top-bar label { font-weight: 700; color: #1B75BC; }
+#plan-sel { padding: 6px 10px; border: 1px solid #b0bec5; border-radius: 4px;
+  font-size: 13px; min-width: 280px; }
+#show-all-btn { padding: 6px 14px; background: #1B75BC; color: #fff;
+  border: none; border-radius: 4px; cursor: pointer; font-size: 13px; }
+#show-all-btn:hover { background: #1565C0; }
+
+/* Single plan view */
+#single-view { background: #fff; border-radius: 6px; box-shadow: 0 1px 4px rgba(0,0,0,.1);
+  padding: 16px; margin-bottom: 16px; display: none; }
+#single-view h2 { color: #1B75BC; margin-bottom: 12px; font-size: 15px; }
+.field-row { display: flex; align-items: center; gap: 10px; padding: 8px 0;
+  border-bottom: 1px solid #e8ecf0; }
+.field-row:last-child { border-bottom: none; }
+.field-name { width: 220px; font-weight: 600; color: #37474f; }
+.badge { padding: 3px 10px; border-radius: 12px; font-size: 12px; font-weight: 700; }
+.show { background: #e8f5e9; color: #2E7D32; }
+.hide { background: #ffebee; color: #C62828; }
+.si-vals { font-size: 12px; color: #546e7a; margin-left: 8px; }
+
+/* All plans table */
+#all-view { display: none; }
+table { width: 100%; border-collapse: collapse; background: #fff;
+  box-shadow: 0 1px 4px rgba(0,0,0,.1); border-radius: 6px; overflow: hidden; }
+th { background: #1B75BC; color: #fff; padding: 8px 10px; text-align: left;
+  font-size: 12px; white-space: nowrap; }
+th.c { text-align: center; }
+td { padding: 6px 10px; border-bottom: 1px solid #e8ecf0; font-size: 12px; }
+tr:last-child td { border-bottom: none; }
+tr:hover td { background: #f0f7ff; }
+.pid { font-weight: 700; color: #1B75BC; }
+.y { text-align: center; color: #2E7D32; font-weight: 700; font-size: 14px; }
+.n { text-align: center; color: #C62828; font-weight: 700; font-size: 14px; }
+.si-small { font-size: 11px; color: #546e7a; }
+</style>
+</head>
+<body>
+
+<h1>Care Health — Field Checker</h1>
+<p class="sub">Shows exactly what fields the calculator displays for each plan (based on current code logic)</p>
+
+<div class="top-bar">
+  <label>Select Plan:</label>
+  <select id="plan-sel" onchange="showSingle()">
+    <option value="">— choose a plan —</option>
+  </select>
+  <button id="show-all-btn" onclick="showAll()">Show All Plans Table</button>
+</div>
+
+<div id="single-view">
+  <h2 id="sv-title"></h2>
+  <div id="sv-fields"></div>
+</div>
+
+<div id="all-view">
+  <table>
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Plan Name</th>
+        <th class="c">BIZ</th>
+        <th class="c">COV</th>
+        <th class="c">MEM</th>
+        <th class="c">CHD</th>
+        <th class="c">TEN</th>
+        <th>SI Values</th>
+      </tr>
+    </thead>
+    <tbody id="all-tbody"></tbody>
+  </table>
+</div>
+
+<script>
+// ── EXACT SAME DATA AS care_index.html ──────────────────────────────────────
+
+const PLANS = [
+  ['7484','POS Care Supreme Shine'],
+  ['7425','POS Secure Child'],
+  ['7424','POS Secure Plus'],
+  ['7218','Care Supreme Shine'],
+  ['7172','Ultimate Care Senior'],
+  ['7159','POS Care Supreme - Super Saver'],
+  ['6740','Secure Child'],
+  ['6725','POS Ultimate Care'],
+  ['6677','POS Care Supreme - VFM 3'],
+  ['6676','Care Supreme - VFM 3'],
+  ['6675','POS Care Supreme - VFM 2'],
+  ['6674','Care Supreme - VFM 2'],
+  ['6619','Ultimate Care'],
+  ['6541','Care Supreme - Super Saver'],
+  ['6434','Supreme Enhance'],
+  ['6395','Surrogacy and Ooctye Donor'],
+  ['6384','Secure Plus'],
+  ['6217','POS Care Supreme - VFM'],
+  ['6196','Care Advantage'],
+  ['6043','Care Supreme - VFM'],
+  ['5955','Joy Tomorrow'],
+  ['5834','POS Explore'],
+  ['5833','New Explore'],
+  ['5674','Student Explore-Health Unlimited'],
+  ['5673','Care Global'],
+  ['5412','Care Freedom'],
+  ['5399','POS Care Supreme'],
+  ['5335','POS Care Smart Select'],
+  ['5334','Care Smart Select'],
+  ['3488','POS Care Senior'],
+  ['3487','Care Senior'],
+  ['3486','POS Care'],
+  ['3485','Care'],
+  ['2813','Care Supreme'],
+  ['2534','Sr Health Advantage - Silver'],
+  ['1992','Care Classic - Instant Cover'],
+  ['1734','Super Care Advantage'],
+  ['1432','Care Classic'],
+  ['1187','Care Plus - Complete Plan'],
+  ['1186','Care Plus - Youth Plan'],
+  ['748', 'Enhance'],
+  ['585', 'Cancer Mediclaim (Advance)'],
+  ['573', 'POS Secure'],
+  ['425', 'Care Heart'],
+  ['362', 'Super Mediclaim'],
+  ['188', 'Secure'],
+  ['107', 'Student Explore'],
+  ['102', 'Joy'],
+];
+
+const BIZ_PLANS = new Set([
+  '7484','7218','7172','7159',
+  '6725','6677','6676','6675','6674','6619','6541','6217','6196','6043',
+  '5399','2813',
+]);
+
+const NO_COVER_TYPE = new Set([
+  '7425','7424','6740','6395','6384','6196',
+  '5834','5833','5674','5673','1992','1734','1432','585','573','362','188',
+]);
+
+const NO_MEMBERS = new Set([
+  '5834','5833','573','188','107',
+]);
+
+const NO_CHILDREN = new Set([
+  '7425','7424','6740','6395','6384','5674',
+  '5834','5833','585','573','2534','362','425','188','107',
+]);
+
+const NO_TENURE = new Set(['102']);
+
+const SI_MAP = {
+  '2813':[5,7,10,15,25,50,100],'6043':[5,7,10,15,25,50,100],
+  '6541':[5,7,10,15,25,50,100],'6674':[5,7,10,15,25,50,100],
+  '6676':[5,7,10,15,25,50,100],'6619':[5,7,10,15,25,50,100],
+  '6725':[5,7,10,15,25,50,100],'7218':[5,7,10,15,25,50,100],
+  '7172':[5,7,10,15,25,50,100],'6434':[5,7,10,15,25,50,100],
+  '5412':[5,7,10,15,25,50,100],'1734':[5,7,10,15,25,50,100],
+  '748': [2,3,5,7,10,15,25],
+  '5399':[5,7,10,15,25,50,100],'6217':[5,7,10,15,25,50,100],
+  '6675':[5,7,10,15,25,50,100],'6677':[5,7,10,15,25,50,100],
+  '7159':[5,7,10,15,25,50,100],
+  '7484':[5,7,10,15],'5335':[5,7,10,15],'6384':[30,50,100,200],'7424':[5,7,10,15],
+  '5334':[5,10,15,20,25,50,100],
+  '3485':[3,4,5,7,10,15,25,50],'3486':[3,4,5,7,10,15,25,50],
+  '3487':[3,5,7,10,15],'3488':[3,5,7,10,15],
+  '2534':[3,5,7,10,15,25],
+  '1432':[3,5,7,10,15,25],'1992':[3,5,7,10,15,25],
+  '1187':[3,5,7,10,15,25],'1186':[3,5,7,10,15,25],
+  '6196':[3,5,7,10,15,25],
+  '5833':[5,7,10,15,25],'5834':[5,7,10,15,25],
+  '5673':[50,100,200,300,500],
+  '5674':[5,7,10],
+  '107': [30],
+  '102': [3,5],'5955':[3,5],
+  '425': [3,5,7,10,15],
+  '585': [10,15,25,50],
+  '362': [5,7,10,15,25],
+  '188': [3,5,7,10],
+  '573': [5,10,15,25,50],
+  '6395':[5,7,10,15,25],
+  '6740':[3,5,7,10],'7425':[3,5,7,10],
+};
+const DEFAULT_SI = [5,7,10,15,25,50,100];
+
+function getConfig(id) {
+  return {
+    hasBizType:   BIZ_PLANS.has(id),
+    hasCoverType: !NO_COVER_TYPE.has(id),
+    hasMembers:   !NO_MEMBERS.has(id),
+    hasChildren:  !NO_CHILDREN.has(id),
+    hasTenure:    !NO_TENURE.has(id),
+    siValues:     SI_MAP[id] || DEFAULT_SI,
+  };
+}
+
+// ── Build plan dropdown ──
+const sel = document.getElementById('plan-sel');
+PLANS.forEach(([id, name]) => {
+  const o = document.createElement('option');
+  o.value = id;
+  o.textContent = `${id} — ${name}`;
+  sel.appendChild(o);
+});
+
+// ── Single plan view ──
+function showSingle() {
+  const id = sel.value;
+  if (!id) { document.getElementById('single-view').style.display = 'none'; return; }
+  const name = PLANS.find(p => p[0] === id)?.[1] || '';
+  const cfg  = getConfig(id);
+
+  document.getElementById('sv-title').textContent = `${id} — ${name}`;
+  const container = document.getElementById('sv-fields');
+  container.innerHTML = '';
+
+  const rows = [
+    { label:'Business Type (BIZ)',         show: cfg.hasBizType,   desc:'NB / PORT / RENEWAL dropdown' },
+    { label:'Cover Type (COV)',             show: cfg.hasCoverType, desc:'Individual / Floater selector' },
+    { label:'Total Members (MEM)',          show: cfg.hasMembers,   desc:'How many members dropdown' },
+    { label:'Children < 25 yrs (CHD)',     show: cfg.hasChildren,  desc:'Number of children dropdown' },
+    { label:'Sum Insured slider (SI)',      show: true,             desc:`Options: ${(cfg.siValues||DEFAULT_SI).map(v=>v+'L').join(', ')}` },
+    { label:'Tenure (TEN)',                 show: cfg.hasTenure,    desc:'1 Year / 2 Year / 3 Year' },
+    { label:'Age of Eldest Member',        show: true,             desc:'Always shown' },
+    { label:'Age of Member 2',             show: cfg.hasMembers,   desc:'Shown when Members ≥ 2' },
+  ];
+
+  rows.forEach(r => {
+    const div = document.createElement('div');
+    div.className = 'field-row';
+    div.innerHTML = `
+      <div class="field-name">${r.label}</div>
+      <span class="badge ${r.show ? 'show' : 'hide'}">${r.show ? '✓ SHOWN' : '✗ HIDDEN'}</span>
+      <span class="si-vals">${r.desc}</span>`;
+    container.appendChild(div);
+  });
+
+  document.getElementById('single-view').style.display = 'block';
+  document.getElementById('all-view').style.display = 'none';
+}
+
+// ── All plans table ──
+function showAll() {
+  const tbody = document.getElementById('all-tbody');
+  tbody.innerHTML = '';
+
+  PLANS.forEach(([id, name]) => {
+    const c = getConfig(id);
+    const si = (c.siValues || DEFAULT_SI).map(v => v + 'L').join(', ');
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td class="pid">${id}</td>
+      <td>${name}</td>
+      <td class="${c.hasBizType   ? 'y' : 'n'}">${c.hasBizType   ? '✓' : '✗'}</td>
+      <td class="${c.hasCoverType ? 'y' : 'n'}">${c.hasCoverType ? '✓' : '✗'}</td>
+      <td class="${c.hasMembers   ? 'y' : 'n'}">${c.hasMembers   ? '✓' : '✗'}</td>
+      <td class="${c.hasChildren  ? 'y' : 'n'}">${c.hasChildren  ? '✓' : '✗'}</td>
+      <td class="${c.hasTenure    ? 'y' : 'n'}">${c.hasTenure    ? '✓' : '✗'}</td>
+      <td class="si-small">${si}</td>`;
+    tbody.appendChild(tr);
+  });
+
+  document.getElementById('all-view').style.display = 'block';
+  document.getElementById('single-view').style.display = 'none';
+}
+
+// Auto-show table on load
+showAll();
+</script>
+</body>
+</html>

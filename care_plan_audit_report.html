@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<title>Care Health — Plan Field Audit Report</title>
+<style>
+body { font-family: Arial, sans-serif; font-size: 13px; background:#f5f7fa; margin:0; padding:16px; }
+h1 { color:#1B75BC; margin-bottom:6px; }
+.legend { display:flex; gap:16px; margin-bottom:12px; font-size:12px; }
+.leg { display:flex; align-items:center; gap:5px; }
+.dot { width:12px;height:12px;border-radius:50%; }
+.g{background:#43A047;} .r{background:#E53935;} .b{background:#9E9E9E;}
+table { border-collapse:collapse; width:100%; background:#fff; box-shadow:0 1px 4px rgba(0,0,0,.1); }
+th { background:#1B75BC; color:#fff; padding:7px 8px; text-align:center; font-size:12px; white-space:nowrap; position:sticky; top:0; z-index:10; }
+th.lh { text-align:left; }
+td { padding:5px 8px; border-bottom:1px solid #e8ecf0; vertical-align:middle; }
+tr:hover { background:#f0f7ff; }
+.plan-id { font-weight:700; color:#1B75BC; font-size:11px; }
+.plan-name { font-size:12px; color:#333; }
+.y { text-align:center; color:#43A047; font-weight:700; }
+.n { text-align:center; color:#E53935; font-weight:700; }
+.si-cell { font-size:11px; color:#546e7a; }
+.mismatch-row { background:#fff8e1 !important; }
+.mismatch-cell { background:#ffecb3; font-weight:700; }
+.note { font-size:10px; color:#F57C00; display:block; }
+.section-hdr td { background:#E3F2FD; font-weight:700; font-size:11px; color:#1B75BC; padding:4px 8px; }
+</style>
+</head>
+<body>
+
+<h1>Care Health — Plan Field Audit Report</h1>
+<p style="color:#546e7a;font-size:12px;margin-bottom:8px;">
+  Data source: Live portal audit (Jul 2026) via <code>care_audit.js</code><br/>
+  Columns: BIZ = Business Type &nbsp;|&nbsp; COV = Cover Type selector &nbsp;|&nbsp; MEM = Total Members &nbsp;|&nbsp; CHD = Children &nbsp;|&nbsp; TEN = Tenure &nbsp;|&nbsp; SI = Sum Insured
+</p>
+
+<div class="legend">
+  <div class="leg"><div class="dot g"></div> Field shown in portal</div>
+  <div class="leg"><div class="dot r"></div> Field NOT shown in portal</div>
+  <div class="leg"><div class="dot b"></div> Field shown but with unusual options</div>
+  <div style="margin-left:auto;color:#F57C00;font-weight:700;">⚠ Yellow rows/cells = code mismatch found</div>
+</div>
+
+<table>
+<thead>
+<tr>
+  <th class="lh" style="width:55px;">Plan ID</th>
+  <th class="lh" style="min-width:220px;">Plan Name</th>
+  <th>BIZ</th>
+  <th>COV</th>
+  <th>MEM</th>
+  <th>CHD</th>
+  <th>TEN</th>
+  <th class="lh">SI Values (code) / Audit default</th>
+  <th class="lh">Notes from Audit</th>
+</tr>
+</thead>
+<tbody>
+
+<!-- ── Care Supreme family ── -->
+<tr class="section-hdr"><td colspan="9">Care Supreme Family</td></tr>
+
+<tr>
+  <td class="plan-id">2813</td>
+  <td class="plan-name">Care Supreme</td>
+  <td class="y">Y</td><td class="y">Y</td><td class="y">Y</td><td class="y">Y</td><td class="y">Y</td>
+  <td class="si-cell">5,7,10,15,25,50,100L &nbsp;|&nbsp; default 10L</td>
+  <td>Standard family plan ✓</td>
+</tr>
+<tr>
+  <td class="plan-id">6043</td>
+  <td class="plan-name">Care Supreme - VFM</td>
+  <td class="y">Y</td><td class="y">Y</td><td class="y">Y</td><td class="y">Y</td><td class="y">Y</td>
+  <td class="si-cell">5,7,10,15,25,50,100L &nbsp;|&nbsp; default 10L</td>
+  <td>✓</td>
+</tr>
+<tr>
+  <td class="plan-id">6541</td>
+  <td class="plan-name">Care Supreme - Super Saver</td>
+  <td class="y">Y</td><td class="y">Y</td><td class="y">Y</td><td class="y">Y</td><td class="y">Y</td>
+  <td class="si-cell">5,7,10,15,25,50,100L &nbsp;|&nbsp; default 10L</td>
+  <td>✓</td>
+</tr>
+<tr>
+  <td class="plan-id">6674</td>
+  <td class="plan-name">Care Supreme - VFM 2</td>
+  <td class="y">Y</td><td class="y">Y</td><td class="y">Y</td><td class="y">Y</td><td class="y">Y</td>
+  <td class="si-cell">5,7,10,15,25,50,100L &nbsp;|&nbsp; default 10L</td>
+  <td>✓</td>
+</tr>
+<tr>
+  <td class="plan-id">6676</td>
+  <td class="plan-name">Care Supreme - VFM 3</td>
+  <td class="y">Y</td><td class="y">Y</td><td class="y">Y</td><td class="y">Y</td><td class="y">Y</td>
+  <td class="si-cell">5,7,10,15,25,50,100L &nbsp;|&nbsp; default 10L</td>
+  <td>✓</td>
+</tr>
+<tr>
+  <td class="plan-id">6619</td>
+  <td class="plan-name">Ultimate Care</td>
+  <td class="y">Y</td><td class="y">Y</td><td class="y">Y</td><td class="y">Y</td><td class="y">Y</td>
+  <td class="si-cell">5,7,10,15,25,50,100L &nbsp;|&nbsp; default 10L</td>
+  <td>✓</td>
+</tr>
+<tr>
+  <td class="plan-id">7218</td>
+  <td class="plan-name">Care Supreme Shine</td>
+  <td class="y">Y</td><td class="y">Y</td><td class="y">Y</td><td class="y">Y</td><td class="y">Y</td>
+  <td class="si-cell">5,7,10,15,25,50,100L &nbsp;|&nbsp; default 10L</td>
+  <td>✓</td>
+</tr>
+<tr>
+  <td class="plan-id">7172</td>
+  <td class="plan-name">Ultimate Care Senior</td>
+  <td class="y">Y</td><td class="y">Y</td><td class="y">Y</td><td class="y">Y</td><td class="y">Y</td>
+  <td class="si-cell">5,7,10,15,25,50,100L &nbsp;|&nbsp; default 10L</td>
+  <td>CHD=Y confirmed — senior plan still shows children ✓</td>
+</tr>
+<tr>
+  <td class="plan-id">6434</td>
+  <td class="plan-name">Supreme Enhance</td>
+  <td class="n">N</td><td class="y">Y</td><td class="y">Y</td><td class="y">Y</td><td class="y">Y</td>
+  <td class="si-cell">5,7,10,15,25,50,100L &nbsp;|&nbsp; default 5L</td>
+  <td>BIZ=N (no Business Type field) — not in BIZ_PLANS ✓</td>
+</tr>
+<tr>
+  <td class="plan-id">5412</td>
+  <td class="plan-name">Care Freedom</td>
+  <td class="n">N</td><td class="y">Y</td><td class="y">Y</td><td class="y">Y</td><td class="y">Y</td>
+  <td class="si-cell">5,7,10,15,25,50,100L &nbsp;|&nbsp; default 3L</td>
+  <td>BIZ=N, COV=Y — standard family plan ✓</td>
+</tr>
+<tr>
+  <td class="plan-id">1734</td>
+  <td class="plan-name">Super Care Advantage</td>
+  <td class="n">N</td><td class="n">N</td><td class="y">Y</td><td class="y">Y</td><td class="y">Y</td>
+  <td class="si-cell">5,7,10,15,25,50,100L &nbsp;|&nbsp; default 100L ⚠</td>
+  <td>No Cover Type selector. Default 100L (=1Cr) — range needs portal check</td>
+</tr>
+<tr>
+  <td class="plan-id">748</td>
+  <td class="plan-name">Enhance</td>
+  <td class="n">N</td><td class="y">Y</td><td class="y">Y</td><td class="y">Y</td><td class="y">Y</td>
+  <td class="si-cell">2,3,5,7,10,15,25L &nbsp;|&nbsp; default 2L</td>
+  <td>Starts from 2L — corrected ✓</td>
+</tr>
+
+<!-- ── POS Care Supreme family ── -->
+<tr class="section-hdr"><td colspan="9">POS Care Supreme Family</td></tr>
+
+<tr>
+  <td class="plan-id">7484</td>
+  <td class="plan-name">POS Care Supreme Shine</td>
+  <td class="y">Y</td><td class="y">Y</td><td class="y">Y</td><td class="y">Y</td><td class="y">Y</td>
+  <td class="si-cell">5,7,10,15L &nbsp;|&nbsp; default 10L</td>
+  <td>POS — confirmed cap at 15L ✓</td>
+</tr>
+<tr>
+  <td class="plan-id">7159</td>
+  <td class="plan-name">POS Care Supreme - Super Saver</td>
+  <td class="y">Y</td><td class="y">Y</td><td class="y">Y</td><td class="y">Y</td><td class="y">Y</td>
+  <td class="si-cell">5,7,10,15,25,50,100L &nbsp;|&nbsp; default 10L</td>
+  <td>Audit default=10L, range needs verify</td>
+</tr>
+<tr>
+  <td class="plan-id">6725</td>
+  <td class="plan-name">POS Ultimate Care</td>
+  <td class="y">Y</td><td class="y">Y</td><td class="y">Y</td><td class="y">Y</td><td class="y">Y</td>
+  <td class="si-cell">5,7,10,15,25,50,100L &nbsp;|&nbsp; default 10L</td>
+  <td>✓</td>
+</tr>
+<tr>
+  <td class="plan-id">6677</td>
+  <td class="plan-name">POS Care Supreme - VFM 3</td>
+  <td class="y">Y</td><td class="y">Y</td><td class="y">Y</td><td class="y">Y</td><td class="y">Y</td>
+  <td class="si-cell">5,7,10,15,25,50,100L &nbsp;|&nbsp; default 5L</td>
+  <td>✓</td>
+</tr>
+<tr>
+  <td class="plan-id">6675</td>
+  <td class="plan-name">POS Care Supreme - VFM 2</td>
+  <td class="y">Y</td><td class="y">Y</td><td class="y">Y</td><td class="y">Y</td><td class="y">Y</td>
+  <td class="si-cell">5,7,10,15,25,50,100L &nbsp;|&nbsp; default 5L</td>
+  <td>✓</td>
+</tr>
+<tr>
+  <td class="plan-id">6217</td>
+  <td class="plan-name">POS Care Supreme - VFM</td>
+  <td class="y">Y</td><td class="y">Y</td><td class="y">Y</td><td class="y">Y</td><td class="y">Y</td>
+  <td class="si-cell">5,7,10,15,25,50,100L &nbsp;|&nbsp; default 5L</td>
+  <td>✓</td>
+</tr>
+<tr>
+  <td class="plan-id">5399</td>
+  <td class="plan-name">POS Care Supreme</td>
+  <td class="y">Y</td><td class="y">Y</td><td class="y">Y</td><td class="y">Y</td><td class="y">Y</td>
+  <td class="si-cell">5,7,10,15,25,50,100L &nbsp;|&nbsp; default 10L</td>
+  <td>✓</td>
+</tr>
+
+<!-- ── Care Smart Select ── -->
+<tr class="section-hdr"><td colspan="9">Care Smart Select</td></tr>
+
+<tr>
+  <td class="plan-id">5335</td>
+  <td class="plan-name">POS Care Smart Select</td>
+  <td class="n">N</td><td class="y">Y</td><td class="y">Y</td><td class="y">Y</td><td class="y">Y</td>
+  <td class="si-cell">5,7,10,15L &nbsp;|&nbsp; default ? (not parsed)</td>
+  <td>SI not parsed by audit script — range assumed 5–15L for POS</td>
+</tr>
+<tr>
+  <td class="plan-id">5334</td>
+  <td class="plan-name">Care Smart Select</td>
+  <td class="n">N</td><td class="y">Y</td><td class="y">Y</td><td class="y">Y</td><td class="y">Y</td>
+  <td class="si-cell">5,10,15,20,25,50,100L &nbsp;|&nbsp; default 20L</td>
+  <td>Includes 20L option ✓</td>
+</tr>
+
+<!-- ── Care Supreme Shine variants ── -->
+<tr class="section-hdr"><td colspan="9">Secure Plus</td></tr>
+
+<tr>
+  <td class="plan-id">7424</td>
+  <td class="plan-name">POS Secure Plus</td>
+  <td class="n">N</td><td class="n">N</td><td class="y">Y</td><td class="n">N</td><td class="y">Y</td>
+  <td class="si-cell">5,7,10,15L &nbsp;|&nbsp; default ? (not parsed)</td>
+  <td>No Cover Type. SI not parsed — range assumed 5–15L</td>
+</tr>
+<tr>
+  <td class="plan-id">6384</td>
+  <td class="plan-name">Secure Plus</td>
+  <td class="n">N</td><td class="n">N</td><td class="y">Y</td><td class="n">N</td><td class="y">Y</td>
+  <td class="si-cell">5,7,10,15L &nbsp;|&nbsp; default ? (not parsed)</td>
+  <td>No Cover Type. SI not parsed — range assumed 5–15L</td>
+</tr>
+
+<!-- ── Care / POS Care ── -->
+<tr class="section-hdr"><td colspan="9">Care / POS Care</td></tr>
+
+<tr>
+  <td class="plan-id">3485</td>
+  <td class="plan-name">Care</td>
+  <td class="n">N</td><td class="y">Y</td><td class="y">Y</td><td class="y">Y</td><td class="y">Y</td>
+  <td class="si-cell">3,4,5,7,10,15,25,50L &nbsp;|&nbsp; default 10L</td>
+  <td>BIZ=N ✓</td>
+</tr>
+<tr>
+  <td class="plan-id">3486</td>
+  <td class="plan-name">POS Care</td>
+  <td class="n">N</td><td class="y">Y</td><td class="y">Y</td><td class="y">Y</td><td class="y">Y</td>
+  <td class="si-cell">3,4,5,7,10,15,25,50L &nbsp;|&nbsp; default 5L</td>
+  <td>BIZ=N ✓</td>
+</tr>
+
+<!-- ── Senior plans ── -->
+<tr class="section-hdr"><td colspan="9">Senior Plans</td></tr>
+
+<tr>
+  <td class="plan-id">3487</td>
+  <td class="plan-name">Care Senior</td>
+  <td class="n">N</td><td class="y">Y</td><td class="y">Y</td><td class="y">Y</td><td class="y">Y</td>
+  <td class="si-cell">3,5,7,10,15L &nbsp;|&nbsp; default 10L</td>
+  <td>CHD=Y confirmed — senior plan still shows children ✓</td>
+</tr>
+<tr>
+  <td class="plan-id">3488</td>
+  <td class="plan-name">POS Care Senior</td>
+  <td class="n">N</td><td class="y">Y</td><td class="y">Y</td><td class="y">Y</td><td class="y">Y</td>
+  <td class="si-cell">3,5,7,10,15L &nbsp;|&nbsp; default 3L</td>
+  <td>CHD=Y confirmed ✓</td>
+</tr>
+<tr>
+  <td class="plan-id">7172</td>
+  <td class="plan-name">Ultimate Care Senior</td>
+  <td class="y">Y</td><td class="y">Y</td><td class="y">Y</td><td class="y">Y</td><td class="y">Y</td>
+  <td class="si-cell">5,7,10,15,25,50,100L &nbsp;|&nbsp; default 10L</td>
+  <td>CHD=Y confirmed ✓</td>
+</tr>
+<tr>
+  <td class="plan-id">2534</td>
+  <td class="plan-name">Sr Health Advantage - Silver</td>
+  <td class="n">N</td><td class="y">Y</td><td class="y">Y</td><td class="n">N</td><td class="y">Y</td>
+  <td class="si-cell">3,5,7,10,15,25L &nbsp;|&nbsp; default 5L</td>
+  <td>CHD=N (only senior adults — no children) ✓</td>
+</tr>
+
+<!-- ── Classic / Advantage / Plus ── -->
+<tr class="section-hdr"><td colspan="9">Care Classic / Advantage / Plus</td></tr>
+
+<tr>
+  <td class="plan-id">1432</td>
+  <td class="plan-name">Care Classic</td>
+  <td class="n">N</td><td class="n">N</td><td class="y">Y</td><td class="y">Y</td><td class="y">Y</td>
+  <td class="si-cell">3,5,7,10,15,25L &nbsp;|&nbsp; default 10L</td>
+  <td>No Cover Type but has Members+Children ✓</td>
+</tr>
+<tr>
+  <td class="plan-id">1992</td>
+  <td class="plan-name">Care Classic - Instant Cover</td>
+  <td class="n">N</td><td class="n">N</td><td class="y">Y</td><td class="y">Y</td><td class="y">Y</td>
+  <td class="si-cell">3,5,7,10,15,25L &nbsp;|&nbsp; default 5L</td>
+  <td>No Cover Type but has Members+Children ✓</td>
+</tr>
+<tr>
+  <td class="plan-id">6196</td>
+  <td class="plan-name">Care Advantage</td>
+  <td class="y">Y</td><td class="n">N</td><td class="y">Y</td><td class="y">Y</td><td class="y">Y</td>
+  <td class="si-cell">3,5,7,10,15,25L &nbsp;|&nbsp; default 25L</td>
+  <td>BIZ=Y, No Cover Type, has Members+Children. Default 25L</td>
+</tr>
+<tr>
+  <td class="plan-id">1187</td>
+  <td class="plan-name">Care Plus - Complete Plan</td>
+  <td class="n">N</td><td class="y">Y</td><td class="y">Y</td><td class="y">Y</td><td class="y">Y</td>
+  <td class="si-cell">3,5,7,10,15,25L &nbsp;|&nbsp; default 5L</td>
+  <td>✓</td>
+</tr>
+<tr>
+  <td class="plan-id">1186</td>
+  <td class="plan-name">Care Plus - Youth Plan</td>
+  <td class="n">N</td><td class="y">Y</td><td class="y">Y</td><td class="y">Y</td><td class="y">Y</td>
+  <td class="si-cell">3,5,7,10,15,25L &nbsp;|&nbsp; default 5L</td>
+  <td>✓</td>
+</tr>
+
+<!-- ── Explore ── -->
+<tr class="section-hdr"><td colspan="9">Explore Plans</td></tr>
+
+<tr>
+  <td class="plan-id">5833</td>
+  <td class="plan-name">New Explore</td>
+  <td class="n">N</td><td class="n">N</td><td class="n">N</td><td class="n">N</td><td class="y">Y</td>
+  <td class="si-cell">5,7,10,15,25L &nbsp;|&nbsp; default 10L</td>
+  <td>No Cover/Members/Children — fixed SI plan ✓</td>
+</tr>
+<tr>
+  <td class="plan-id">5834</td>
+  <td class="plan-name">POS Explore</td>
+  <td class="n">N</td><td class="n">N</td><td class="n">N</td><td class="n">N</td><td class="y">Y</td>
+  <td class="si-cell">5,7,10,15,25L &nbsp;|&nbsp; default 10L</td>
+  <td>No Cover/Members/Children — fixed SI plan ✓</td>
+</tr>
+
+<!-- ── Secure Child / Secure Plus ── -->
+<tr class="section-hdr"><td colspan="9">Child / Secure Plans</td></tr>
+
+<tr>
+  <td class="plan-id">7425</td>
+  <td class="plan-name">POS Secure Child</td>
+  <td class="n">N</td><td class="n">N</td><td class="y">Y</td><td class="n">N</td><td class="y">Y</td>
+  <td class="si-cell">3,5,7,10L &nbsp;|&nbsp; SI not parsed by audit</td>
+  <td>Has Members (child count) but no Cover Type or Children ✓</td>
+</tr>
+<tr>
+  <td class="plan-id">6740</td>
+  <td class="plan-name">Secure Child</td>
+  <td class="n">N</td><td class="n">N</td><td class="y">Y</td><td class="n">N</td><td class="y">Y</td>
+  <td class="si-cell">3,5,7,10L &nbsp;|&nbsp; SI not parsed by audit</td>
+  <td>Has Members (child count) but no Cover Type or Children ✓</td>
+</tr>
+<tr>
+  <td class="plan-id">573</td>
+  <td class="plan-name">POS Secure</td>
+  <td class="n">N</td><td class="n">N</td><td class="n">N</td><td class="n">N</td><td class="y">Y</td>
+  <td class="si-cell">5,10,15,25,50L &nbsp;|&nbsp; default 50L ⚠</td>
+  <td>No Cover/Members/Children. Default 50L — range needs portal check</td>
+</tr>
+<tr>
+  <td class="plan-id">188</td>
+  <td class="plan-name">Secure</td>
+  <td class="n">N</td><td class="n">N</td><td class="n">N</td><td class="n">N</td><td class="y">Y</td>
+  <td class="si-cell">3,5,7,10L &nbsp;|&nbsp; default 300 ⚠ (possibly ₹3L parsed differently)</td>
+  <td>No Cover/Members/Children. SI=300 might be ₹3,00,000 (3L) in thousands</td>
+</tr>
+
+<!-- ── Specialised ── -->
+<tr class="section-hdr"><td colspan="9">Specialised Plans</td></tr>
+
+<tr>
+  <td class="plan-id">425</td>
+  <td class="plan-name">Care Heart</td>
+  <td class="n">N</td><td class="y">Y</td><td class="y">Y</td><td class="n">N</td><td class="y">Y</td>
+  <td class="si-cell">3,5,7,10,15L &nbsp;|&nbsp; default 3L</td>
+  <td>Has Cover+Members, NO Children. Cardiac plan ✓</td>
+</tr>
+<tr>
+  <td class="plan-id">585</td>
+  <td class="plan-name">Cancer Mediclaim (Advance)</td>
+  <td class="n">N</td><td class="n">N</td><td class="y">Y</td><td class="n">N</td><td class="y">Y</td>
+  <td class="si-cell">10,15,25,50L &nbsp;|&nbsp; default 25L</td>
+  <td>No Cover Type. Has Members, no Children. ✓</td>
+</tr>
+<tr>
+  <td class="plan-id">362</td>
+  <td class="plan-name">Super Mediclaim</td>
+  <td class="n">N</td><td class="n">N</td><td class="y">Y</td><td class="n">N</td><td class="y">Y</td>
+  <td class="si-cell">5,7,10,15,25L &nbsp;|&nbsp; default 10L</td>
+  <td>No Cover Type. Has Members, no Children. ✓</td>
+</tr>
+<tr>
+  <td class="plan-id">6395</td>
+  <td class="plan-name">Surrogacy and Oocyte Donor</td>
+  <td class="n">N</td><td class="n">N</td><td class="y">Y</td><td class="n">N</td><td class="y">Y</td>
+  <td class="si-cell">5,7,10,15,25L &nbsp;|&nbsp; default 5L</td>
+  <td>No Cover Type. Has Members, no Children. ✓</td>
+</tr>
+<tr>
+  <td class="plan-id">5673</td>
+  <td class="plan-name">Care Global</td>
+  <td class="n">N</td><td class="n">N</td><td class="y">Y</td><td class="y">Y</td><td class="y">Y</td>
+  <td class="si-cell">50,100,200,300,500 &nbsp;|&nbsp; default 100 ⚠</td>
+  <td>International plan — SI in USD thousands. No Cover Type. Has Members+Children.</td>
+</tr>
+
+<!-- ── Maternity ── -->
+<tr class="section-hdr"><td colspan="9">Maternity Plans</td></tr>
+
+<tr>
+  <td class="plan-id">102</td>
+  <td class="plan-name">Joy</td>
+  <td class="n">N</td><td class="y">Y</td><td class="y">Y</td><td class="y">Y</td><td class="n">N</td>
+  <td class="si-cell">3,5L &nbsp;|&nbsp; default 3L</td>
+  <td><strong>NO TENURE FIELD</strong> — tenure section must be hidden ✓</td>
+</tr>
+<tr>
+  <td class="plan-id">5955</td>
+  <td class="plan-name">Joy Tomorrow</td>
+  <td class="n">N</td><td class="y">Y</td><td class="y">Y</td><td class="y">Y</td><td class="y">Y</td>
+  <td class="si-cell">3,5L &nbsp;|&nbsp; default 3L</td>
+  <td>Has Cover+Members+Children (maternity, supports family) ✓</td>
+</tr>
+
+<!-- ── Student ── -->
+<tr class="section-hdr"><td colspan="9">Student Plans</td></tr>
+
+<tr>
+  <td class="plan-id">107</td>
+  <td class="plan-name">Student Explore</td>
+  <td class="n">N</td><td class="y">Y*</td><td class="n">N</td><td class="n">N</td><td class="y">Y*</td>
+  <td class="si-cell">[30] &nbsp;|&nbsp; default 30 ⚠</td>
+  <td>*COV=Y but options are "NNNNNNNNN" (unusual). *TEN in months (1–24 months not years). SI may be fixed at 30L or $30K.</td>
+</tr>
+<tr>
+  <td class="plan-id">5674</td>
+  <td class="plan-name">Student Explore-Health Unlimited</td>
+  <td class="n">N</td><td class="n">N</td><td class="y">Y</td><td class="n">N</td><td class="y">Y</td>
+  <td class="si-cell">5,7,10L &nbsp;|&nbsp; SI not parsed</td>
+  <td>No Cover Type. Has Members (student count), no Children. ✓</td>
+</tr>
+
+</tbody>
+</table>
+
+<div style="margin-top:20px;padding:12px;background:#fff;border-left:4px solid #F57C00;font-size:12px;color:#333;">
+  <strong>⚠ Items needing portal verification:</strong><br/>
+  1. <strong>SI ranges</strong> for 7159, 6725, 6677, 6675, 6217, 5335, 7424, 6384, 7425, 6740, 5674 — audit couldn't parse full range, only default value captured.<br/>
+  2. <strong>573 (POS Secure)</strong> — default SI=50L seems high for a POS plan; actual range unknown.<br/>
+  3. <strong>188 (Secure)</strong> — SI=300 might be ₹3L stored in thousands or a different unit.<br/>
+  4. <strong>107 (Student Explore)</strong> — Cover Type has unusual options; Tenure is in months not years. Both need special UI handling.<br/>
+  5. <strong>1734 (Super Care Advantage)</strong> — SI default=100L (1 Crore) needs confirmation.
+</div>
+
+</body>
+</html>

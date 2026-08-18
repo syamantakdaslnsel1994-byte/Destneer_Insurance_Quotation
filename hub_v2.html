@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Insurance Premium Hub</title>
+<script src="https://cdn.jsdelivr.net/npm/exceljs@4.3.0/dist/es5/exceljs.browser.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+/* ── Reset ────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; overflow: hidden; font-family: 'Inter', system-ui, sans-serif; font-size: 13px; color: #1e293b; }
+
+/* ── App Header ───────────────────────────────── */
+.app-hdr {
+  height: 52px; background: #0f172a; color: #fff;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 20px; flex-shrink: 0; z-index: 200;
+  box-shadow: 0 2px 10px rgba(0,0,0,.3);
+}
+.hdr-brand { display: flex; align-items: center; gap: 10px; }
+.hdr-icon { width: 32px; height: 32px; background: linear-gradient(135deg,#3b82f6,#0ea5e9); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 16px; }
+.hdr-title { font-size: 15px; font-weight: 700; letter-spacing: -.3px; }
+.hdr-sub   { font-size: 10.5px; color: #64748b; margin-top: 1px; }
+.hdr-right { display: flex; align-items: center; gap: 10px; }
+.live-badge { background: rgba(34,197,94,.12); color: #4ade80; border: 1px solid rgba(34,197,94,.25); border-radius: 20px; padding: 2px 10px; font-size: 10px; font-weight: 700; letter-spacing: .6px; display: flex; align-items: center; gap: 5px; }
+.live-dot { width: 6px; height: 6px; background: #22c55e; border-radius: 50%; animation: blink 2s infinite; }
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
+.hdr-btn { background: linear-gradient(135deg,#16a34a,#15803d); color: #fff; border: none; border-radius: 8px; padding: 7px 16px; font-family: inherit; font-size: 12.5px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 7px; box-shadow: 0 2px 8px rgba(22,163,74,.35); transition: all .2s; }
+.hdr-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 14px rgba(22,163,74,.45); }
+.hdr-btn:disabled { opacity: .6; cursor: not-allowed; transform: none; }
+
+/* ── App Body ─────────────────────────────────── */
+.app-body { display: flex; height: calc(100vh - 52px); overflow: hidden; }
+
+/* ── Left Pane ────────────────────────────────── */
+.left-pane { flex: 0 0 50%; min-width: 280px; max-width: 80%; display: flex; flex-direction: column; overflow: hidden; background: #fff; }
+
+/* Insurer Tabs */
+.ins-tabbar { display: flex; background: #1e293b; flex-shrink: 0; height: 44px; align-items: stretch; }
+.ins-tab {
+  flex: 1; border: none; background: transparent; cursor: pointer;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 1px; padding: 0 6px; transition: background .15s; position: relative;
+  font-family: inherit;
+}
+.ins-tab:hover { background: rgba(255,255,255,.07); }
+.ins-tab.active { background: rgba(255,255,255,.12); }
+.ins-tab.active::after { content:''; position:absolute; bottom:0; left:10%; right:10%; height:2px; border-radius:2px 2px 0 0; background: var(--tc, #3b82f6); }
+.ins-tab-label { font-size: 11px; font-weight: 700; color: #94a3b8; letter-spacing: .2px; }
+.ins-tab.active .ins-tab-label { color: #e2e8f0; }
+.ins-tab-sub { font-size: 9px; color: #475569; }
+.ins-tab.active .ins-tab-sub { color: #94a3b8; }
+
+/* Iframe area */
+.iframe-area { flex: 1; position: relative; overflow: hidden; }
+.calc-frame { position: absolute; inset: 0; width: 100%; height: 100%; border: none; opacity: 0; pointer-events: none; transition: opacity .2s; }
+.calc-frame.active { opacity: 1; pointer-events: all; }
+
+/* ── Divider ──────────────────────────────────── */
+.pane-divider {
+  flex: 0 0 10px; background: #e2e8f0; cursor: col-resize;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 0; position: relative; z-index: 100; transition: background .15s; user-select: none;
+}
+.pane-divider:hover, .pane-divider.dragging { background: #c7d2e0; }
+.divider-dots { font-size: 14px; color: #94a3b8; line-height: .9; letter-spacing: -1px; pointer-events: none; }
+.pane-toggle-btn {
+  position: absolute; top: 50%; transform: translateY(-50%);
+  width: 20px; height: 44px; background: #334155; color: #94a3b8;
+  border: none; border-radius: 4px; cursor: pointer; display: flex;
+  align-items: center; justify-content: center; font-size: 10px;
+  transition: all .15s; z-index: 10;
+}
+.pane-toggle-btn:hover { background: #475569; color: #e2e8f0; }
+
+/* ── Right Pane ───────────────────────────────── */
+.right-pane { flex: 1; display: flex; flex-direction: column; overflow: hidden; background: #f8fafc; min-width: 0; }
+.right-pane.hidden { display: none; }
+
+/* Member Section */
+.member-sec { flex-shrink: 0; background: #fff; border-bottom: 2px solid #e2e8f0; max-height: 220px; display: flex; flex-direction: column; overflow: hidden; transition: max-height .3s ease; }
+.member-sec.collapsed { max-height: 42px; }
+.sec-hdr {
+  height: 42px; flex-shrink: 0; display: flex; align-items: center; justify-content: space-between;
+  padding: 0 14px; cursor: pointer; background: #f1f5f9; border-bottom: 1px solid #e2e8f0;
+  user-select: none;
+}
+.sec-hdr-left { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 700; color: #0f172a; }
+.sec-hdr-right { display: flex; align-items: center; gap: 8px; }
+.mini-btn { background: #eff6ff; color: #2563eb; border: 1px solid #bfdbfe; border-radius: 6px; padding: 3px 10px; font-family: inherit; font-size: 11px; font-weight: 700; cursor: pointer; transition: all .15s; }
+.mini-btn:hover { background: #dbeafe; }
+.caret-icon { font-size: 10px; color: #94a3b8; transition: transform .2s; }
+.member-sec.collapsed .caret-icon { transform: rotate(-90deg); }
+
+.member-body { flex: 1; overflow: auto; }
+.member-tbl { width: 100%; border-collapse: collapse; font-size: 12px; }
+.member-tbl th { background: #f8fafc; color: #64748b; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .4px; padding: 6px 8px; text-align: left; border-bottom: 1px solid #e2e8f0; white-space: nowrap; position: sticky; top: 0; }
+.member-tbl td { padding: 5px 6px; border-bottom: 1px solid #f1f5f9; vertical-align: middle; }
+.member-tbl tbody tr:last-child td { border-bottom: none; }
+.member-tbl input, .member-tbl select { border: 1px solid #e2e8f0; border-radius: 5px; padding: 3px 6px; font-size: 11px; font-family: inherit; color: #1e293b; background: #fff; width: 100%; }
+.member-tbl input:focus, .member-tbl select:focus { outline: none; border-color: #3b82f6; }
+.del-btn { background: #fef2f2; color: #ef4444; border: 1px solid #fecaca; border-radius: 5px; padding: 2px 7px; font-size: 10px; cursor: pointer; font-family: inherit; font-weight: 700; white-space: nowrap; }
+.del-btn:hover { background: #fee2e2; }
+
+/* Comparison Section */
+.comp-sec { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+.comp-sec-hdr { display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; background: #fff; border-bottom: 1px solid #e2e8f0; flex-shrink: 0; }
+.comp-sec-title { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 800; color: #0f172a; }
+.quote-badge { background: #0f172a; color: #fff; border-radius: 10px; padding: 1px 8px; font-size: 10.5px; font-weight: 700; }
+.comp-actions { display: flex; gap: 7px; }
+.act-btn { border-radius: 7px; padding: 5px 12px; font-family: inherit; font-size: 11.5px; font-weight: 700; cursor: pointer; transition: all .15s; display: flex; align-items: center; gap: 5px; }
+.act-btn.clear { background: #fff; border: 1px solid #e2e8f0; color: #64748b; }
+.act-btn.clear:hover { border-color: #ef4444; color: #ef4444; background: #fef2f2; }
+.act-btn.gen { background: linear-gradient(135deg,#16a34a,#15803d); border: none; color: #fff; box-shadow: 0 2px 6px rgba(22,163,74,.3); }
+.act-btn.gen:hover { box-shadow: 0 4px 12px rgba(22,163,74,.4); transform: translateY(-1px); }
+
+/* Comparison Body */
+.comp-body { flex: 1; overflow-y: auto; padding: 12px; display: flex; flex-direction: column; gap: 10px; }
+.comp-body::-webkit-scrollbar { width: 4px; }
+.comp-body::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 2px; }
+
+/* Empty State */
+.comp-empty { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; gap: 10px; padding: 24px; text-align: center; color: #94a3b8; }
+.empty-ico { font-size: 48px; opacity: .25; }
+.empty-ttl { font-size: 15px; font-weight: 700; color: #334155; }
+.empty-hint { font-size: 12px; color: #94a3b8; line-height: 1.6; max-width: 280px; }
+
+/* ── SI Group ─────────────────────────────────── */
+.si-group { background: #fff; border-radius: 12px; border: 1px solid #e2e8f0; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,.05); }
+.si-grp-hdr { display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; background: #f8fafc; border-bottom: 1px solid #e2e8f0; cursor: pointer; user-select: none; }
+.si-grp-left { display: flex; align-items: center; gap: 10px; }
+.si-pill { background: #1e293b; color: #fff; border-radius: 6px; padding: 3px 10px; font-size: 12px; font-weight: 800; letter-spacing: -.2px; }
+.si-rupee { font-size: 11px; color: #64748b; }
+.si-row-count { font-size: 10px; color: #94a3b8; }
+.si-caret { font-size: 11px; color: #94a3b8; transition: transform .2s; }
+.si-group.collapsed .si-caret { transform: rotate(-90deg); }
+.si-group.collapsed .si-grp-body { display: none; }
+
+/* Comparison Table */
+.comp-tbl { width: 100%; border-collapse: collapse; font-size: 12px; }
+.comp-tbl th { background: #f1f5f9; color: #475569; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .4px; padding: 7px 10px; text-align: left; border-bottom: 1px solid #e2e8f0; white-space: nowrap; }
+.comp-tbl th.prem-col { text-align: right; }
+.comp-tbl td { padding: 8px 10px; border-bottom: 1px solid #f1f5f9; vertical-align: middle; }
+.comp-tbl tbody tr:last-child td { border-bottom: none; }
+.comp-tbl tbody tr:hover td { background: #f8fafc; }
+
+/* Company cell */
+.company-cell { display: flex; align-items: center; gap: 7px; }
+.co-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--c, #94a3b8); flex-shrink: 0; }
+.co-name { font-weight: 600; white-space: nowrap; color: #0f172a; }
+
+/* Plan type badges */
+.pt-badge { display: inline-flex; align-items: center; padding: 2px 8px; border-radius: 20px; font-size: 10px; font-weight: 700; white-space: nowrap; }
+.pt-ff  { background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; }
+.pt-mi  { background: #f0fdf4; color: #15803d; border: 1px solid #bbf7d0; }
+.pt-ind { background: #fef3c7; color: #92400e; border: 1px solid #fde68a; }
+.pt-unk { background: #f1f5f9; color: #64748b; border: 1px solid #e2e8f0; }
+
+/* Plan name */
+.plan-name { max-width: 130px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: #1d4ed8; font-weight: 500; }
+
+/* Premium cells */
+.prem-cell { text-align: right; font-weight: 600; color: #0f172a; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.prem-cell.empty { color: #cbd5e1; font-weight: 400; }
+.prem-best { color: #15803d; background: #f0fdf4; border-radius: 5px; padding: 1px 5px; }
+
+/* Addon */
+.addon-cell { max-width: 140px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: #0070c0; font-size: 11px; cursor: default; }
+
+/* Row delete */
+.row-del { background: none; border: none; color: #e2e8f0; cursor: pointer; font-size: 12px; padding: 2px 5px; border-radius: 4px; transition: all .15s; }
+.row-del:hover { color: #ef4444; background: #fef2f2; }
+
+/* ── Toast ────────────────────────────────────── */
+.toast { position: fixed; bottom: 18px; left: 50%; transform: translateX(-50%) translateY(12px); background: #0f172a; color: #fff; padding: 9px 18px; border-radius: 10px; font-size: 12.5px; font-weight: 600; box-shadow: 0 8px 24px rgba(0,0,0,.25); opacity: 0; transition: all .25s; z-index: 999; pointer-events: none; white-space: nowrap; }
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* ── Scrollbars ───────────────────────────────── */
+.member-body::-webkit-scrollbar { width: 4px; }
+.member-body::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 2px; }
+</style>
+</head>
+<body>
+
+<!-- ── App Header ─────────────────────────────── -->
+<header class="app-hdr">
+  <div class="hdr-brand">
+    <div class="hdr-icon">🏥</div>
+    <div>
+      <div class="hdr-title">Insurance Premium Hub</div>
+      <div class="hdr-sub">Live quotes · Side-by-side comparison · Excel report</div>
+    </div>
+  </div>
+  <div class="hdr-right">
+    <div class="live-badge"><span class="live-dot"></span>4 LIVE</div>
+    <button class="hdr-btn" id="genBtn" onclick="generateReport()">📥 Generate Excel Report</button>
+  </div>
+</header>
+
+<!-- ── App Body ────────────────────────────────── -->
+<div class="app-body">
+
+  <!-- ════════════════ LEFT PANE ════════════════ -->
+  <div class="left-pane" id="leftPane">
+
+    <!-- Insurer tab bar -->
+    <div class="ins-tabbar">
+      <button class="ins-tab active" style="--tc:#f97316" onclick="switchIns('care',this)">
+        <div class="ins-tab-label">Care</div>
+        <div class="ins-tab-sub">Health</div>
+      </button>
+      <button class="ins-tab" style="--tc:#e05c00" onclick="switchIns('niva',this)">
+        <div class="ins-tab-label">Niva</div>
+        <div class="ins-tab-sub">Bupa</div>
+      </button>
+      <button class="ins-tab" style="--tc:#0284c7" onclick="switchIns('mc',this)">
+        <div class="ins-tab-label">Manipal</div>
+        <div class="ins-tab-sub">Cigna</div>
+      </button>
+      <button class="ins-tab" style="--tc:#dc2626" onclick="switchIns('star',this)">
+        <div class="ins-tab-label">Star</div>
+        <div class="ins-tab-sub">Health</div>
+      </button>
+    </div>
+
+    <!-- Calculator iframes -->
+    <div class="iframe-area">
+      <iframe id="frame-care" class="calc-frame active" src="http://localhost:3005"></iframe>
+      <iframe id="frame-niva" class="calc-frame"        src="http://localhost:3002"></iframe>
+      <iframe id="frame-mc"   class="calc-frame"        src="http://localhost:3003/multi"></iframe>
+      <iframe id="frame-star" class="calc-frame"        src="http://localhost:3004"></iframe>
+    </div>
+
+  </div>
+
+  <!-- ════════════ RESIZABLE DIVIDER ═══════════ -->
+  <div class="pane-divider" id="paneDivider" onmousedown="startDrag(event)">
+    <div class="divider-dots">⋮⋮</div>
+    <button class="pane-toggle-btn" id="paneToggleBtn" title="Toggle comparison pane" onclick="togglePane(event)">◀</button>
+  </div>
+
+  <!-- ══════════════ RIGHT PANE ════════════════ -->
+  <div class="right-pane" id="rightPane">
+
+    <!-- ── Member Details (collapsible) ──────── -->
+    <div class="member-sec" id="memberSec">
+      <div class="sec-hdr" onclick="toggleMemberSec()">
+        <div class="sec-hdr-left">
+          <span>👥</span>
+          <span>Member Details</span>
+        </div>
+        <div class="sec-hdr-right">
+          <button class="mini-btn" onclick="event.stopPropagation();addMember()">+ Add Member</button>
+          <span class="caret-icon" id="memberCaret">▼</span>
+        </div>
+      </div>
+      <div class="member-body" id="memberBody">
+        <table class="member-tbl">
+          <thead>
+            <tr>
+              <th style="width:130px">Name</th>
+              <th style="width:90px">Relation</th>
+              <th style="width:100px">Date of Birth</th>
+              <th style="width:44px">Age</th>
+              <th>PED</th>
+              <th style="width:70px">Pin Code</th>
+              <th style="width:32px"></th>
+            </tr>
+          </thead>
+          <tbody id="memberRows"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ── Comparison Section ─────────────────── -->
+    <div class="comp-sec">
+      <div class="comp-sec-hdr">
+        <div class="comp-sec-title">
+          📊 Premium Comparison
+          <span class="quote-badge" id="quoteBadge">0</span>
+        </div>
+        <div class="comp-actions">
+          <button class="act-btn clear" onclick="clearAll()">🗑 Clear All</button>
+        </div>
+      </div>
+
+      <div class="comp-body" id="compBody">
+        <!-- Empty state -->
+        <div class="comp-empty" id="compEmpty">
+          <div class="empty-ico">📊</div>
+          <div class="empty-ttl">No quotes yet</div>
+          <div class="empty-hint">
+            Use the calculator on the left, get a premium, then click
+            <strong>➕ Add to Comparison</strong> — it will appear here grouped by Sum Insured.
+          </div>
+        </div>
+        <!-- SI group sections injected here -->
+      </div>
+    </div>
+
+  </div><!-- /right-pane -->
+
+</div><!-- /app-body -->
+
+<!-- ── Toast ───────────────────────────────────── -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ════════════════════════════════════════════════
+//  CONSTANTS
+// ════════════════════════════════════════════════
+const INS_CONFIG = {
+  care: { name: 'Care Health',    color: '#f97316' },
+  niva: { name: 'Niva Bupa',      color: '#e05c00' },
+  mc:   { name: 'ManipalCigna',   color: '#0284c7' },
+  star: { name: 'Star Health',    color: '#dc2626' },
+};
+
+const SI_ORDER  = ['10','15','25','50','100'];
+const SI_META   = {
+  '10':  { label: '10 Lacs',  rupee: '₹10,00,000',  value: 1000000 },
+  '15':  { label: '15 Lacs',  rupee: '₹15,00,000',  value: 1500000 },
+  '25':  { label: '25 Lacs',  rupee: '₹25,00,000',  value: 2500000 },
+  '50':  { label: '50 Lacs',  rupee: '₹50,00,000',  value: 5000000 },
+  '100': { label: '1 Crore',  rupee: '₹1,00,00,000', value: 10000000 },
+};
+
+// ════════════════════════════════════════════════
+//  INSURER SWITCHING
+// ════════════════════════════════════════════════
+function switchIns(key, btn) {
+  document.querySelectorAll('.ins-tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.calc-frame').forEach(f => f.classList.remove('active'));
+  document.getElementById('frame-' + key).classList.add('active');
+}
+
+// ════════════════════════════════════════════════
+//  PANE RESIZE
+// ════════════════════════════════════════════════
+let _drag = false, _dragStartX = 0, _dragStartW = 0;
+
+function startDrag(e) {
+  if (e.target.closest('.pane-toggle-btn')) return; // don't drag when clicking toggle
+  _drag = true;
+  _dragStartX = e.clientX;
+  _dragStartW = document.getElementById('leftPane').offsetWidth;
+  document.getElementById('paneDivider').classList.add('dragging');
+  document.addEventListener('mousemove', onDrag);
+  document.addEventListener('mouseup',   stopDrag);
+  document.body.style.cursor = 'col-resize';
+  document.body.style.userSelect = 'none';
+  document.querySelectorAll('.calc-frame').forEach(f => f.style.pointerEvents = 'none');
+}
+function onDrag(e) {
+  if (!_drag) return;
+  const total = document.querySelector('.app-body').offsetWidth;
+  const newW  = _dragStartW + (e.clientX - _dragStartX);
+  if (newW > 200 && newW < total - 200) {
+    document.getElementById('leftPane').style.flex = `0 0 ${newW}px`;
+  }
+}
+function stopDrag() {
+  _drag = false;
+  document.getElementById('paneDivider').classList.remove('dragging');
+  document.removeEventListener('mousemove', onDrag);
+  document.removeEventListener('mouseup',   stopDrag);
+  document.body.style.cursor = '';
+  document.body.style.userSelect = '';
+  document.querySelectorAll('.calc-frame').forEach(f => f.style.pointerEvents = '');
+}
+
+let _paneOpen = true;
+function togglePane(e) {
+  if (e) e.stopPropagation();
+  _paneOpen = !_paneOpen;
+  document.getElementById('rightPane').classList.toggle('hidden', !_paneOpen);
+  document.getElementById('paneToggleBtn').textContent = _paneOpen ? '◀' : '▶';
+  document.getElementById('paneToggleBtn').title = _paneOpen ? 'Hide comparison' : 'Show comparison';
+}
+
+// ════════════════════════════════════════════════
+//  MEMBER MANAGEMENT
+// ════════════════════════════════════════════════
+let _memberOpen = true;
+function toggleMemberSec() {
+  _memberOpen = !_memberOpen;
+  document.getElementById('memberSec').classList.toggle('collapsed', !_memberOpen);
+}
+
+function addMember(name='', relation='Self', dob='', age='', ped='NA', pin='') {
+  const tbody = document.getElementById('memberRows');
+  const tr = tbody.insertRow();
+  tr.innerHTML = `
+    <td><input type="text" value="${name}" placeholder="Full name"/></td>
+    <td>
+      <select>
+        <option ${relation==='Self'?'selected':''}>Self</option>
+        <option ${relation==='Wife'?'selected':''}>Wife</option>
+        <option ${relation==='Husband'?'selected':''}>Husband</option>
+        <option ${relation==='Son'?'selected':''}>Son</option>
+        <option ${relation==='Daughter'?'selected':''}>Daughter</option>
+        <option ${relation==='Father'?'selected':''}>Father</option>
+        <option ${relation==='Mother'?'selected':''}>Mother</option>
+      </select>
+    </td>
+    <td><input type="date" value="${dob}"/></td>
+    <td><input type="number" value="${age}" min="0" max="99" style="width:40px"/></td>
+    <td><input type="text" value="${ped}" placeholder="NA"/></td>
+    <td><input type="text" value="${pin}" placeholder="700001" maxlength="6"/></td>
+    <td><button class="del-btn" onclick="this.closest('tr').remove()">✕</button></td>
+  `;
+}
+
+function getMemberData() {
+  const rows = [];
+  document.querySelectorAll('#memberRows tr').forEach(tr => {
+    const inputs = tr.querySelectorAll('input');
+    const sel = tr.querySelector('select');
+    const dob = inputs[1].value;
+    let dobFmt = '';
+    if (dob) { const [y,m,d] = dob.split('-'); dobFmt = `${d}.${m}.${y}`; }
+    rows.push({
+      name:     inputs[0].value,
+      relation: sel ? sel.value : 'Self',
+      dob:      dobFmt,
+      age:      inputs[2].value,
+      ped:      inputs[3].value || 'NA',
+      pin:      inputs[4].value,
+    });
+  });
+  return rows;
+}
+
+// ════════════════════════════════════════════════
+//  QUOTE GRID (keyed by SI → rows)
+// ════════════════════════════════════════════════
+// quoteGrid[siKey] = [ { id, rowKey, company, planType, planName, addons, prem1, prem2, prem3, color } ]
+const quoteGrid = {};
+let _nextId = 1;
+
+function getSIKey(saRaw) {
+  const v = parseInt((saRaw || '').toString().replace(/[^0-9]/g, ''));
+  if (v >= 900000   && v <= 1100000)  return '10';
+  if (v >= 1400000  && v <= 1600000)  return '15';
+  if (v >= 2400000  && v <= 2600000)  return '25';
+  if (v >= 4900000  && v <= 5100000)  return '50';
+  if (v >= 9000000  && v <= 11000000) return '100';
+  return null;
+}
+
+function parseTenure(t) {
+  const s = (t || '').toString().replace(/\D/g,'');
+  if (s === '2' || s.startsWith('2')) return 2;
+  if (s === '3' || s.startsWith('3')) return 3;
+  return 1;
+}
+
+function planTypeClass(pt) {
+  if (!pt || pt === '—') return 'pt-unk';
+  const s = pt.toLowerCase();
+  if (s.includes('floater') || s === 'ff') return 'pt-ff';
+  if (s.includes('multi')   || s === 'mi') return 'pt-mi';
+  if (s.includes('individual'))            return 'pt-ind';
+  return 'pt-unk';
+}
+
+function coColor(company) {
+  const c = (company || '').toLowerCase();
+  if (c.includes('care'))                            return '#f97316';
+  if (c.includes('niva'))                            return '#e05c00';
+  if (c.includes('manipal') || c.includes('cigna'))  return '#0284c7';
+  if (c.includes('star'))                            return '#dc2626';
+  if (c.includes('hdfc') || c.includes('ergo'))      return '#7c3aed';
+  return '#475569';
+}
+
+function fmtINR(n) {
+  if (n == null || n === '') return null;
+  return '₹' + parseInt(n).toLocaleString('en-IN');
+}
+
+function addQuote(data) {
+  const { company, planName, sumAssured, premium, addons, planType, tenure } = data;
+
+  const siKey = getSIKey(sumAssured);
+  if (!siKey) { showToast('⚠️ Sum Insured not in standard range (10L–1Cr)'); return; }
+
+  if (!quoteGrid[siKey]) quoteGrid[siKey] = [];
+
+  // Row = unique combo of company + planType + planName
+  const pt = planType || '—';
+  const pn = planName || '—';
+  const rowKey = `${company}|||${pt}|||${pn}`;
+  let row = quoteGrid[siKey].find(r => r.rowKey === rowKey);
+
+  if (!row) {
+    row = { id: _nextId++, rowKey, company, planType: pt, planName: pn, addons: addons || '—', color: coColor(company), prem1: null, prem2: null, prem3: null };
+    quoteGrid[siKey].push(row);
+  }
+
+  // Fill the correct premium slot
+  const yr = parseTenure(tenure);
+  const premNum = parseInt((premium || '').toString().replace(/[^0-9]/g, '')) || null;
+  if (yr === 1) row.prem1 = premNum;
+  else if (yr === 2) row.prem2 = premNum;
+  else row.prem3 = premNum;
+
+  // Update addons if meaningful
+  if (addons && addons !== '—') row.addons = addons;
+
+  renderGrid();
+  showToast(`✅ ${company} — ${pn} added (${siKey}L, Yr${yr})`);
+}
+
+function deleteRow(siKey, id) {
+  if (!quoteGrid[siKey]) return;
+  quoteGrid[siKey] = quoteGrid[siKey].filter(r => r.id !== id);
+  if (quoteGrid[siKey].length === 0) delete quoteGrid[siKey];
+  renderGrid();
+}
+
+function clearAll() {
+  const total = Object.values(quoteGrid).reduce((s, a) => s + a.length, 0);
+  if (!total) return;
+  if (!confirm(`Clear all ${total} quote(s) from the comparison?`)) return;
+  SI_ORDER.forEach(k => delete quoteGrid[k]);
+  renderGrid();
+}
+
+// ════════════════════════════════════════════════
+//  RENDER COMPARISON GRID
+// ════════════════════════════════════════════════
+function renderGrid() {
+  const body   = document.getElementById('compBody');
+  const empty  = document.getElementById('compEmpty');
+  const badge  = document.getElementById('quoteBadge');
+
+  const total = Object.values(quoteGrid).reduce((s, a) => s + a.length, 0);
+  badge.textContent = total;
+
+  if (total === 0) {
+    body.innerHTML = '';
+    body.appendChild(empty);
+    empty.style.display = 'flex';
+    return;
+  }
+  empty.style.display = 'none';
+
+  // Remove old si-groups, keep empty state element
+  body.querySelectorAll('.si-group').forEach(el => el.remove());
+
+  SI_ORDER.forEach(siKey => {
+    const rows = quoteGrid[siKey];
+    if (!rows || rows.length === 0) return;
+    const meta = SI_META[siKey];
+
+    // Find best (lowest) premiums per column for highlighting
+    const bests = [1, 2, 3].map(yr => {
+      const vals = rows.map(r => r[`prem${yr}`]).filter(v => v != null);
+      return vals.length ? Math.min(...vals) : null;
+    });
+
+    const group = document.createElement('div');
+    group.className = 'si-group';
+    group.innerHTML = `
+      <div class="si-grp-hdr" onclick="this.parentElement.classList.toggle('collapsed')">
+        <div class="si-grp-left">
+          <div class="si-pill">${meta.label}</div>
+          <span class="si-rupee">${meta.rupee}</span>
+          <span class="si-row-count">${rows.length} insurer${rows.length !== 1 ? 's' : ''}</span>
+        </div>
+        <span class="si-caret">▾</span>
+      </div>
+      <div class="si-grp-body">
+        <table class="comp-tbl">
+          <thead>
+            <tr>
+              <th style="width:130px">Company</th>
+              <th style="width:100px">Plan Type</th>
+              <th>Plan Name</th>
+              <th class="prem-col" style="width:90px">1 Year</th>
+              <th class="prem-col" style="width:90px">2 Years</th>
+              <th class="prem-col" style="width:90px">3 Years</th>
+              <th>Add-ons</th>
+              <th style="width:30px"></th>
+            </tr>
+          </thead>
+          <tbody>
+            ${rows.map(r => rowHTML(r, siKey, bests)).join('')}
+          </tbody>
+        </table>
+      </div>`;
+    body.appendChild(group);
+  });
+}
+
+function rowHTML(r, siKey, bests) {
+  const premCell = (val, best) => {
+    if (val == null) return `<td class="prem-cell empty">—</td>`;
+    const f = fmtINR(val);
+    const isBest = best != null && val === best;
+    return `<td class="prem-cell">${isBest ? `<span class="prem-best" title="Best value">${f}</span>` : f}</td>`;
+  };
+
+  const addonTitle = r.addons !== '—' ? ` title="${r.addons.replace(/"/g,"'")}"` : '';
+  const addonDisplay = r.addons !== '—' ? r.addons : '—';
+
+  return `<tr>
+    <td><div class="company-cell"><div class="co-dot" style="--c:${r.color}"></div><span class="co-name">${r.company}</span></div></td>
+    <td><span class="pt-badge ${planTypeClass(r.planType)}">${r.planType}</span></td>
+    <td><div class="plan-name" title="${r.planName}">${r.planName}</div></td>
+    ${premCell(r.prem1, bests[0])}
+    ${premCell(r.prem2, bests[1])}
+    ${premCell(r.prem3, bests[2])}
+    <td><div class="addon-cell"${addonTitle}>${addonDisplay}</div></td>
+    <td><button class="row-del" title="Remove" onclick="deleteRow('${siKey}',${r.id})">✕</button></td>
+  </tr>`;
+}
+
+// ════════════════════════════════════════════════
+//  POSTMESSAGE LISTENER
+// ════════════════════════════════════════════════
+window.addEventListener('message', function(e) {
+  try {
+    const d = typeof e.data === 'string' ? JSON.parse(e.data) : e.data;
+    if (d && d.type === 'add-quote') addQuote(d);
+  } catch(_) {}
+});
+
+// ════════════════════════════════════════════════
+//  EXCEL REPORT GENERATION
+// ════════════════════════════════════════════════
+const YTHIN = { style: 'thin' };
+const YTHIN_B = { top: YTHIN, left: YTHIN, bottom: YTHIN, right: YTHIN };
+const YLW_FILL = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFFFF00' } };
+const BLU_COLOR = { argb: 'FF0070C0' };
+
+function yCell(ws, r, c, v, center=true) {
+  const cell = ws.getCell(r, c);
+  cell.value = v;
+  cell.fill = YLW_FILL;
+  cell.font = { bold: true };
+  cell.border = YTHIN_B;
+  cell.alignment = { horizontal: center?'center':'left', vertical:'middle', wrapText:true };
+}
+function dCell(ws, r, c, v, opts={}) {
+  const cell = ws.getCell(r, c);
+  cell.value = v;
+  cell.border = YTHIN_B;
+  cell.alignment = { horizontal: opts.center?'center':'left', vertical:'middle', wrapText:!!opts.wrap };
+  if (opts.blue) cell.font = { color: BLU_COLOR, underline: !!opts.ul };
+  if (opts.bold) cell.font = { ...(cell.font||{}), bold: true };
+}
+function mc(ws, r1, c1, r2, c2) { try { ws.mergeCells(r1,c1,r2,c2); } catch(e){} }
+
+function buildExcelSheet(ws, members) {
+  // Column widths: A–H (left FF) | I spacer | J–Q (right MI)
+  [18,22,13,14,14,14,22,6, 2, 18,22,13,14,14,14,22,6].forEach((w,i) => ws.getColumn(i+1).width = w);
+  ws.properties.defaultRowHeight = 15;
+  let r = 1;
+
+  // Greeting
+  ws.getCell(r,1).value = 'Dear Sir/Madam,'; r++;
+  r++; // blank
+  ws.getCell(r,1).value = 'Greetings from Plan my life.';
+  ws.getCell(r,1).font = { italic:true, color:{argb:'FF808080'} }; r++;
+  r++; // blank
+  ws.getCell(r,1).value = 'As per your requirement we have drafted quotation that will suit your needs.';
+  ws.getCell(r,1).font = { italic:true }; r++;
+  r++; // blank
+
+  // Member table
+  ['Name','Relation','D.O.B','Age','PED','Pin Code'].forEach((h,i) => yCell(ws,r,i+1,h));
+  r++;
+  members.forEach(m => {
+    [m.name, m.relation, m.dob, m.age?parseInt(m.age):'', m.ped, m.pin].forEach((v,i) => dCell(ws,r,i+1,v));
+    r++;
+  });
+  r++; r++; // blanks
+
+  // Group by company for insurer data
+  const companyMap = {}; // company → { ffPlan, miPlan, ffAddon, miAddon, premiums:{siKey:{ff1..ff3,mi1..mi3}} }
+  SI_ORDER.forEach(siKey => {
+    const rows = quoteGrid[siKey] || [];
+    rows.forEach(row => {
+      const co = row.company;
+      if (!companyMap[co]) companyMap[co] = { ff:{plan:'',addon:'',prems:{}}, mi:{plan:'',addon:'',prems:{}} };
+      const pt = (row.planType||'').toLowerCase();
+      const isFF = pt.includes('floater') || pt === 'ff';
+      const isMI = pt.includes('multi') || pt === 'mi';
+      const isSide = isFF ? 'ff' : (isMI ? 'mi' : 'ff'); // default to ff
+
+      const side = companyMap[co][isSide];
+      if (!side.plan && row.planName && row.planName !== '—') side.plan = row.planName;
+      if (!side.addon && row.addons && row.addons !== '—') side.addon = row.addons;
+      if (!side.prems[siKey]) side.prems[siKey] = {p1:null,p2:null,p3:null};
+      if (row.prem1) side.prems[siKey].p1 = row.prem1;
+      if (row.prem2) side.prems[siKey].p2 = row.prem2;
+      if (row.prem3) side.prems[siKey].p3 = row.prem3;
+    });
+  });
+
+  const companies = Object.keys(companyMap);
+  const fmtP = (v) => v != null ? v : 'NA';
+
+  // SI sections
+  SI_ORDER.forEach(siKey => {
+    const rows = quoteGrid[siKey] || [];
+    if (rows.length === 0) return;
+    const sLabel = SI_META[siKey].label;
+
+    // Section title
+    yCell(ws,r,1, `Family Floater Quotation For ${sLabel}`);  mc(ws,r,1,r,8);
+    yCell(ws,r,10,`Multi Individual Quotation For ${sLabel}`); mc(ws,r,10,r,17);
+    ws.getRow(r).height = 18; r++;
+
+    // Column headers
+    const hdrs = ['Company','Plan name','Sum Assure','Premium for 1 Year','Premium for 2 Years','Premium for 3 Years','Addon'];
+    [1,2,3,4,5,6].forEach((c,i) => yCell(ws,r,c,hdrs[i]));
+    yCell(ws,r,7,'Addon'); mc(ws,r,7,r,8);
+    [10,11,12,13,14,15].forEach((c,i) => yCell(ws,r,c,hdrs[i]));
+    yCell(ws,r,16,'Addon'); mc(ws,r,16,r,17);
+    r++;
+
+    // Company rows
+    companies.forEach(co => {
+      const d = companyMap[co];
+      const ffP = d.ff.prems[siKey] || {};
+      const miP = d.mi.prems[siKey] || {};
+
+      dCell(ws,r,1,co); dCell(ws,r,2,d.ff.plan,{blue:true,ul:true});
+      dCell(ws,r,3,SI_META[siKey].value,{center:true});
+      dCell(ws,r,4,fmtP(ffP.p1),{center:true}); dCell(ws,r,5,fmtP(ffP.p2),{center:true}); dCell(ws,r,6,fmtP(ffP.p3),{center:true});
+      dCell(ws,r,7,d.ff.addon,{blue:d.ff.addon!=='NA',wrap:true}); mc(ws,r,7,r,8);
+
+      dCell(ws,r,10,co); dCell(ws,r,11,d.mi.plan||d.ff.plan,{blue:true,ul:true});
+      dCell(ws,r,12,SI_META[siKey].value,{center:true});
+      dCell(ws,r,13,fmtP(miP.p1),{center:true}); dCell(ws,r,14,fmtP(miP.p2),{center:true}); dCell(ws,r,15,fmtP(miP.p3),{center:true});
+      dCell(ws,r,16,d.mi.addon||d.ff.addon,{blue:true,wrap:true}); mc(ws,r,16,r,17);
+      ws.getRow(r).height = 16; r++;
+    });
+    r++; // blank
+  });
+}
+
+async function generateReport() {
+  const total = Object.values(quoteGrid).reduce((s,a) => s+a.length, 0);
+  if (total === 0) { showToast('⚠️ No quotes in comparison yet'); return; }
+
+  const members = getMemberData();
+  const btn = document.getElementById('genBtn');
+  btn.disabled = true; btn.textContent = '⏳ Generating...';
+
+  try {
+    const wb = new ExcelJS.Workbook();
+    wb.creator = 'Insurance Premium Hub';
+    wb.created = new Date();
+
+    // Combined sheet
+    const nameStr = members.map(m => m.name).filter(Boolean).join(' & ') || 'Quotation';
+    const ws = wb.addWorksheet(nameStr.substring(0, 28));
+    buildExcelSheet(ws, members);
+
+    // Individual sheets for each member if >1
+    if (members.length > 1) {
+      members.forEach(m => {
+        if (!m.name) return;
+        const wsI = wb.addWorksheet((m.name + ' ' + m.relation).substring(0, 28));
+        buildExcelSheet(wsI, [m]);
+      });
+    }
+
+    const buf = await wb.xlsx.writeBuffer();
+    const blob = new Blob([buf], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a'); a.href = url;
+    a.download = (nameStr.replace(/[^a-zA-Z0-9 ]/g,'_') + '_Quote.xlsx');
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    showToast('✅ Excel report downloaded!');
+  } catch(err) {
+    console.error(err);
+    showToast('❌ Error: ' + err.message);
+  } finally {
+    btn.disabled = false; btn.innerHTML = '📥 Generate Excel Report';
+  }
+}
+
+// ════════════════════════════════════════════════
+//  TOAST
+// ════════════════════════════════════════════════
+let _tt;
+function showToast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(_tt);
+  _tt = setTimeout(() => el.classList.remove('show'), 3200);
+}
+
+// ════════════════════════════════════════════════
+//  INIT
+// ════════════════════════════════════════════════
+addMember('', 'Self', '', '', 'NA', '');
+renderGrid();
+</script>
+</body>
+</html>

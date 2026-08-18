@@ -1,0 +1,36 @@
+{
+  "name": "insurance-premium-hub",
+  "version": "1.1.0",
+  "private": true,
+  "description": "Health insurance premium comparison \u2014 Care, Niva Bupa, ManipalCigna and Star Health calculators behind one hub",
+  "main": "care_server.js",
+  "scripts": {
+    "start": "node care_server.js",
+    "care": "node care_server.js",
+    "niva": "node niva_server.js",
+    "mc": "node mc_server.js",
+    "star": "node sh_server.js",
+    "care:v1": "node server.js",
+    "audit:care": "node care_audit.js",
+    "verify:excel": "node verify_excel_fixture.js && python verify_excel_format.py _test_output.xlsx",
+    "verify:picker": "node verify_plan_picker.js",
+    "verify": "npm run verify:picker && npm run verify:care && npm run verify:mc && npm run verify:star && npm run verify:features && npm run verify:history && npm run verify:excel && npm run verify:pdf",
+    "verify:care": "node verify_care_plantype.js",
+    "verify:mc": "node verify_mc_plantype.js && node verify_mc_ui.js",
+    "verify:star": "node verify_star_si.js",
+    "verify:pdf": "node verify_pdf_report.js",
+    "verify:features": "node verify_feature_columns.js",
+    "verify:history": "node verify_quotation_store.js && node verify_history_roundtrip.js"
+  },
+  "dependencies": {
+    "cheerio": "^1.0.0",
+    "cors": "^2.8.5",
+    "exceljs": "^4.4.0",
+    "express": "^4.18.2",
+    "jspdf": "^2.5.1",
+    "node-fetch": "^2.7.0"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

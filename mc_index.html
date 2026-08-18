@@ -1,0 +1,1174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ManipalCigna Lifetime Health – Get Quick Quote</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Arial MT Std Light',Arial,sans-serif;font-size:14px;color:#57585A;background:#fff}
+a{text-decoration:none;color:inherit}
+button{font-family:inherit;cursor:pointer}
+select,input{font-family:inherit}
+
+/* ══ TOP STRIP ══ */
+.top-strip{background:#E8720C;color:#fff;font-size:12px;padding:7px 24px;display:flex;align-items:center;gap:0;justify-content:center}
+.top-strip-left{display:flex;align-items:center;gap:20px}
+.top-strip-left span{display:flex;align-items:center;gap:5px}
+.top-strip-sep{margin:0 10px;opacity:.7}
+.top-strip-right{display:flex;align-items:center;gap:14px;margin-left:auto}
+.btn-login-top{background:#fff;color:#E8720C;border:1px solid #fff;padding:3px 14px;border-radius:3px;font-size:12px;font-weight:600;cursor:pointer}
+.bell-icon{font-size:15px;opacity:.9}
+
+/* ══ HEADER ══ */
+.mc-header{background:#fff;padding:10px 24px;display:flex;align-items:center;justify-content:space-between;border-bottom:3px solid #0077A8;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+.mc-logo{display:flex;align-items:center;gap:0;cursor:pointer}
+.logo-wrap{display:flex;align-items:center}
+.logo-man{width:48px;height:48px}
+.logo-text{display:flex;flex-direction:column;margin-left:2px}
+.logo-brand{display:flex;align-items:center;gap:0;line-height:1.1}
+.logo-manipal{font-size:22px;font-weight:700;color:#E8720C;letter-spacing:-.3px}
+.logo-cigna{font-size:22px;font-weight:700;color:#0077A8;letter-spacing:-.3px}
+.logo-tree{width:22px;height:22px;margin:0 2px}
+.logo-sub{font-size:10px;color:#888;letter-spacing:.5px;display:flex;align-items:center;gap:6px;margin-top:1px}
+.logo-sub-line{flex:1;height:1px;background:#ccc;width:24px}
+.header-nav{display:flex;align-items:center;gap:24px}
+.header-nav a{font-size:14px;color:#57585A;font-weight:500}
+.header-nav a:hover{color:#E8720C}
+.btn-header-login{background:transparent;border:1.5px solid #E8720C;color:#E8720C;padding:5px 18px;border-radius:3px;font-size:13px;font-weight:600}
+.btn-header-login:hover{background:#E8720C;color:#fff}
+
+/* ══ PAGE 1 — FORM ══ */
+#page-form{background:#f5f5f5;min-height:calc(100vh - 90px);display:flex;align-items:flex-start;justify-content:center;padding:40px 20px}
+.form-section{max-width:960px;width:100%;display:flex;gap:24px;align-items:flex-start}
+
+.quote-card{background:#fff;border-radius:4px;box-shadow:0 2px 8px rgba(0,0,0,.09);padding:28px 28px 24px;flex:0 0 380px}
+.quote-card-title{font-size:18px;font-weight:700;color:#333;margin-bottom:20px;padding-bottom:12px;border-bottom:2px solid #E8720C}
+
+.members-section{margin-bottom:18px}
+.members-label{font-size:12px;color:#888;font-weight:600;text-transform:uppercase;letter-spacing:.3px;margin-bottom:10px;display:flex;justify-content:space-between}
+.members-label span:last-child{font-size:11px;color:#aaa;font-weight:400;text-transform:none}
+.members-row{display:flex;gap:20px}
+.member-block{display:flex;flex-direction:column;gap:6px}
+.member-block label{font-size:13px;color:#555;font-weight:500}
+.counter{display:flex;align-items:center;border:1px solid #ccc;border-radius:4px;overflow:hidden;width:100px}
+.ctr-btn{width:30px;height:32px;background:#f5f5f5;border:none;font-size:16px;color:#555;cursor:pointer;line-height:1}
+.ctr-btn:hover{background:#eee}
+.ctr-val{flex:1;text-align:center;font-size:14px;font-weight:600;color:#333}
+
+.inp-group{margin-bottom:16px}
+.inp-group label{display:block;font-size:12px;color:#888;font-weight:600;text-transform:uppercase;letter-spacing:.3px;margin-bottom:6px}
+.inp-group .hint{font-size:11px;color:#aaa;margin-top:4px;line-height:1.4}
+.inp-wrap{position:relative}
+.mc-inp{width:100%;padding:8px 32px 8px 10px;border:1px solid #ccc;border-radius:4px;font-size:13px;color:#333;background:#fff;outline:none}
+.mc-inp:focus{border-color:#0077A8}
+.mc-inp.valid{border-color:#50B948}
+.inp-check{position:absolute;right:10px;top:50%;transform:translateY(-50%);color:#50B948;font-size:15px}
+.mc-inp[readonly]{background:#fafafa;cursor:pointer}
+
+.port-section{margin-bottom:18px}
+.port-q{font-size:13px;color:#555;margin-bottom:8px}
+.radio-grp{display:flex;gap:10px}
+.radio-opt{display:flex;align-items:center;gap:6px;padding:6px 16px;border:1px solid #ccc;border-radius:4px;font-size:13px;cursor:pointer;color:#555}
+.radio-opt.sel{border-color:#E8720C;color:#E8720C;background:#FFF5EF}
+.radio-opt input{display:none}
+
+.form-err{color:#c00;font-size:12px;margin-bottom:10px;padding:8px 12px;background:#fff3f3;border-radius:4px;border-left:3px solid #c00;display:none}
+
+.btn-get-quotes{width:100%;padding:12px;background:#E8720C;color:#fff;border:none;border-radius:4px;font-size:15px;font-weight:700;letter-spacing:.5px;cursor:pointer;margin-top:4px}
+.btn-get-quotes:hover{background:#d0640a}
+
+.form-features{flex:1;padding-top:10px}
+.form-features h3{font-size:15px;font-weight:700;color:#333;margin-bottom:16px}
+.feature-item{display:flex;gap:10px;margin-bottom:14px;align-items:flex-start}
+.feat-dot{width:8px;height:8px;background:#E8720C;border-radius:50%;flex-shrink:0;margin-top:4px}
+.feat-txt{font-size:13px;color:#555;line-height:1.5}
+
+/* ══ PLAN PICKER ══ */
+#plan-picker-overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:1100;display:none;align-items:center;justify-content:center}
+#plan-picker-overlay.open{display:flex}
+.pp-box{background:#fff;border-radius:12px;padding:28px;width:480px;max-width:95vw;box-shadow:0 8px 32px rgba(0,0,0,.18)}
+.pp-title{font-size:17px;font-weight:700;color:#1e293b;margin-bottom:4px}
+.pp-sub{font-size:12.5px;color:#64748b;margin-bottom:20px}
+.pp-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px}
+.pp-plan{border:2px solid #e2e8f0;border-radius:10px;padding:14px;cursor:pointer;transition:all .18s;background:#f8fafc;position:relative}
+.pp-plan:hover:not(.pp-disabled){border-color:#0284c7;background:#eff9ff;transform:translateY(-1px)}
+.pp-plan.pp-active{border-color:#0284c7;background:#eff9ff}
+.pp-plan.pp-disabled{opacity:.45;cursor:not-allowed;pointer-events:none}
+.pp-plan-dot{width:10px;height:10px;border-radius:50%;margin-bottom:8px}
+.pp-plan-name{font-size:13px;font-weight:700;color:#1e293b;margin-bottom:3px}
+.pp-plan-desc{font-size:11px;color:#64748b;line-height:1.4}
+.pp-badge{position:absolute;top:8px;right:8px;font-size:9.5px;font-weight:700;padding:2px 6px;border-radius:4px;background:#dcfce7;color:#166534}
+.pp-badge.soon{background:#fef3c7;color:#92400e}
+.pp-btn{width:100%;padding:12px;background:linear-gradient(135deg,#0284c7,#0369a1);color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;letter-spacing:.3px}
+.pp-btn:hover{opacity:.9}
+.pp-cancel{display:block;text-align:center;margin-top:10px;font-size:12px;color:#94a3b8;cursor:pointer}
+.pp-cancel:hover{color:#475569}
+
+/* ══ AGE MODAL ══ */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:1000;display:none;align-items:center;justify-content:center}
+.modal-overlay.open{display:flex}
+.modal-box{background:#fff;border-radius:6px;padding:24px;width:380px;max-width:95vw;max-height:80vh;overflow-y:auto;position:relative}
+.modal-title{font-size:16px;font-weight:700;color:#333;margin-bottom:18px;padding-right:24px}
+.modal-close{position:absolute;top:14px;right:14px;background:none;border:none;font-size:18px;color:#888;cursor:pointer}
+.modal-close:hover{color:#333}
+.modal-member{margin-bottom:16px;padding-bottom:16px;border-bottom:1px solid #eee}
+.modal-member:last-child{border-bottom:none}
+.modal-mem-label{font-size:13px;font-weight:600;color:#555;margin-bottom:8px}
+.modal-inp-row{display:flex;gap:10px}
+.modal-age{flex:1;padding:8px 10px;border:1px solid #ccc;border-radius:4px;font-size:13px;outline:none}
+.modal-age:focus{border-color:#0077A8}
+.modal-age.valid{border-color:#50B948}
+.modal-gender{flex:0 0 100px;padding:8px 6px;border:1px solid #ccc;border-radius:4px;font-size:13px;outline:none;background:#fff}
+.btn-modal-ok{width:100%;padding:11px;background:#E8720C;color:#fff;border:none;border-radius:4px;font-size:14px;font-weight:700;cursor:pointer;margin-top:14px;letter-spacing:.4px}
+.btn-modal-ok:hover{background:#d0640a}
+
+/* ══ PAGE 2 — RESULTS ══ */
+#page-results{display:none;background:#f5f5f5;min-height:calc(100vh - 90px)}
+
+/* Filter bar */
+.filter-bar{background:#f0f0f0;border-bottom:1px solid #ddd;padding:14px 24px 12px;position:sticky;top:0;z-index:100;box-shadow:0 2px 4px rgba(0,0,0,.07)}
+.filter-inner{max-width:1200px;margin:0 auto;display:flex;gap:0;align-items:stretch}
+.filter-fields{flex:1;display:flex;flex-direction:column;gap:10px}
+.filter-row{display:flex;gap:12px;align-items:flex-end}
+.fg{display:flex;flex-direction:column;gap:4px}
+.fg label{font-size:11px;color:#555;font-weight:600;text-transform:uppercase;letter-spacing:.2px;white-space:nowrap}
+.f-sel,.f-inp{padding:7px 10px;border:1px solid #ccc;border-radius:3px;font-size:13px;background:#fff;color:#333;outline:none;min-width:130px}
+.f-sel:focus,.f-inp:focus{border-color:#0077A8}
+.f-inp{min-width:90px;width:100px}
+.summary-panel{width:230px;flex-shrink:0;margin-left:16px;background:#E6E7E9;border-radius:3px;padding:12px 14px;display:flex;flex-direction:column;justify-content:space-between}
+.sum-title{font-size:15px;font-weight:700;color:#333;margin-bottom:10px}
+.sum-row{display:flex;justify-content:space-between;align-items:center;font-size:13px;margin-bottom:6px;color:#555}
+.sum-row.total-row{font-weight:700;font-size:14px;color:#333;border-top:1px solid #ccc;padding-top:7px;margin-top:3px}
+.sum-addon-lbl{display:flex;align-items:center;gap:5px}
+.info-icon{font-size:12px;color:#888;cursor:help}
+.btn-recalc{width:100%;padding:9px;background:#E8720C;color:#fff;border:none;border-radius:3px;font-size:13px;font-weight:700;cursor:pointer;margin-top:10px;letter-spacing:.4px}
+.btn-recalc:hover{background:#d0640a}
+
+/* Back bar */
+.back-bar{max-width:1200px;margin:0 auto;padding:8px 0 0;font-size:13px}
+.back-link{color:#0077A8;cursor:pointer;display:inline-flex;align-items:center;gap:4px}
+.back-link:hover{text-decoration:underline}
+
+/* Main 3-column layout */
+.results-body{max-width:1200px;margin:0 auto;padding:8px 0 40px;display:flex;gap:16px;align-items:flex-start}
+
+/* Left nav */
+.left-nav{width:180px;flex-shrink:0;background:#fff;border:1px solid #e0e0e0;border-radius:3px;overflow:hidden;text-align:center}
+.nav-item{display:block;padding:13px 10px;font-size:13px;color:#57585A;border-bottom:1px solid #eee;cursor:pointer;transition:color .12s;line-height:1.3}
+.nav-item:last-child{border-bottom:none}
+.nav-item.active{color:#F5851F;font-weight:700}
+.nav-item:hover{color:#F5851F}
+
+/* Plans area */
+.plans-area{flex:1;min-width:0}
+.plans-heading{font-size:22px;font-weight:700;color:#333;margin-bottom:12px}
+
+/* Plan card */
+.plan-card-outer{border:1px solid #50B948;border-radius:3px;margin-bottom:16px;background:#fff;overflow:hidden}
+.plan-card-outer.loading{border-color:#ddd}
+.card-header{background:rgba(0,0,0,.03);padding:11px 15px;border-bottom:1px solid #eee;display:flex;justify-content:space-between;align-items:center}
+.card-title{font-size:15px;font-weight:700;color:#333}
+.card-body{padding:16px 15px}
+
+/* Feature grid */
+.feat-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px 16px;margin-bottom:14px}
+.feat-item{display:flex;gap:7px;align-items:flex-start;font-size:13px;color:#57585A;line-height:1.4}
+.feat-star{color:#50B948;flex-shrink:0;font-size:13px;margin-top:1px}
+.more-features{font-size:13px;color:#0077A8;cursor:pointer;margin-bottom:14px;display:inline-block}
+.more-features:hover{text-decoration:underline}
+
+/* Card footer: premium + button */
+.card-footer{display:flex;justify-content:space-between;align-items:flex-end;padding-top:12px;border-top:1px solid #eee;margin-top:6px}
+.prem-section{display:flex;flex-direction:column;gap:2px}
+.prem-lbl{font-size:11px;color:#888}
+.prem-amt{font-size:22px;font-weight:700;color:#333}
+.prem-note{font-size:11px;color:#aaa}
+.btn-select{padding:10px 28px;background:#E8720C;color:#fff;border:none;border-radius:3px;font-size:13px;font-weight:700;cursor:pointer;letter-spacing:.3px}
+.btn-select:hover{background:#d0640a}
+
+/* Global plan extra options */
+.global-opts{background:#f9f9f9;border:1px solid #eee;border-radius:3px;padding:12px 14px;margin-bottom:14px}
+.global-opts-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.gopt{display:flex;flex-direction:column;gap:4px}
+.gopt label{font-size:11px;color:#666;font-weight:600;text-transform:uppercase;letter-spacing:.2px}
+.gopt select{padding:6px 8px;border:1px solid #ccc;border-radius:3px;font-size:13px;background:#fff;color:#333;outline:none}
+
+/* Right panel */
+.right-panel{width:270px;flex-shrink:0}
+.benefits-heading{font-size:20px;font-weight:700;color:#333;margin-bottom:12px}
+.benefit-item{margin-bottom:0;padding:10px 0;border-bottom:1px solid #eee}
+.benefit-item:last-child{border-bottom:none}
+.benefit-label{display:flex;align-items:flex-start;gap:8px;font-size:13px;font-weight:600;color:#333;cursor:pointer;line-height:1.4}
+.benefit-label input[type=checkbox]{width:14px;height:14px;flex-shrink:0;margin-top:2px;accent-color:#0077A8;cursor:pointer}
+.benefit-desc{font-size:11px;color:#888;margin-top:4px;margin-left:22px;line-height:1.5}
+.benefit-sub{margin-left:22px;margin-top:8px;display:none;flex-direction:column;gap:6px}
+.benefit-sub.open{display:flex}
+.benefit-sub .fg label{font-size:11px}
+.benefit-sub .f-sel{min-width:0;width:100%;font-size:12px;padding:5px 7px}
+
+/* Loading / error */
+.loading-state{text-align:center;padding:48px 20px;color:#888;background:#fff;border:1px solid #e0e0e0;border-radius:3px}
+.spinner{display:inline-block;width:32px;height:32px;border:3px solid #eee;border-top-color:#E8720C;border-radius:50%;animation:spin .75s linear infinite;margin-bottom:10px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.err-box{background:#fff3f3;border:1px solid #f5c6c6;border-radius:3px;padding:14px 16px;color:#c00;font-size:14px;line-height:1.5;margin-bottom:10px}
+</style>
+</head>
+<body>
+
+<!-- ══ TOP STRIP ══ -->
+<div class="top-strip">
+  <div class="top-strip-left">
+    <span>To Renew:&nbsp;&#128222;&nbsp;1800 102 4465</span>
+    <span>For Service:&nbsp;&#128222;&nbsp;1800 102 4462</span>
+    <span>To Buy:&nbsp;&#128222;&nbsp;1800 102 4464</span>
+    <span class="top-strip-sep">|</span>
+    <span>Groups</span>
+  </div>
+  <div class="top-strip-right">
+    <span class="bell-icon">&#128276;</span>
+    <button class="btn-login-top">Login</button>
+  </div>
+</div>
+
+<!-- ══ HEADER ══ -->
+<header class="mc-header">
+  <div class="mc-logo" onclick="goToForm()">
+    <div class="logo-wrap">
+      <!-- Running man icon -->
+      <svg class="logo-man" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="24" cy="24" r="24" fill="#E8720C"/>
+        <!-- head -->
+        <circle cx="30" cy="12" r="4" fill="#fff"/>
+        <!-- body running pose -->
+        <line x1="30" y1="16" x2="25" y2="26" stroke="#fff" stroke-width="2.5" stroke-linecap="round"/>
+        <!-- arm back -->
+        <line x1="27" y1="20" x2="19" y2="17" stroke="#fff" stroke-width="2.5" stroke-linecap="round"/>
+        <!-- arm forward -->
+        <line x1="27" y1="20" x2="33" y2="24" stroke="#fff" stroke-width="2.5" stroke-linecap="round"/>
+        <!-- leg forward -->
+        <line x1="25" y1="26" x2="32" y2="34" stroke="#fff" stroke-width="2.5" stroke-linecap="round"/>
+        <!-- leg back -->
+        <line x1="25" y1="26" x2="18" y2="30" stroke="#fff" stroke-width="2.5" stroke-linecap="round"/>
+        <line x1="18" y1="30" x2="16" y2="36" stroke="#fff" stroke-width="2.5" stroke-linecap="round"/>
+      </svg>
+      <div class="logo-text">
+        <div class="logo-brand">
+          <span class="logo-manipal">Manipal</span>
+          <!-- Tree icon -->
+          <svg class="logo-tree" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M11 2 C7 2 4 5 4 8 C4 11 6 13 8 14 L8 19 L14 19 L14 14 C16 13 18 11 18 8 C18 5 15 2 11 2Z" fill="#50B948"/>
+            <rect x="10" y="14" width="2" height="5" fill="#6B4F2E"/>
+          </svg>
+          <span class="logo-cigna">Cigna</span>
+        </div>
+        <div class="logo-sub">
+          <span class="logo-sub-line"></span>
+          <span style="font-size:10px;color:#888;letter-spacing:1px">Health Insurance</span>
+          <span class="logo-sub-line"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="header-nav">
+    <a href="#">Health Plans</a>
+    <a href="#">Renew</a>
+    <a href="#">Claims</a>
+    <button class="btn-header-login">Login</button>
+  </div>
+</header>
+
+<!-- ══════════════════════════
+     PAGE 1 — QUOTE FORM
+══════════════════════════ -->
+<div id="page-form">
+  <div class="form-section">
+
+    <div class="quote-card">
+      <div class="quote-card-title">Lifetime Quotation</div>
+
+      <!-- Members -->
+      <div class="members-section">
+        <div class="members-label">
+          <span>No of. members to secure</span>
+          <span>Age 18 &amp; above is Adult</span>
+        </div>
+        <div class="members-row">
+          <div class="member-block">
+            <label>Adults</label>
+            <div class="counter">
+              <button class="ctr-btn" onclick="changeCount('adults',-1)">&#8722;</button>
+              <span class="ctr-val" id="adults-val">1</span>
+              <button class="ctr-btn" onclick="changeCount('adults',1)">+</button>
+            </div>
+          </div>
+          <div class="member-block">
+            <label>Kids</label>
+            <div class="counter">
+              <button class="ctr-btn" onclick="changeCount('kids',-1)">&#8722;</button>
+              <span class="ctr-val" id="kids-val">0</span>
+              <button class="ctr-btn" onclick="changeCount('kids',1)">+</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Age & Gender -->
+      <div class="inp-group">
+        <label>Enter Age &amp; Gender</label>
+        <div class="inp-wrap">
+          <input type="text" class="mc-inp" id="age-display" placeholder="Enter AGE &amp; Gender"
+                 readonly onclick="openAgeModal()" style="cursor:pointer">
+          <span class="inp-check" id="age-check" style="display:none">&#10003;</span>
+        </div>
+        <div class="hint">Same as mentioned in Aadhaar card / Passport / Driving License or any other document</div>
+      </div>
+
+      <!-- Pincode -->
+      <div class="inp-group">
+        <label>Pincode</label>
+        <div class="inp-wrap">
+          <input type="text" class="mc-inp" id="pincode" placeholder="Enter Pincode"
+                 maxlength="6" oninput="validatePin(this)">
+          <span class="inp-check" id="pin-check" style="display:none">&#10003;</span>
+        </div>
+      </div>
+
+      <!-- Portability -->
+      <div class="port-section">
+        <div class="port-q">Are you looking to Port/Migrate your Health Insurance?</div>
+        <div class="radio-grp">
+          <label class="radio-opt" id="opt-yes" onclick="setPort(true)">
+            <input type="radio" name="port" value="yes"> Yes
+          </label>
+          <label class="radio-opt sel" id="opt-no" onclick="setPort(false)">
+            <input type="radio" name="port" value="no" checked> No
+          </label>
+        </div>
+      </div>
+
+      <div class="form-err" id="form-err"></div>
+
+      <button class="btn-get-quotes" id="btn-gq" onclick="handleGetQuotes()">GET QUOTES</button>
+    </div>
+
+    <!-- Right: features -->
+    <div class="form-features">
+      <h3>Why ManipalCigna Lifetime Health?</h3>
+      <div class="feature-item">
+        <div class="feat-dot"></div>
+        <div class="feat-txt">Upgrade your Lifetime Health Insurance with the newly launched ManipalCigna Health 360 riders.</div>
+      </div>
+      <div class="feature-item">
+        <div class="feat-dot"></div>
+        <div class="feat-txt">Continuity Benefit on entire SI chosen for existing base SI of 10 Lacs or above.</div>
+      </div>
+      <div class="feature-item">
+        <div class="feat-dot"></div>
+        <div class="feat-txt">Unlimited Restoration for unrelated illnesses.</div>
+      </div>
+      <div class="feature-item">
+        <div class="feat-dot"></div>
+        <div class="feat-txt">Premium waiver benefit for next one year renewal premium.</div>
+      </div>
+      <div class="feature-item">
+        <div class="feat-dot"></div>
+        <div class="feat-txt">Loyalty discount of 5% from 4th policy year onwards &amp; 10% from 8th year onwards.</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══ PLAN PICKER OVERLAY ══ -->
+<div id="plan-picker-overlay">
+  <div class="pp-box">
+    <div class="pp-title">Select a ManipalCigna Plan</div>
+    <div class="pp-sub">Your details are filled in. Choose a plan to get the premium quote.</div>
+    <div class="pp-grid">
+      <!-- Lifetime Health — active -->
+      <div class="pp-plan pp-active" onclick="pickPlan('lifetime')">
+        <div class="pp-badge">Available</div>
+        <div class="pp-plan-dot" style="background:#0284c7"></div>
+        <div class="pp-plan-name">Lifetime Health</div>
+        <div class="pp-plan-desc">Comprehensive lifelong coverage with restoration benefit</div>
+      </div>
+      <!-- ProHealth Plus — coming soon -->
+      <div class="pp-plan pp-disabled">
+        <div class="pp-badge soon">Coming Soon</div>
+        <div class="pp-plan-dot" style="background:#94a3b8"></div>
+        <div class="pp-plan-name">ProHealth Plus</div>
+        <div class="pp-plan-desc">Flexible health plan with OPD and wellness benefits</div>
+      </div>
+      <!-- ProHealth Protect — coming soon -->
+      <div class="pp-plan pp-disabled">
+        <div class="pp-badge soon">Coming Soon</div>
+        <div class="pp-plan-dot" style="background:#94a3b8"></div>
+        <div class="pp-plan-name">ProHealth Protect</div>
+        <div class="pp-plan-desc">Budget-friendly base plan for individuals and families</div>
+      </div>
+      <!-- ProHealth Prime — coming soon -->
+      <div class="pp-plan pp-disabled">
+        <div class="pp-badge soon">Coming Soon</div>
+        <div class="pp-plan-dot" style="background:#94a3b8"></div>
+        <div class="pp-plan-name">ProHealth Prime</div>
+        <div class="pp-plan-desc">Senior-friendly plan with specialized coverage</div>
+      </div>
+    </div>
+    <button class="pp-btn" onclick="pickPlan('lifetime')">Get Lifetime Health Quote</button>
+    <span class="pp-cancel" onclick="closePlanPicker()">Cancel — I'll fill manually</span>
+  </div>
+</div>
+
+<!-- ══ AGE / GENDER MODAL ══ -->
+<div class="modal-overlay" id="age-modal">
+  <div class="modal-box">
+    <div class="modal-title">Enter Age &amp; Gender</div>
+    <button class="modal-close" onclick="closeModal()">&#10005;</button>
+    <div id="modal-body"></div>
+    <button class="btn-modal-ok" onclick="confirmAges()">OK</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════
+     PAGE 2 — RESULTS
+══════════════════════════ -->
+<div id="page-results">
+
+  <!-- Filter bar -->
+  <div class="filter-bar">
+    <div class="filter-inner">
+      <div class="filter-fields">
+        <!-- Row 1 -->
+        <div class="filter-row">
+          <div class="fg">
+            <label>Payment Frequency</label>
+            <select class="f-sel" id="r-freq">
+              <option value="single">Single</option>
+              <option value="monthly">Monthly</option>
+              <option value="quarterly">Quarterly</option>
+              <option value="halfyearly">Half Yearly</option>
+              <option value="annually">Annually</option>
+            </select>
+          </div>
+          <div class="fg">
+            <label>Plan Type</label>
+            <select class="f-sel" id="r-ptype">
+              <option value="individual">Individual</option>
+              <option value="FamilyFloater">Family Floater</option>
+              <option value="multiindividual">Multi Individual</option>
+            </select>
+          </div>
+          <div class="fg">
+            <label>All Insured are resident Indian</label>
+            <select class="f-sel" id="r-resident">
+              <option value="Y">YES</option>
+              <option value="N">NO</option>
+            </select>
+          </div>
+          <div class="fg">
+            <label>Sum Insured</label>
+            <select class="f-sel" id="r-si">
+              <option value="5000000">50.0 Lakhs</option>
+              <option value="7500000">75.0 Lakhs</option>
+              <option value="10000000">100.0 Lakhs</option>
+              <option value="15000000">150.0 Lakhs</option>
+              <option value="20000000">200.0 Lakhs</option>
+              <option value="30000000">300.0 Lakhs</option>
+            </select>
+          </div>
+        </div>
+        <!-- Row 2 -->
+        <div class="filter-row">
+          <div class="fg">
+            <label>Pincode</label>
+            <input type="text" class="f-inp" id="r-pin" maxlength="6">
+          </div>
+          <div class="fg">
+            <label>Portability</label>
+            <select class="f-sel" id="r-port">
+              <option value="false">NO</option>
+              <option value="true">YES</option>
+            </select>
+          </div>
+          <div class="fg">
+            <label>Policy Duration</label>
+            <select class="f-sel" id="r-tenure">
+              <option value="1">1 Year</option>
+              <option value="2">2 Year (7.5% Discount)</option>
+              <option value="3">3 Year (10% Discount)</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Summary panel -->
+      <div class="summary-panel">
+        <div>
+          <div class="sum-title">Summary</div>
+          <div class="sum-row">
+            <span>Base Premium</span>
+            <span id="s-base">&#8377;0</span>
+          </div>
+          <div class="sum-row">
+            <span class="sum-addon-lbl">GST &amp; Taxes <span class="info-icon" title="Difference between the base premium and the total payable. This is tax, not add-on cost — the benefit checkboxes on this page do not affect the premium.">&#9432;</span></span>
+            <span id="s-addons">&#8377; 0</span>
+          </div>
+          <div class="sum-row total-row">
+            <span>Final Amount</span>
+            <span id="s-final">&#8377;0</span>
+          </div>
+        </div>
+        <button class="btn-recalc" onclick="recalculate()">RECALCULATE</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Back link -->
+  <div style="max-width:1200px;margin:0 auto;padding:0 0">
+    <div class="back-bar">
+      <a class="back-link" onclick="goToForm()">&#8592; Modify Details</a>
+    </div>
+  </div>
+
+  <!-- 3-column body -->
+  <div class="results-body">
+
+    <!-- Left nav -->
+    <div class="left-nav">
+      <a class="nav-item active" id="nav-plans" onclick="scrollToSection('plans')">Plans</a>
+      <a class="nav-item" onclick="scrollToSection('features')">Lifetime Health Features</a>
+      <a class="nav-item" onclick="scrollToSection('discounts')">Discounts</a>
+      <a class="nav-item" onclick="scrollToSection('claims')">Claim Process</a>
+      <a class="nav-item" onclick="scrollToSection('waiting')">Waiting Period</a>
+      <a class="nav-item" onclick="scrollToSection('faq')">FAQs</a>
+    </div>
+
+    <!-- Plans area -->
+    <div class="plans-area">
+      <div class="plans-heading" id="section-plans">Plans</div>
+      <div id="plans-container">
+        <!-- filled by JS -->
+      </div>
+    </div>
+
+    <!-- Right panel: Add More Benefits -->
+    <div class="right-panel">
+      <div class="benefits-heading">Add More Benefits</div>
+      <div id="benefits-list">
+
+        <!-- 1. Deductible Cover -->
+        <div class="benefit-item">
+          <label class="benefit-label">
+            <input type="checkbox" id="ben-deductible" onchange="onBenefitChange()"> Deductible Cover
+          </label>
+          <div class="benefit-desc">Deductible can be opted at the inception or during any renewal.</div>
+        </div>
+
+        <!-- 2. Cumulative Bonus (checked by default) -->
+        <div class="benefit-item">
+          <label class="benefit-label">
+            <input type="checkbox" id="ben-cbb" checked onchange="onBenefitChange()"> Cumulative Bonus
+          </label>
+          <div class="benefit-desc">Guaranteed 15% increase in base Sum Insured with no limit on Accumulation, irrespective of claims</div>
+        </div>
+
+        <!-- 3. Worldwide Medical Emergency -->
+        <div class="benefit-item">
+          <label class="benefit-label">
+            <input type="checkbox" id="ben-wme" onchange="toggleBenefitSub('wme-sub',this)"> Worldwide Medical Emergency Hospitalization
+          </label>
+          <div class="benefit-desc">Coverage for medical emergencies that can occur when you are abroad. Medical emergencies due to pre-existing conditions are also covered up to 25% of sum insured.</div>
+          <div class="benefit-sub" id="wme-sub">
+            <div class="fg">
+              <label>Select Area of Cover (AOC):</label>
+              <select class="f-sel" id="wme-aoc" onchange="onBenefitChange()">
+                <option>Worldwide excluding India</option>
+                <option>Worldwide excluding India, USA, and Canada</option>
+              </select>
+            </div>
+            <div class="fg">
+              <label>Sum Insured</label>
+              <select class="f-sel" id="wme-si" onchange="onBenefitChange()">
+                <option value="2500000">25 lacs</option>
+                <option value="5000000">50 lacs</option>
+                <option value="10000000">1 crore</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- 4. Critical Illness Benefit Rider -->
+        <div class="benefit-item">
+          <label class="benefit-label">
+            <input type="checkbox" id="ben-ci" onchange="onBenefitChange()"> Critical Illness Benefit Rider
+          </label>
+          <div class="benefit-desc">Lump sum payment of Sum Insured, upon diagnosis of a listed Critical Illness</div>
+        </div>
+
+        <!-- 5. OPD Rider -->
+        <div class="benefit-item">
+          <label class="benefit-label">
+            <input type="checkbox" id="ben-opd" onchange="onBenefitChange()"> OPD Rider
+          </label>
+          <div class="benefit-desc">Get comprehensive cashless coverage for doctor consultations, prescribed diagnostics, and pharmacy expenses.</div>
+        </div>
+
+        <!-- 6. Shield -->
+        <div class="benefit-item">
+          <label class="benefit-label">
+            <input type="checkbox" id="ben-shield" onchange="onBenefitChange()"> Shield
+          </label>
+          <div class="benefit-desc">Coverage for listed Non-Medical Expenses up to Sum Insured and Durable Medical Equipment up to &#8377;1 Lac</div>
+        </div>
+
+        <!-- 7. Health+ -->
+        <div class="benefit-item">
+          <label class="benefit-label">
+            <input type="checkbox" id="ben-healthplus" onchange="onBenefitChange()"> Health+
+          </label>
+          <div class="benefit-desc">With this package, avail: Air Ambulance Cover, Medical Devices, Domestic Second Opinion, Bariatric Surgery Cover, Convalescence Benefit, Major Illness Hospi Cash, Chemotherapy Cash, Accidental Hospi Cash, Tele-Consultations and more.</div>
+        </div>
+
+        <!-- 8. Advance -->
+        <div class="benefit-item">
+          <label class="benefit-label">
+            <input type="checkbox" id="ben-advance" onchange="onBenefitChange()"> Advance
+          </label>
+          <div class="benefit-desc">Coverage for 'Any room' category for Hospitalization, Unlimited Restoration of base Sum Insured for all illness and injury and Air Ambulance cover up to &#8377;10 Lac (over and above base Sum Insured)</div>
+        </div>
+
+        <!-- 9. Maternity Cover -->
+        <div class="benefit-item">
+          <label class="benefit-label">
+            <input type="checkbox" id="ben-maternity" onchange="onBenefitChange()"> Maternity Cover
+          </label>
+          <div class="benefit-desc">Maternity Expenses are covered up to Rs 1 Lac, covering up to 2 deliveries or medically necessary terminations. Infertility Cover (Optional) up to Rs. 2.5 Lacs.</div>
+        </div>
+
+        <!-- 10. Oocyte Donor Cover -->
+        <div class="benefit-item">
+          <label class="benefit-label">
+            <input type="checkbox" id="ben-oocyte" onchange="onBenefitChange()"> Oocyte Donor Cover
+          </label>
+          <div class="benefit-desc">Coverage on complications from oocyte retrieval, including inpatient hospitalization, day care, emergency ambulance, and pre- and post-hospitalization care up to &#8377;1 Lac.</div>
+        </div>
+
+        <!-- 11. Personal Accident Plus -->
+        <div class="benefit-item">
+          <label class="benefit-label">
+            <input type="checkbox" id="ben-pa" onchange="onBenefitChange()"> Personal Accident Plus
+          </label>
+          <div class="benefit-desc">Opt for Accidental Death or Permanent Disability or combination of both, and receive a lump-sum payout if an accident leads to death or permanent disablement in India.</div>
+        </div>
+
+      </div><!-- /benefits-list -->
+    </div><!-- /right-panel -->
+
+  </div><!-- /results-body -->
+</div><!-- /page-results -->
+
+<script>
+// ━━━━━━━━━━━━━━━━━━━━━━
+//  STATE
+// ━━━━━━━━━━━━━━━━━━━━━━
+const S = {
+  adults: 1, kids: 0,
+  members: [],
+  portability: false,
+  pincode: '',
+  planType: 'individual',
+  sumInsured: 5000000,
+  tenure: '1',
+  frequency: 'single',
+  apiResp: null,
+};
+
+// ━━━━━━━━━━━━━━━━━━━━━━
+//  FORM PAGE
+// ━━━━━━━━━━━━━━━━━━━━━━
+function changeCount(type, d) {
+  if (type === 'adults') S.adults = Math.max(1, Math.min(6, S.adults + d));
+  else                   S.kids   = Math.max(0, Math.min(4, S.kids + d));
+  document.getElementById(type === 'adults' ? 'adults-val' : 'kids-val').textContent =
+    type === 'adults' ? S.adults : S.kids;
+  S.members = [];
+  updateAgeDisplay();
+}
+
+function setPort(v) {
+  S.portability = v;
+  document.getElementById('opt-yes').classList.toggle('sel',  v);
+  document.getElementById('opt-no' ).classList.toggle('sel', !v);
+}
+
+function validatePin(el) {
+  const ok = /^\d{6}$/.test(el.value.trim());
+  el.classList.toggle('valid', ok);
+  const chk = document.getElementById('pin-check');
+  chk.style.display = ok ? '' : 'none';
+}
+
+function updateAgeDisplay() {
+  const total  = S.adults + S.kids;
+  const filled = S.members.filter(m => m.age).length;
+  const el  = document.getElementById('age-display');
+  const chk = document.getElementById('age-check');
+  if (filled === 0) { el.value = ''; el.classList.remove('valid'); chk.style.display='none'; return; }
+  el.value = filled === total ? `${total} member${total>1?'s':''} filled` : `${filled}/${total} filled`;
+  const allFilled = filled === total;
+  el.classList.toggle('valid', allFilled);
+  chk.style.display = allFilled ? '' : 'none';
+}
+
+// ─── Age/Gender Modal ───
+function openAgeModal() {
+  const total = S.adults + S.kids;
+  if (S.members.length !== total) {
+    S.members = [];
+    for (let i=0;i<S.adults;i++) S.members.push({type:'adult',age:'',gender:'MALE'});
+    for (let i=0;i<S.kids;i++)   S.members.push({type:'child',age:'',gender:'MALE'});
+  }
+  renderModalBody();
+  document.getElementById('age-modal').classList.add('open');
+}
+
+function renderModalBody() {
+  const body = document.getElementById('modal-body');
+  body.innerHTML = S.members.map((m,i) => {
+    const lbl = m.type==='adult'
+      ? `Adult ${String(i+1).padStart(2,'0')}`
+      : `Child ${String(i-S.adults+1).padStart(2,'0')}`;
+    return `
+      <div class="modal-member">
+        <div class="modal-mem-label" id="mlbl-${i}">${lbl}${m.age?' Age '+m.age:''}</div>
+        <div class="modal-inp-row">
+          <input type="number" class="modal-age${m.age?' valid':''}" id="ma-${i}" value="${m.age}"
+            min="${m.type==='adult'?18:1}" max="${m.type==='adult'?99:17}" placeholder="Enter Age">
+          <select class="modal-gender" id="mg-${i}">
+            <option value="MALE"  ${m.gender==='MALE'  ?'selected':''}>Male</option>
+            <option value="FEMALE"${m.gender==='FEMALE'?'selected':''}>Female</option>
+          </select>
+        </div>
+      </div>`;
+  }).join('');
+
+  S.members.forEach((_,i) => {
+    const inp = document.getElementById(`ma-${i}`);
+    if (!inp) return;
+    inp.addEventListener('input', function() {
+      const lbl = S.members[i].type==='adult'
+        ? `Adult ${String(i+1).padStart(2,'0')}`
+        : `Child ${String(i-S.adults+1).padStart(2,'0')}`;
+      document.getElementById(`mlbl-${i}`).textContent = `${lbl}${this.value?' Age '+this.value:''}`;
+      inp.classList.toggle('valid', !!this.value);
+    });
+  });
+}
+
+function closeModal() { document.getElementById('age-modal').classList.remove('open'); }
+
+function confirmAges() {
+  for (let i=0;i<S.members.length;i++) {
+    const inp = document.getElementById(`ma-${i}`);
+    const val = inp ? parseInt(inp.value) : 0;
+    const m   = S.members[i];
+    const minA = m.type==='adult'?18:1, maxA = m.type==='adult'?99:17;
+    if (!val || val<minA || val>maxA) {
+      inp && inp.focus();
+      alert(`Please enter a valid age (${minA}–${maxA}) for ${m.type==='adult'?'Adult':'Child'} ${i-(m.type==='adult'?0:S.adults)+1}.`);
+      return;
+    }
+    const gSel = document.getElementById(`mg-${i}`);
+    S.members[i].age    = val;
+    S.members[i].gender = gSel ? gSel.value : 'MALE';
+  }
+  closeModal();
+  updateAgeDisplay();
+}
+
+// ─── GET QUOTES ───
+function showErr(msg) {
+  const el = document.getElementById('form-err');
+  el.textContent = msg;
+  el.style.display = msg ? 'block' : 'none';
+}
+
+async function handleGetQuotes() {
+  showErr('');
+  const pin = document.getElementById('pincode').value.trim();
+  if (!/^\d{6}$/.test(pin)) { showErr('Please enter a valid 6-digit pincode.'); return; }
+  const total  = S.adults + S.kids;
+  const filled = S.members.filter(m => m.age).length;
+  if (filled < total) { openAgeModal(); return; }
+  S.pincode = pin;
+  S.planType = 'individual'; // maps to INDI on server for single, FamilyFloater for 2+
+
+  // sync results controls
+  document.getElementById('r-ptype').value  = S.planType;
+  document.getElementById('r-si').value     = String(S.sumInsured);
+  document.getElementById('r-pin').value    = S.pincode;
+  document.getElementById('r-port').value   = String(S.portability);
+  document.getElementById('r-tenure').value = S.tenure;
+  document.getElementById('r-freq').value   = S.frequency;
+
+  showPage('results');
+  await fetchPremiums();
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━
+//  PAGE SWITCHING
+// ━━━━━━━━━━━━━━━━━━━━━━
+function showPage(p) {
+  document.getElementById('page-form'   ).style.display = p==='form'    ? 'block' : 'none';
+  document.getElementById('page-results').style.display = p==='results' ? 'block' : 'none';
+}
+function goToForm() { showPage('form'); }
+
+function scrollToSection(id) {
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  event.target.classList.add('active');
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━
+//  RECALCULATE
+// ━━━━━━━━━━━━━━━━━━━━━━
+function recalculate() {
+  S.planType   = document.getElementById('r-ptype').value;
+  S.sumInsured = parseInt(document.getElementById('r-si').value);
+  S.pincode    = document.getElementById('r-pin').value.trim();
+  S.portability= document.getElementById('r-port').value === 'true';
+  S.tenure     = document.getElementById('r-tenure').value;
+  S.frequency  = document.getElementById('r-freq').value;
+  fetchPremiums();
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━
+//  FETCH PREMIUMS
+// ━━━━━━━━━━━━━━━━━━━━━━
+async function fetchPremiums() {
+  const container = document.getElementById('plans-container');
+  container.innerHTML = `<div class="loading-state"><div class="spinner"></div><div>Fetching best plans for you…</div></div>`;
+  setSummary(0, 0, 0);
+
+  const body = {
+    members:    S.members.map(m => ({type:m.type, age:parseInt(m.age), gender:m.gender})),
+    sumInsured: S.sumInsured,
+    pincode:    S.pincode,
+    tenure:     S.tenure,
+    portability:S.portability,
+    frequency:  S.frequency,
+    planType:   S.planType,
+  };
+
+  try {
+    const r = await fetch('http://localhost:3003/api/premium', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify(body),
+    });
+    const data = await r.json();
+    if (data.error) {
+      container.innerHTML = `<div class="err-box"><b>&#9888; Could not fetch premiums</b><br>${data.error}</div>`;
+      return;
+    }
+    S.apiResp = data;
+    renderPlans(data);
+  } catch(e) {
+    container.innerHTML = `<div class="err-box"><b>&#9888; No response from server</b><br>Is mc_server.js running on port 3003?</div>`;
+  }
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━
+//  RENDER PLANS
+// ━━━━━━━━━━━━━━━━━━━━━━
+
+// Plan-specific features (from actual website)
+const PLAN_FEATURES = {
+  India: [
+    'Continuity benefits on the entire opted Sum Insured while porting from a base Sum Insured (excluding accumulated Cumulative Bonus) of INR 10Lacs and above',
+    'Get one year’ renewal premium waived off upon diagnosis of listed critical illnesses, permanent partial disability, permanent total disability or accidental death',
+    'Avail Annual Health Check-Up from the 1st Policy Year',
+    'Unlimited Restoration of Sum Insured for unrelated illnesses',
+  ],
+  Global: [
+    'Get a guaranteed 15% increase in base Sum Insured every single year with no maximum limit on accumulation, irrespective of claims',
+    'Get one year’ renewal premium waived off upon diagnosis of listed critical illnesses, permanent partial disability, permanent total disability or accidental death',
+    'Seamlessly continue existing waiting period credits while porting from a base Sum Insured (excluding accumulated Cumulative Bonus) of INR 10Lacs and above',
+    'Opt for up to ₹3 crore Sum Insured with no limit on room rent limit',
+  ],
+};
+
+function renderPlans(data) {
+  const cards = data.response?.Card || [];
+  const zone  = data.response?.zone || '';
+
+  if (!cards.length) {
+    document.getElementById('plans-container').innerHTML =
+      `<div class="err-box"><b>No plans returned</b><br>Try a different Sum Insured or Plan Type.</div>`;
+    return;
+  }
+
+  let html = '';
+  cards.forEach((card, ci) => {
+    const name    = card.SuggestionName || '';
+    const title   = name ? `ManipalCigna Lifetime Health - ${name} Plan` : 'Plan';
+    const pt      = card.FinalPremiumTable?.[0] || {};
+    const base    = pt.BASE_PREM || 0;
+    const total   = pt.MODAL_PREM_TAX || pt.TOTAL_WITH_TAX || 0;
+    const addons  = Math.max(0, total - base);
+    const feats   = PLAN_FEATURES[name] || [];
+    const isGlobal = name === 'Global';
+
+    const featHtml = feats.map(f => `
+      <div class="feat-item">
+        <span class="feat-star">&#9733;</span>
+        <span>${f}</span>
+      </div>`).join('');
+
+    const globalOptsHtml = isGlobal ? `
+      <div class="global-opts">
+        <div class="global-opts-grid">
+          <div class="gopt">
+            <label>Indian Cover</label>
+            <select id="global-india-si-${ci}" onchange="onBenefitChange()">
+              <option value="5000000">50.0 Lakhs</option>
+              <option value="7500000">75.0 Lakhs</option>
+              <option value="10000000">100.0 Lakhs</option>
+              <option value="15000000">150.0 Lakhs</option>
+              <option value="20000000">200.0 Lakhs</option>
+              <option value="30000000">300.0 Lakhs</option>
+            </select>
+          </div>
+          <div class="gopt">
+            <label>Global Cover</label>
+            <select id="global-intl-si-${ci}" onchange="onBenefitChange()">
+              <option value="7500000">75.0 Lacs</option>
+              <option value="10000000">100.0 Lacs</option>
+              <option value="15000000">150.0 Lacs</option>
+              <option value="20000000">200.0 Lacs</option>
+              <option value="30000000">300.0 Lacs</option>
+            </select>
+          </div>
+          <div class="gopt">
+            <label>Major Illness Cover</label>
+            <select id="global-ill-${ci}" onchange="onBenefitChange()">
+              <option>Only Cancer Treatment</option>
+              <option>All 27 Major Illnesses</option>
+            </select>
+          </div>
+          <div class="gopt">
+            <label>Area of Cover</label>
+            <select id="global-aoc-${ci}" onchange="onBenefitChange()">
+              <option>Worldwide excluding India</option>
+              <option>Worldwide excluding India, USA &amp; Canada</option>
+            </select>
+          </div>
+        </div>
+      </div>` : '';
+
+    html += `
+      <div class="plan-card-outer" id="plan-card-${ci}">
+        <div class="card-header">
+          <span class="card-title">${title}</span>
+        </div>
+        <div class="card-body">
+          <div class="feat-grid">${featHtml}</div>
+          <a class="more-features" onclick="alert('Full feature details available on the ManipalCigna website.')">MORE FEATURES &rsaquo;</a>
+          ${globalOptsHtml}
+          <div class="card-footer">
+            <div class="prem-section">
+              <div class="prem-lbl">Premium (incl. GST)</div>
+              <div class="prem-amt" id="prem-${ci}">${fmtINR(total)}*</div>
+              <div class="prem-note">${fmtSI(S.sumInsured)} &middot; ${S.tenure} Year &middot; ${zone}</div>
+            </div>
+            <button class="btn-select" onclick="selectPlan(${ci})">SELECT NOW</button>
+            <button onclick="mcAddToCompare(${ci},'${title.replace(/'/g,"\\'")}','${fmtSI(S.sumInsured)}')"
+              style="background:#1a7a3a;color:#fff;border:none;padding:7px 14px;border-radius:4px;font-size:12px;font-weight:600;cursor:pointer;margin-top:6px;width:100%">
+              ➕ Add to Comparison
+            </button>
+          </div>
+        </div>
+      </div>`;
+  });
+
+  document.getElementById('plans-container').innerHTML = html;
+
+  // Default summary from first card
+  updateSummaryFromCard(0);
+}
+
+function selectPlan(ci) {
+  updateSummaryFromCard(ci);
+  document.querySelectorAll('.plan-card-outer').forEach((el,i) => {
+    el.style.boxShadow = i===ci ? '0 0 0 2px #E8720C' : '';
+  });
+}
+
+function updateSummaryFromCard(ci) {
+  const cards = S.apiResp?.response?.Card || [];
+  if (!cards[ci]) return;
+  const pt     = cards[ci].FinalPremiumTable?.[0] || {};
+  const base   = pt.BASE_PREM || 0;
+  const total  = pt.MODAL_PREM_TAX || pt.TOTAL_WITH_TAX || 0;
+  const addons = Math.max(0, total - base);
+  setSummary(base, addons, total);
+}
+
+function setSummary(base, addons, final) {
+  document.getElementById('s-base'  ).textContent = fmtINR(base);
+  document.getElementById('s-addons').textContent = '₹ ' + fmt2(addons);
+  document.getElementById('s-final' ).textContent = fmtINR(final);
+}
+
+function onBenefitChange() {
+  // In a full implementation, this would recalculate premiums
+  // For now, just note the change — user presses RECALCULATE to refresh
+}
+
+function toggleBenefitSub(subId, checkbox) {
+  const sub = document.getElementById(subId);
+  if (sub) sub.classList.toggle('open', checkbox.checked);
+  onBenefitChange();
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━
+//  HELPERS
+// ━━━━━━━━━━━━━━━━━━━━━━
+function fmtINR(n) {
+  return '₹' + Math.round(n).toLocaleString('en-IN');
+}
+function fmt2(n) {
+  return n.toLocaleString('en-IN', {minimumFractionDigits:2, maximumFractionDigits:2});
+}
+function fmtSI(v) {
+  v = +v;
+  if (v >= 10000000) return (v/10000000).toFixed(1).replace(/\.0$/,'') + ' Cr';
+  return (v/100000).toFixed(0) + ' Lakhs';
+}
+
+// ── Add to Comparison (postMessage to parent unified.html) ─────────────────
+function mcAddToCompare(ci, planTitle, siLabel) {
+  const premEl  = document.getElementById('prem-' + ci);
+  const premium = premEl ? premEl.textContent.replace('*','').trim() : '';
+  if (!premium || premium === '₹0') return;
+
+  window.parent.postMessage({
+    type:       'add-quote',
+    company:    'ManipalCigna',
+    planName:   planTitle,
+    sumAssured: siLabel + ' Lakhs',
+    premium,
+    addons:     '—'
+  }, '*');
+}
+
+// ══════════════════════════════════════════════════════════════════
+//  HUB INTEGRATION — receive set-params from parent insurance_hub
+// ══════════════════════════════════════════════════════════════════
+// Only accept instructions from a page served by our own local servers.
+// Every receiver here used to take a message from any origin.
+var _ALLOWED_ORIGINS = ['http://localhost:3002','http://127.0.0.1:3002',
+  'http://localhost:3003','http://127.0.0.1:3003','http://localhost:3004',
+  'http://127.0.0.1:3004','http://localhost:3005','http://127.0.0.1:3005'];
+function _originAllowed(o){ return !o || o === 'null' || _ALLOWED_ORIGINS.indexOf(o) !== -1; }
+window.addEventListener('message', function(ev) {
+  if (!_originAllowed(ev.origin)) return;
+  try {
+    const msg = (typeof ev.data === 'string') ? JSON.parse(ev.data) : ev.data;
+    if (!msg || msg.type !== 'set-params') return;
+    const d = msg.data || {};
+
+    // ── Adults / Kids counts ───────────────────────────────────
+    if (d.members) {
+      S.adults = Math.max(1, Math.min(6, d.members.adults   || 1));
+      S.kids   = Math.max(0, Math.min(4, d.members.children || 0));
+      const avEl = document.getElementById('adults-val');
+      const kvEl = document.getElementById('kids-val');
+      if (avEl) avEl.textContent = S.adults;
+      if (kvEl) kvEl.textContent = S.kids;
+
+      // Pre-fill member ages into S.members
+      S.members = [];
+      const aA = d.members.adultAges || [];
+      const cA = d.members.childAges || [];
+      for (let i = 0; i < S.adults; i++) {
+        S.members.push({ type:'adult', age: aA[i] ? String(aA[i]) : '', gender:'MALE' });
+      }
+      for (let i = 0; i < S.kids; i++) {
+        S.members.push({ type:'child', age: cA[i] ? String(cA[i]) : '', gender:'MALE' });
+      }
+      if (typeof updateAgeDisplay === 'function') updateAgeDisplay();
+    }
+
+    // ── Pincode ────────────────────────────────────────────────
+    if (d.pincode) {
+      const pinEl = document.getElementById('pincode');
+      if (pinEl) {
+        pinEl.value = d.pincode;
+        if (typeof validatePin === 'function') validatePin(pinEl);
+      }
+    }
+
+    // ── Sum Insured — MC minimum is 50L (5000000) ──────────────
+    if (d.si) {
+      const mcSI = Math.max(5000000, d.si);
+      S.sumInsured = mcSI;
+      const siSel = document.getElementById('r-si');
+      if (siSel && siSel.options.length) {
+        let bestVal = null, bestDiff = Infinity;
+        Array.from(siSel.options).forEach(function(opt) {
+          const v = parseInt(opt.value);
+          if (!isNaN(v)) {
+            const diff = Math.abs(v - mcSI);
+            if (diff < bestDiff) { bestDiff = diff; bestVal = opt.value; }
+          }
+        });
+        if (bestVal) siSel.value = bestVal;
+      }
+    }
+
+    // ── Tenure ─────────────────────────────────────────────────
+    if (d.tenure) {
+      S.tenure = String(d.tenure);
+      const tenSel = document.getElementById('r-tenure');
+      if (tenSel) tenSel.value = String(d.tenure);
+    }
+
+    // ── Plan type ──────────────────────────────────────────────
+    if (d.coverType) {
+      let ptVal = 'FamilyFloater';
+      if      (d.coverType === 'individual') ptVal = 'individual';
+      else if (d.coverType === 'mi')         ptVal = 'multiindividual';
+      S.planType = ptVal;
+      const ptSel = document.getElementById('r-ptype');
+      if (ptSel) ptSel.value = ptVal;
+    }
+
+    // ── Show plan picker instead of auto-calculating ───────────
+    if (msg.autoCalc) {
+      setTimeout(function() {
+        document.getElementById('plan-picker-overlay').classList.add('open');
+      }, 300);
+    }
+  } catch(e) {}
+});
+
+// ── Plan picker helpers ────────────────────────────────────────
+function pickPlan(planKey) {
+  closePlanPicker();
+  if (planKey === 'lifetime') {
+    if (typeof handleGetQuotes === 'function') handleGetQuotes();
+  }
+  // Other plan keys reserved for future API integration
+}
+
+function closePlanPicker() {
+  document.getElementById('plan-picker-overlay').classList.remove('open');
+}
+
+// Signal ready
+try { window.parent.postMessage({ type: 'calc-ready', calculator: 'mc' }, '*'); } catch(e) {}
+</script>
+</body>
+</html>

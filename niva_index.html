@@ -1,0 +1,1346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Niva Bupa Premium Calculator</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',Arial,sans-serif;background:#f0f4f8;color:#222;min-height:100vh}
+.header{background:linear-gradient(135deg,#00669c 0%,#00a3d7 100%);padding:14px 28px;display:flex;align-items:center;gap:14px;box-shadow:0 2px 8px rgba(0,102,156,.3)}
+.header-logo{width:38px;height:38px;background:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:14px;color:#00669c;flex-shrink:0}
+.header-title{color:#fff;font-size:1.25rem;font-weight:700;letter-spacing:.3px}
+.header-sub{color:rgba(255,255,255,.8);font-size:.78rem;margin-top:1px}
+.container{max-width:1100px;margin:0 auto;padding:22px 18px}
+.plan-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:18px}
+.plan-tab{padding:7px 16px;border-radius:20px;border:1.5px solid #c5d8e8;background:#fff;font-size:.82rem;font-weight:600;color:#00669c;cursor:pointer;transition:all .18s}
+.plan-tab:hover{background:#e6f4fb;border-color:#00a3d7}
+.plan-tab.active{background:#00669c;color:#fff;border-color:#00669c}
+.card{background:#fff;border-radius:11px;box-shadow:0 1px 6px rgba(0,0,0,.08);margin-bottom:16px;overflow:hidden}
+.card-header{background:#f0f7fb;padding:10px 16px;font-size:.78rem;font-weight:700;color:#00669c;text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid #ddeef7;border-radius:11px 11px 0 0}
+.card-body{padding:14px 16px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+label{display:block;font-size:.77rem;font-weight:600;color:#555;margin-bottom:4px}
+select,input[type="text"],input[type="date"]{width:100%;padding:7px 10px;border:1.5px solid #ccd8e4;border-radius:6px;font-size:.84rem;color:#222;background:#fff;transition:border-color .15s}
+select:focus,input:focus{outline:none;border-color:#00a3d7}
+select:disabled{background:#f5f5f5;color:#999}
+.member-counter{display:flex;align-items:center;gap:12px;margin-bottom:10px}
+.member-counter-label{font-size:.82rem;font-weight:600;color:#333;min-width:80px}
+.counter-ctrl{display:flex;align-items:center;gap:8px}
+.counter-btn{width:28px;height:28px;border-radius:50%;border:1.5px solid #00669c;background:#fff;color:#00669c;font-size:1rem;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s}
+.counter-btn:hover{background:#00669c;color:#fff}
+.counter-btn:disabled{border-color:#ccc;color:#ccc;cursor:not-allowed}
+.counter-btn:disabled:hover{background:#fff;color:#ccc}
+.counter-val{font-size:.95rem;font-weight:700;color:#00669c;min-width:20px;text-align:center}
+.dob-row{display:flex;gap:10px;align-items:center;margin-bottom:8px}
+.dob-row label{min-width:70px;margin:0;font-size:.77rem}
+.dob-row input[type=date]{flex:1}
+.dob-row .age-box{width:64px;flex:0 0 64px;text-align:center;padding:6px 4px;border:1px solid #ddd;border-radius:5px;font:inherit;font-size:.8rem}
+.dob-row .age-box::placeholder{color:#aaa;font-size:.72rem}
+/* Result no longer matches the inputs on screen. */
+#result.is-stale{opacity:.45;filter:grayscale(.7)}
+#staleBanner{display:none;margin:0 0 10px;padding:9px 12px;background:#fffbeb;border:1px solid #fcd34d;
+  border-left:3px solid #f59e0b;border-radius:7px;font-size:.78rem;color:#8a6100;font-weight:600}
+.city-wrap{position:relative}
+.city-dropdown{position:absolute;top:100%;left:0;right:0;background:#fff;border:1.5px solid #00a3d7;border-top:none;border-radius:0 0 7px 7px;max-height:200px;overflow-y:auto;z-index:100;display:none}
+.city-dropdown.open{display:block}
+.city-option{padding:7px 11px;font-size:.83rem;cursor:pointer;border-bottom:1px solid #f0f4f8}
+.city-option:hover{background:#e6f4fb;color:#00669c}
+.addons-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:12px 14px}
+.addon-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border:1.5px solid #ddeef7;border-radius:8px;cursor:pointer;transition:all .18s;background:#fff}
+.addon-item:hover{border-color:#00a3d7;background:#f0f8fd}
+.addon-item input[type="checkbox"]{width:16px;height:16px;accent-color:#00669c;cursor:pointer;flex-shrink:0}
+.addon-item.disabled-addon{opacity:.55;cursor:not-allowed;pointer-events:none;background:#f9f9f9}
+.addon-label{font-size:.82rem;color:#444;line-height:1.3;flex:1}
+.addon-item.checked{border-color:#00669c;background:#edf6fb}
+.addon-item.checked .addon-label{color:#00669c;font-weight:600}
+.addon-section-title{font-size:.72rem;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.5px;padding:10px 14px 4px;border-top:1px solid #f0f4f8}
+.addon-section-title:first-child{border-top:none}
+.included-grid{display:flex;flex-wrap:wrap;gap:6px;padding:8px 14px 12px}
+.included-tag{background:#f0f7fb;border:1px solid #c8e1ef;border-radius:20px;padding:4px 10px;font-size:.76rem;color:#00669c;display:flex;align-items:center;gap:5px}
+.included-tag::before{content:'✓';font-size:.72rem;color:#00a36c}
+.refresh-btn{padding:5px 12px;border-radius:6px;border:1.5px solid #00669c;background:#fff;color:#00669c;font-size:.78rem;font-weight:600;cursor:pointer;transition:all .18s;white-space:nowrap}
+.refresh-btn:hover{background:#00669c;color:#fff}
+.card-header-row{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;background:#f0f7fb;border-bottom:1px solid #ddeef7}
+.calc-btn{width:100%;padding:13px;background:linear-gradient(135deg,#00669c,#00a3d7);color:#fff;border:none;border-radius:8px;font-size:1rem;font-weight:700;cursor:pointer;letter-spacing:.4px;transition:opacity .2s;margin-top:4px}
+.calc-btn:hover{opacity:.9}
+.calc-btn:disabled{opacity:.6;cursor:not-allowed}
+#result{display:none}
+.result-card{background:linear-gradient(135deg,#00669c,#007db8);border-radius:11px;padding:20px;color:#fff;margin-bottom:16px}
+.result-product{font-size:.82rem;opacity:.85;margin-bottom:4px}
+.result-premium-label{font-size:.88rem;opacity:.8;margin-bottom:2px}
+.result-premium-amount{font-size:2.4rem;font-weight:800;letter-spacing:-.5px}
+.result-gst{font-size:.78rem;opacity:.75;margin-top:2px}
+.pay-modes{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:14px}
+.pay-mode-card{background:rgba(255,255,255,.15);border-radius:8px;padding:10px;text-align:center}
+.pay-mode-label{font-size:.73rem;opacity:.8;margin-bottom:4px}
+.pay-mode-amount{font-size:1.1rem;font-weight:700}
+.riders-result{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:4px}
+.rider-result-item{background:#f7fbff;border:1.5px solid #ddeef7;border-radius:7px;padding:9px 11px;display:flex;justify-content:space-between;align-items:center;cursor:pointer;transition:all .18s;user-select:none}
+.rider-result-item:hover{border-color:#00a3d7;background:#e8f5fc}
+.rider-result-item.selected{border-color:#00669c;background:#edf6fb}
+.rider-result-item.deselected{opacity:.5;background:#f4f4f4;border-color:#ddd}
+.rider-result-item.deselected .rider-result-premium{text-decoration:line-through;color:#aaa}
+.rider-result-name{font-size:.8rem;color:#333;display:flex;align-items:center;gap:7px}
+.rider-result-premium{font-size:.82rem;font-weight:700;color:#00669c}
+.rider-cb{width:14px;height:14px;accent-color:#00669c;cursor:pointer;flex-shrink:0}
+.tenure-options{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
+.tenure-card{background:rgba(255,255,255,.15);border-radius:8px;padding:9px 12px;cursor:pointer;border:2px solid transparent;transition:all .18s;flex:1;min-width:90px;text-align:center}
+.tenure-card:hover{background:rgba(255,255,255,.25)}
+.tenure-card.selected{background:rgba(255,255,255,.3);border-color:rgba(255,255,255,.85)}
+.tenure-card-year{font-size:.72rem;opacity:.8;margin-bottom:3px}
+.tenure-card-price{font-size:1rem;font-weight:700}
+.tenure-view-more{background:rgba(255,255,255,.1);border:1.5px dashed rgba(255,255,255,.5);border-radius:8px;padding:9px 12px;cursor:pointer;font-size:.8rem;color:rgba(255,255,255,.85);display:flex;align-items:center;justify-content:center;flex:1;min-width:90px;transition:background .18s}
+.tenure-view-more:hover{background:rgba(255,255,255,.2)}
+.info-note{background:#fff8e1;border:1.5px solid #ffe082;color:#795548;border-radius:7px;padding:9px 13px;font-size:.8rem;margin-bottom:10px;display:none}
+.error-banner{background:#fff3f3;border:1.5px solid #ffb3b3;color:#c00;border-radius:7px;padding:10px 14px;font-size:.84rem;margin-bottom:12px;display:none}
+.spinner{display:none;width:22px;height:22px;border:3px solid rgba(255,255,255,.35);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;margin:0 auto}
+@keyframes spin{to{transform:rotate(360deg)}}
+@media(max-width:640px){
+  .grid2,.pay-modes,.addons-grid,.riders-result{grid-template-columns:1fr}
+  .plan-tabs{gap:4px}
+  .plan-tab{font-size:.76rem;padding:6px 11px}
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-logo">NB</div>
+  <div>
+    <div class="header-title">Niva Bupa Premium Calculator</div>
+    <div class="header-sub">Instant health insurance premium estimates</div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="plan-tabs" id="planTabs">
+    <div class="plan-tab active"  data-plan="Individual">Individual</div>
+    <div class="plan-tab"         data-plan="Floater">Family Floater</div>
+    <div class="plan-tab"         data-plan="SeniorCitizen">Senior Citizen</div>
+    <div class="plan-tab"         data-plan="TopUp">Top-Up Plan</div>
+    <div class="plan-tab"         data-plan="FamilyFirst">Family First</div>
+    <div class="plan-tab"         data-plan="PersonalAccident">Personal Accident</div>
+  </div>
+
+  <div id="errorBanner" class="error-banner"></div>
+  <div id="infoNote"    class="info-note"></div>
+
+  <div class="grid2" style="gap:16px;align-items:start">
+    <!-- LEFT COLUMN -->
+    <div>
+      <!-- Product -->
+      <div class="card">
+        <div class="card-header">Product</div>
+        <div class="card-body">
+          <label for="productSelect">Select Product</label>
+          <select id="productSelect" onchange="markResultStale()"><option value="">Loading...</option></select>
+        </div>
+      </div>
+
+      <!-- Members -->
+      <div class="card">
+        <div class="card-header">Members</div>
+        <div class="card-body">
+          <div class="member-counter">
+            <span class="member-counter-label">Adults</span>
+            <div class="counter-ctrl">
+              <button class="counter-btn" id="adultMinus" onclick="changeCount('adult',-1)">−</button>
+              <span class="counter-val" id="adultCountEl">1</span>
+              <button class="counter-btn" id="adultPlus"  onclick="changeCount('adult',1)">+</button>
+            </div>
+          </div>
+          <div id="adultDOBs"></div>
+
+          <div id="childSection">
+            <div class="member-counter" style="margin-top:8px">
+              <span class="member-counter-label">Children</span>
+              <div class="counter-ctrl">
+                <button class="counter-btn" id="childMinus" onclick="changeCount('child',-1)">−</button>
+                <span class="counter-val" id="childCountEl">0</span>
+                <button class="counter-btn" id="childPlus"  onclick="changeCount('child',1)">+</button>
+              </div>
+            </div>
+            <div id="childDOBs"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- City -->
+      <div class="card" style="overflow:visible">
+        <div class="card-header">Location</div>
+        <div class="card-body">
+          <label>Pincode <span style="font-weight:400;color:#888">(finds the city for you)</span></label>
+          <input type="text" id="pinInput" maxlength="6" inputmode="numeric"
+                 placeholder="e.g. 700001" autocomplete="off"
+                 style="width:100%;padding:9px 11px;border:1px solid #ddd;border-radius:6px;font:inherit;font-size:.9rem"/>
+          <div id="pinMsg" style="font-size:.75rem;margin:4px 0 10px;min-height:14px;color:#888"></div>
+
+          <label>City</label>
+          <div class="city-wrap">
+            <input type="text" id="cityInput" placeholder="Type city name..." autocomplete="off"/>
+            <div class="city-dropdown" id="cityDropdown"></div>
+          </div>
+          <input type="hidden" id="cityId" value=""/>
+        </div>
+      </div>
+
+      <!-- Plan Options -->
+      <div class="card">
+        <div class="card-header">Plan Options</div>
+        <div class="card-body">
+          <div class="grid2">
+            <div id="variantWrap">
+              <label for="planVariant">Plan Variant</label>
+              <select id="planVariant" onchange="markResultStale()"></select>
+            </div>
+            <div>
+              <label for="sumInsured">Sum Insured</label>
+              <select id="sumInsured" onchange="markResultStale()"></select>
+            </div>
+            <div>
+              <label for="deductible">Deductible</label>
+              <select id="deductible" onchange="markResultStale()"></select>
+            </div>
+            <div>
+              <label for="paymentMode">Payment Mode</label>
+              <select id="paymentMode" onchange="markResultStale()">
+                <option value="A">Annual</option>
+                <option value="H">Half-Yearly</option>
+                <option value="Q">Quarterly</option>
+                <option value="M">Monthly</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <button class="calc-btn" onclick="calculate()" id="calcBtn">
+        <span id="calcLabel">Calculate Premium</span>
+        <div class="spinner" id="calcSpinner"></div>
+      </button>
+    </div>
+
+    <!-- RIGHT COLUMN -->
+    <div>
+      <!-- Add-ons -->
+      <div class="card">
+        <div class="card-header-row">
+          <span style="font-size:.78rem;font-weight:700;color:#00669c;text-transform:uppercase;letter-spacing:.5px">Customize Your Plan</span>
+          <button class="refresh-btn" onclick="refreshAddons()" title="Reset all add-ons to defaults and recalculate">↺ Refresh</button>
+        </div>
+        <div id="addonsContainer">
+          <div id="addonsPlaceholder" style="padding:16px;font-size:.84rem;color:#888;text-align:center">
+            Calculate premium to load add-ons
+          </div>
+        </div>
+      </div>
+
+      <!-- Result -->
+      <div id="staleBanner">⚠️ Inputs changed — click Calculate Premium to reprice. The figures below are from the previous inputs.</div>
+      <div id="result">
+        <div class="result-card">
+          <div class="result-product" id="resultProduct"></div>
+          <div class="result-premium-label">Annual Premium (incl. GST)</div>
+          <div class="result-premium-amount" id="resultAmount">₹0</div>
+          <div class="result-gst" id="resultGST"></div>
+          <div class="tenure-options" id="tenureOptions"></div>
+          <div class="pay-modes" id="payModes" style="margin-top:14px"></div>
+          <div style="text-align:center;margin-top:12px">
+            <button id="niva-add-btn" onclick="nivaAddToCompare()"
+              style="display:none;background:#1a7a3a;color:#fff;border:none;padding:9px 22px;border-radius:5px;font-size:13px;font-weight:600;cursor:pointer;letter-spacing:.3px">
+              ➕ Add to Comparison
+            </button>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header">Add-On Premium Breakdown</div>
+          <div class="card-body">
+            <div class="riders-result" id="ridersResult"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════
+// DYNAMIC: rider.name → payload field
+// The 'name' field is consistent across ALL
+// products regardless of rider ID. This makes
+// add-on toggling work for any plan.
+// ═══════════════════════════════════════════
+const NAME_TO_FIELD = {
+  // ── Aspire / ReAssure3.0 ─────────────────
+  'HospitalCashid':        { field: 'IsHospitalCash',         loc: 'plan',   on: '1', off: '0' },
+  'SafeGuardplusid':       { field: 'safeguardPlusOpted',      loc: 'policy', on: 'Y', off: 'N' }, // SafeGuard+ & Claim SafeGuard+
+  'GatekeeperId':          { field: 'safeguardOpted',          loc: 'policy', on: 'Y', off: 'N' }, // HeadsUp (Aspire)
+  'FutureReadyid':         { field: 'IsFutureReady',           loc: 'plan',   on: '1', off: '0' },
+  'Borderlessid':          { field: 'IsTreatmentOutSideIndia', loc: 'plan',   on: '1', off: '0' },
+  'WellConsultid':         { field: 'WellConsultOpted',        loc: 'policy', on: 'Y', off: 'N' }, // Aspire OPD
+  'OPDId':                 { field: 'WellConsultOpted',        loc: 'policy', on: 'Y', off: 'N' }, // ReAssure OPD (WellConsult+)
+  'CashBagid':             { field: 'AccumulateOpted',         loc: 'policy', on: 'Y', off: 'N' }, // Cash-Bag & Cash-Bag+
+  'FastForwardid':         { field: 'IsFastForword',           loc: 'plan',   on: '1', off: '0' },
+  'ValueTierNetworkId':    { field: 'IsTieredNetwork',         loc: 'plan',   on: '1', off: '0' },
+  'MedicalPractitionerid': { field: 'medicalPractDiscount',    loc: 'policy', on: 'Y', off: 'N' },
+  // ── Senior First / ReAssure2.0 ──────────
+  'Safeguardid':           { field: 'safeguardOpted',          loc: 'policy', on: 'Y', off: 'N' }, // Safeguard (basic)
+  // ── ReAssure3.0 specific ─────────────────
+  'NivaHealthMembershipId':{ field: 'NivaBupaOneOpted',        loc: 'policy', on: 'Y', off: 'N' }, // NivaBupaOne membership
+  'AnnualHealthCheckupid': { field: 'ahcOpted',                loc: 'policy', on: 'Y', off: 'N' }, // Annual Health Check-Up
+  'NRIDiscountid':         { field: 'nriDiscount',             loc: 'policy', on: 'Y', off: 'N' }, // NRI discount
+};
+
+// Returns the payload-field mapping for a rider, keyed by its name field
+function riderFieldMap(r) { return r && r.name ? (NAME_TO_FIELD[r.name] || null) : null; }
+
+// Is the Amount field a real numeric premium (not "SELECT"/"POPUP"/"CHECKBOX"/null)?
+function numericAmount(r) {
+  const a = r.Amount;
+  return a !== null && a !== undefined && String(a).trim() !== '' && !isNaN(Number(a)) && Number(a) > 0;
+}
+
+// ── State ──────────────────────────────────
+let cities         = [];
+let adultCount     = 1;
+let childCount     = 0;
+let selectedCityId = '';
+let currentPlanType = 'Individual';
+let currentProducts = [];
+let allYearData     = [];   // full premiumResponseDto1 array from last API call
+let lastRiders      = [];   // riders from last API response (for Refresh)
+let addonRecalc     = false; // true when calculate() triggered by an addon toggle
+
+let maxAdults    = 4;
+let maxChildren  = 5;
+let adultMinAge  = 18;
+let adultMaxAge  = 99;
+let childMinDays = 91;
+let childMaxAge  = 30;
+let childrenAllowed = true;
+
+// ── Init ───────────────────────────────────
+document.addEventListener('DOMContentLoaded', async () => {
+  await loadConfig();
+  await loadProducts('Individual');
+
+  document.getElementById('cityInput').addEventListener('input', filterCities);
+  document.getElementById('cityInput').addEventListener('blur', () => {
+    // Close dropdown; if no city confirmed, restore previously selected name or clear
+    setTimeout(() => {
+      document.getElementById('cityDropdown').classList.remove('open');
+      const input = document.getElementById('cityInput');
+      if (!selectedCityId) {
+        input.value = '';
+        input.dataset.selected = '';
+      } else {
+        // Restore the confirmed city name if user typed something but didn't re-select
+        input.value = input.dataset.selected || input.value;
+      }
+    }, 150);
+  });
+  document.getElementById('productSelect').addEventListener('change', onProductChange);
+
+  document.querySelectorAll('.plan-tab').forEach(tab => {
+    tab.addEventListener('click', async () => {
+      document.querySelectorAll('.plan-tab').forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      currentPlanType = tab.dataset.plan;
+      clearError(); clearInfo();
+      document.getElementById('result').style.display = 'none';
+      resetAddons();
+      await loadProducts(currentPlanType);
+    });
+  });
+});
+
+// ── Config ─────────────────────────────────
+async function loadConfig() {
+  try {
+    const r = await fetch('/api/config');
+    const j = await r.json();
+    cities = j.cities || [];
+  } catch(e) { showError('Could not load city list.'); }
+}
+
+// Switch the plan category tab programmatically (used by hub plan popup).
+async function applyPlanTab(cat){
+  const tab = Array.from(document.querySelectorAll('.plan-tab')).find(function(t){ return t.dataset.plan === cat; });
+  if (!tab) return;
+  document.querySelectorAll('.plan-tab').forEach(function(t){ t.classList.remove('active'); });
+  tab.classList.add('active');
+  currentPlanType = cat;
+  if (typeof clearError === 'function') clearError();
+  if (typeof clearInfo === 'function') clearInfo();
+  if (typeof resetAddons === 'function') resetAddons();
+  await loadProducts(cat);
+}
+
+// ── Products ───────────────────────────────
+async function loadProducts(planType) {
+  const sel = document.getElementById('productSelect');
+  sel.innerHTML = '<option value="">Loading products...</option>';
+  sel.disabled = true;
+  try {
+    const r = await fetch(`/api/products/${planType}`);
+    const j = await r.json();
+    currentProducts = j.products || [];
+    renderProductDropdown();
+  } catch(e) {
+    sel.innerHTML = '<option value="">Error loading products</option>';
+    showError('Could not load products: ' + e.message);
+  } finally {
+    sel.disabled = false;
+  }
+}
+
+function renderProductDropdown() {
+  const sel = document.getElementById('productSelect');
+  sel.innerHTML = '';
+  if (!currentProducts.length) {
+    sel.innerHTML = '<option value="">No products available</option>';
+    resetPlanOptions(); return;
+  }
+  currentProducts.forEach(p => {
+    const o = document.createElement('option');
+    o.value = p.value; o.textContent = p.label;
+    sel.appendChild(o);
+  });
+  onProductChange();
+}
+
+function onProductChange() {
+  const sel  = document.getElementById('productSelect');
+  const prod = currentProducts.find(p => p.value === sel.value);
+  if (!prod) { resetPlanOptions(); return; }
+
+  const cats = prod.planSubCategory || [];
+
+  // ── Adults ──
+  const aC = cats.find(c => c.name === 'InsuredAdultMember');
+  const aOpts = aC?.options || [{value:'1'}];
+  maxAdults   = Math.max(...aOpts.map(o => Number(o.value)));
+  adultMinAge = aC ? Number(aC.AdultMinAge || 18) : 18;
+  adultMaxAge = aC ? Number(aC.AdultMaxAge || 99) : 99;
+  if (adultCount > maxAdults) adultCount = maxAdults;
+  document.getElementById('adultCountEl').textContent = adultCount;
+
+  // ── Children ──
+  const cC = cats.find(c => c.name === 'InsuredChildMember');
+  const cOpts = cC?.options || [];
+  maxChildren    = cOpts.length ? Math.max(...cOpts.map(o => Number(o.value))) : 0;
+  childrenAllowed = maxChildren > 0;
+  childMinDays   = cC && cC.ChildMinAgeInDays ? Number(cC.ChildMinAgeInDays) : 91;
+  childMaxAge    = cC && cC.ChildMaxAge      ? Number(cC.ChildMaxAge)       : 30;
+  if (childCount > maxChildren) childCount = 0;
+  document.getElementById('childCountEl').textContent = childCount;
+  document.getElementById('childSection').style.display = childrenAllowed ? '' : 'none';
+
+  updateCounterBtns();
+  renderDOBs();
+
+  // ── Sum Insured ──
+  const isFloaterProduct = prod.productType === 'Floater' ||
+    ((prod.productType || '').toLowerCase().includes('floater')) ||
+    ((prod.label || '').toLowerCase().includes('floater'));
+  const siField = isFloaterProduct
+    ? (cats.find(c => c.name === 'floatercover') || cats.find(c => c.name === 'individualCover'))
+    : (cats.find(c => c.name === 'individualCover') || cats.find(c => c.name === 'floatercover'));
+
+  const siSel  = document.getElementById('sumInsured');
+  siSel.innerHTML = '';
+  const siOpts = siField?.options?.filter(Boolean) || ['500000'];
+  siOpts.forEach(v => {
+    const o = document.createElement('option');
+    o.value = v; o.textContent = fmtSI(v);
+    siSel.appendChild(o);
+  });
+
+  // ── Variant ──
+  const varField = cats.find(c => c.name === 'plantype');
+  const varWrap  = document.getElementById('variantWrap');
+  const varSel   = document.getElementById('planVariant');
+  varSel.innerHTML = '';
+  if (varField?.options?.length) {
+    varField.options.forEach(opt => {
+      const o = document.createElement('option');
+      o.value       = typeof opt === 'object' ? opt.value : opt;
+      o.textContent = typeof opt === 'object' ? opt.label : opt;
+      varSel.appendChild(o);
+    });
+    varWrap.style.display = '';
+    varSel.disabled = false;
+  } else {
+    varWrap.style.display = 'none';
+    varSel.disabled = true;
+  }
+
+  // ── Deductible ──
+  const dedField = cats.find(c => c.name === 'deductable');
+  const dedSel   = document.getElementById('deductible');
+  dedSel.innerHTML = '';
+  const dedOpts  = dedField?.options || ['0'];
+  (dedOpts || ['0']).forEach(v => {
+    const o = document.createElement('option');
+    o.value = v;
+    o.textContent = v === '0' || v === 0 ? 'None' : '₹' + Number(v).toLocaleString('en-IN');
+    dedSel.appendChild(o);
+  });
+
+  // ── Info note ──
+  if (currentPlanType === 'SeniorCitizen') {
+    showInfo(`Senior Citizen plan — insured must be age ${adultMinAge}–${adultMaxAge} years.`);
+  } else if (currentPlanType === 'TopUp') {
+    showInfo('Super Top-Up plan — activates after your base plan\'s deductible is exhausted.');
+  } else { clearInfo(); }
+}
+
+function resetPlanOptions() {
+  document.getElementById('sumInsured').innerHTML  = '<option>—</option>';
+  document.getElementById('planVariant').innerHTML = '<option>—</option>';
+  document.getElementById('deductible').innerHTML  = '<option value="0">None</option>';
+}
+
+function updateCounterBtns() {
+  document.getElementById('adultMinus').disabled = adultCount <= 1;
+  document.getElementById('adultPlus').disabled  = adultCount >= maxAdults;
+  document.getElementById('childMinus').disabled = childCount <= 0;
+  document.getElementById('childPlus').disabled  = childCount >= maxChildren;
+}
+
+function fmtSI(v) {
+  if (v === '999999999' || Number(v) >= 999999999) return '₹ Unlimited';
+  const n = Number(v);
+  if (n >= 10000000) return '₹' + parseFloat((n/10000000).toFixed(2)) + ' Cr';
+  if (n >= 100000)   return '₹' + parseFloat((n/100000).toFixed(2))   + ' Lakhs';
+  return '₹' + n.toLocaleString('en-IN');
+}
+
+// ── Member counters ────────────────────────
+function changeCount(type, d) {
+  markResultStale();
+  if (type === 'adult') {
+    adultCount = Math.max(1, Math.min(maxAdults, adultCount + d));
+    document.getElementById('adultCountEl').textContent = adultCount;
+  } else {
+    childCount = Math.max(0, Math.min(maxChildren, childCount + d));
+    document.getElementById('childCountEl').textContent = childCount;
+  }
+  updateCounterBtns();
+  renderDOBs();
+}
+
+function renderDOBs() {
+  const aC = document.getElementById('adultDOBs');
+  const cC = document.getElementById('childDOBs');
+  const exA = Array.from(aC.querySelectorAll('input[type=date]')).map(i => i.value);
+  const exC = Array.from(cC.querySelectorAll('input[type=date]')).map(i => i.value);
+
+  aC.innerHTML = '';
+  for (let i = 0; i < adultCount; i++) {
+    const r = document.createElement('div');
+    r.className = 'dob-row';
+    r.innerHTML = `<label>Adult ${i+1} DOB</label>
+      <input type="date" id="adultDOB${i}"
+        max="${aDOBmax()}" min="${aDOBmin()}" value="${exA[i]||''}"
+        oninput="syncAgeFromDob('adult',${i})"/>
+      <input type="number" class="age-box" id="adultAge${i}" min="0" max="120"
+        placeholder="age" title="Type an age and the date of birth is filled in"
+        oninput="syncDobFromAge('adult',${i})"/>`;
+    aC.appendChild(r);
+  }
+  cC.innerHTML = '';
+  for (let i = 0; i < childCount; i++) {
+    const r = document.createElement('div');
+    r.className = 'dob-row';
+    r.innerHTML = `<label>Child ${i+1} DOB</label>
+      <input type="date" id="childDOB${i}"
+        max="${cDOBmax()}" min="${cDOBmin()}" value="${exC[i]||''}"
+        oninput="syncAgeFromDob('child',${i})"/>
+      <input type="number" class="age-box" id="childAge${i}" min="0" max="30"
+        placeholder="age" title="Type an age and the date of birth is filled in"
+        oninput="syncDobFromAge('child',${i})"/>`;
+    cC.appendChild(r);
+  }
+  // Mirror the restored dates back into the age boxes.
+  for (let i = 0; i < adultCount; i++) syncAgeFromDob('adult', i);
+  for (let i = 0; i < childCount; i++) syncAgeFromDob('child', i);
+}
+
+// ── Age ⇄ DOB ───────────────────────────────────────────────────────────────
+// Operators are quoted in ages; Niva's API needs real dates. The hub already
+// derived synthetic DOBs for the same reason — this exposes it locally so a
+// standalone operator does not have to work a date picker for every member.
+function ageToDob(age, isChild) {
+  const n = parseInt(age, 10);
+  if (!isFinite(n) || n < 0) return '';
+  const y = new Date().getFullYear() - n;
+  return `${y}-${isChild ? '06-15' : '01-15'}`;
+}
+function dobToAge(dob) {
+  if (!dob) return '';
+  const d = new Date(dob);
+  if (isNaN(d)) return '';
+  const t = new Date();
+  let a = t.getFullYear() - d.getFullYear();
+  const m = t.getMonth() - d.getMonth();
+  if (m < 0 || (m === 0 && t.getDate() < d.getDate())) a--;
+  return a >= 0 ? String(a) : '';
+}
+let _ageSyncing = false;
+function syncDobFromAge(kind, i) {
+  if (_ageSyncing) return;
+  _ageSyncing = true;
+  const ageEl = document.getElementById(`${kind}Age${i}`);
+  const dobEl = document.getElementById(`${kind}DOB${i}`);
+  if (ageEl && dobEl && ageEl.value !== '') dobEl.value = ageToDob(ageEl.value, kind === 'child');
+  _ageSyncing = false;
+  markResultStale();
+}
+function syncAgeFromDob(kind, i) {
+  if (_ageSyncing) return;
+  _ageSyncing = true;
+  const ageEl = document.getElementById(`${kind}Age${i}`);
+  const dobEl = document.getElementById(`${kind}DOB${i}`);
+  if (ageEl && dobEl) ageEl.value = dobToAge(dobEl.value);
+  _ageSyncing = false;
+  markResultStale();
+}
+
+function aDOBmax(){const d=new Date();d.setFullYear(d.getFullYear()-adultMinAge);return d.toISOString().split('T')[0];}
+function aDOBmin(){const d=new Date();d.setFullYear(d.getFullYear()-adultMaxAge);return d.toISOString().split('T')[0];}
+function cDOBmax(){const d=new Date();d.setDate(d.getDate()-childMinDays);return d.toISOString().split('T')[0];}
+function cDOBmin(){const d=new Date();d.setFullYear(d.getFullYear()-childMaxAge);return d.toISOString().split('T')[0];}
+function toApi(iso){if(!iso)return'';const[y,m,d]=iso.split('-');return`${d}/${m}/${y}`;}
+function getAge(iso){if(!iso)return 0;const[y,m,d]=iso.split('-').map(Number);const t=new Date();let a=t.getFullYear()-y;if(t.getMonth()+1<m||(t.getMonth()+1===m&&t.getDate()<d))a--;return a;}
+
+// ── City autocomplete ──────────────────────
+function filterCities() {
+  const q  = document.getElementById('cityInput').value.trim().toLowerCase();
+  const dd = document.getElementById('cityDropdown');
+  // Only clear the selected ID if user is actively changing the text (not just re-focusing)
+  if (selectedCityId && document.getElementById('cityInput').value !== document.getElementById('cityInput').dataset.selected) {
+    selectedCityId = '';
+    document.getElementById('cityId').value = '';
+  }
+  if (q.length < 2) { dd.classList.remove('open'); return; }
+  const m = cities.filter(c => c.name.toLowerCase().includes(q)).slice(0, 40);
+  if (!m.length) { dd.classList.remove('open'); return; }
+  // Use onmousedown + e.preventDefault() so selection fires BEFORE blur closes dropdown
+  dd.innerHTML = m.map(c => {
+    const safeName = c.name.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+    return `<div class="city-option"
+      onmousedown="event.preventDefault(); selectCity('${c.id}','${safeName}')">
+      ${c.name} <span style="font-size:.72rem;color:#888">(Zone ${c.zone})</span>
+    </div>`;
+  }).join('');
+  dd.classList.add('open');
+}
+
+function selectCity(id, name) {
+  markResultStale();
+  selectedCityId = id;
+  document.getElementById('cityId').value    = id;
+  document.getElementById('cityInput').value = name;
+  document.getElementById('cityInput').dataset.selected = name; // track confirmed name
+  document.getElementById('cityDropdown').classList.remove('open');
+}
+
+// ── Add-ons ────────────────────────────────
+function resetAddons() {
+  lastRiders = [];
+  const container = document.getElementById('addonsContainer');
+  container.innerHTML = `<div id="addonsPlaceholder" style="padding:16px;font-size:.84rem;color:#888;text-align:center">Calculate premium to load add-ons</div>`;
+}
+
+function isRiderChecked(r) {
+  const v = r.value;
+  return v !== 0 && v !== '0' && v !== '-1' && v !== null && v !== undefined && v !== '';
+}
+
+function renderAddons(riders) {
+  lastRiders = riders;
+  const container = document.getElementById('addonsContainer');
+
+  // "Customize Your Plan" top section shows only non-optional (included/info) features as tags
+  // Interactive add-ons are shown in the breakdown section below with prices + checkboxes
+  const included = riders.filter(r => r.isVisible === true && !riderFieldMap(r) && r.ParentId == null);
+
+  let html = '';
+  if (included.length) {
+    html += `<div class="addon-section-title" style="border-top:none">Plan Features</div>`;
+    html += `<div class="included-grid">`;
+    html += included.map(r => `<span class="included-tag">${r.label}</span>`).join('');
+    html += `</div>`;
+  } else {
+    html = `<div style="padding:10px 14px;font-size:.82rem;color:#888">Optional add-ons shown below with pricing.</div>`;
+  }
+
+  container.innerHTML = html;
+}
+
+function refreshAddons() {
+  if (!lastRiders.length) { calculate(); return; }
+  // Reset all add-on checkboxes to their API-default state, then recalculate
+  renderAddons(lastRiders);
+  addonRecalc = false; // force full re-render on next calculate
+  if (document.getElementById('result').style.display !== 'none') calculate();
+}
+
+// Click handler for breakdown row (whole row click → toggle checkbox)
+function toggleBreakdown(riderId) {
+  const cb = document.querySelector(`.rider-result-item [data-addon="${riderId}"]`);
+  if (!cb || cb.disabled) return;
+  cb.checked = !cb.checked;
+  cb.dispatchEvent(new Event('change'));
+}
+
+function onAddonChange(el) {
+  // Update visual state — works for both label.addon-item and div.rider-result-item
+  const row = el.closest('label') || el.closest('.rider-result-item');
+  if (row) {
+    if (row.classList.contains('rider-result-item')) {
+      row.classList.toggle('selected',    el.checked);
+      row.classList.toggle('deselected', !el.checked);
+    } else {
+      row.classList.toggle('checked', el.checked);
+    }
+  }
+  if (document.getElementById('result').style.display !== 'none') {
+    addonRecalc = true;
+    calculate();
+  }
+}
+
+function addonState() {
+  const s = {};
+  document.querySelectorAll('[data-addon]').forEach(el => { s[Number(el.dataset.addon)] = el.checked; });
+  return s;
+}
+
+// ── BUILD PAYLOAD (exact UNO structure) ────
+function buildPayload({ prodCode, adultDOBs, childDOBs, si, variant, ded, payMode, cityId, addons }) {
+  // Build lookup: riderId → rider object (from lastRiders)
+  const riderById = {};
+  lastRiders.forEach(r => { riderById[r.ID] = r; });
+
+  // Plan-level and policy-level add-on fields, derived dynamically from NAME_TO_FIELD
+  const planAddonFields   = {};
+  const policyAddonFields = {};
+  Object.entries(addons).forEach(([idStr, checked]) => {
+    const id   = Number(idStr);
+    const map  = riderFieldMap(riderById[id]);
+    if (!map) return;
+    const val = checked ? map.on : map.off;
+    if (map.loc === 'plan')   planAddonFields[map.field]   = val;
+    if (map.loc === 'policy') policyAddonFields[map.field] = val;
+  });
+
+  const memberDetails = [
+    ...adultDOBs.map(dob => ({
+      dob: toApi(dob),
+      loadingPercentage: '100',
+      personalAccidentOpted: 'N',
+      dmOpted: 'N',
+      diaPedTenure: '0',
+      htnPedTenure: '0',
+      diaLoading: '0',
+      htnLoading: '0',
+      isAdult: true
+    })),
+    ...childDOBs.map(dob => ({
+      dob: toApi(dob),
+      loadingPercentage: '100',
+      personalAccidentOpted: 'N',
+      dmOpted: 'N',
+      diaPedTenure: '0',
+      htnPedTenure: '0',
+      diaLoading: '0',
+      htnLoading: '0',
+      isAdult: false
+    }))
+  ];
+
+  const isPA = currentPlanType === 'PersonalAccident';
+
+  return {
+    planDetails: {
+      Adult:                    String(adultDOBs.length),
+      Child:                    String(childDOBs.length),
+      SumINsured:               isPA ? '0' : si,
+      ProdCode:                 prodCode,
+      IsHospitalCash:           planAddonFields.IsHospitalCash  || '0',
+      DMRider:                  'N',
+      AccuteCareLimit:          '0',
+      GOPAFactor:               '0',
+      IsAccuteCare:             '0',
+      Deductible:               ded || '0',
+      CoPay:                    '0',
+      BedType:                  'O',
+      PlanType:                 variant || '',
+      CityId:                   cityId,
+      IsTieredNetwork:          planAddonFields.IsTieredNetwork || '0',
+      WaitingPeriod:            '-1',
+      IsTreatmentOutSideIndia:  planAddonFields.IsTreatmentOutSideIndia || '0',
+      IsFastForword:            planAddonFields.IsFastForword           || '0',
+      IsFutureReady:            planAddonFields.IsFutureReady           || '0',
+      WithRiders:               true,
+      PPN:                      'N',
+      RoomRentFactor:           '0',
+      CriticalInsuredSumInsured:'0',
+      IsTTD:                    '1',
+      IsADSPORts:               '1',
+      Adult1IncomeType:         'Not Earning',
+      Adult2IncomeType:         '',
+      GOCIFactor:               '0',
+      PAInsuredSumInsured:      isPA ? si : '100000',
+      ExistingPolicyDate:       '',
+      ExistingPolicyNo:         '',
+      PREMIUM_WAIVER_OPTED:     '0',
+      IncludingUsaCanada:       '0',
+      EConsultancy:             '1',
+      TotalFamilyCover:         '0'
+    },
+    premiumCal: {
+      policyDetails: (() => {
+        // Core fields always sent (same set the UNO app sends for every product)
+        const pd = {
+          discount:               '0',
+          planId:                 '0',
+          billCycle:              '3',
+          medicalPractDiscount:   policyAddonFields.medicalPractDiscount || 'N',
+          safeguardOpted:         policyAddonFields.safeguardOpted       || 'N',
+          safeguardPlusOpted:     policyAddonFields.safeguardPlusOpted   || 'N',
+          paymentMode:            payMode,
+          policy_Number_IFRenewal:'',
+          deductible:             ded || '0',
+          copayLimit:             '0',
+          acuteCareLimit:         '0',
+          dmRiderType:            'N',
+          outsideIndiaCopayLimit: '0',
+          AccumulateOpted:        policyAddonFields.AccumulateOpted      || 'N',
+          WellConsultOpted:       policyAddonFields.WellConsultOpted     || 'N',
+          isPort:                 'N'
+          // premiumCalculationDate injected server-side
+        };
+        // Product-specific optional fields — only inject when user actively enables them.
+        // Sending them as 'N' to products that don't support them causes "service error".
+        // Omitting = same as 'N' on the API side.
+        if (policyAddonFields.NivaBupaOneOpted === 'Y') pd.NivaBupaOneOpted = 'Y';
+        if (policyAddonFields.ahcOpted         === 'Y') pd.ahcOpted         = 'Y';
+        if (policyAddonFields.nriDiscount      === 'Y') pd.nriDiscount      = 'Y';
+        return pd;
+      })(),
+      memberDetails
+    }
+  };
+}
+
+// ── Calculate ──────────────────────────────
+async function calculate() {
+  clearError();
+
+  if (!selectedCityId) { showError('Please select a city from the dropdown.'); return; }
+  const prodCode = document.getElementById('productSelect').value;
+  if (!prodCode)       { showError('Please select a product.'); return; }
+
+  const aDOBs = [];
+  for (let i = 0; i < adultCount; i++) {
+    const v = document.getElementById(`adultDOB${i}`)?.value;
+    if (!v) { showError(`Please enter DOB for Adult ${i+1}.`); return; }
+    aDOBs.push(v);
+  }
+  const cDOBs = [];
+  for (let i = 0; i < childCount; i++) {
+    const v = document.getElementById(`childDOB${i}`)?.value;
+    if (!v) { showError(`Please enter DOB for Child ${i+1}.`); return; }
+    cDOBs.push(v);
+  }
+
+  // Age validation for Senior Citizen
+  if (currentPlanType === 'SeniorCitizen') {
+    for (let i = 0; i < aDOBs.length; i++) {
+      const age = getAge(aDOBs[i]);
+      if (age < adultMinAge || age > adultMaxAge) {
+        showError(`Adult ${i+1} age is ${age} yrs. This plan requires age ${adultMinAge}–${adultMaxAge}.`);
+        return;
+      }
+    }
+  }
+
+  const si      = document.getElementById('sumInsured').value;
+  const variant = document.getElementById('planVariant').value;
+  const ded     = document.getElementById('deductible').value;
+  const payMode = document.getElementById('paymentMode').value;
+  const addons  = addonState();
+
+  setLoading(true);
+  try {
+    const payload = buildPayload({ prodCode, adultDOBs: aDOBs, childDOBs: cDOBs, si, variant, ded, payMode, cityId: selectedCityId, addons });
+
+    // ── Retry logic: 3 attempts with growing delays ─────────────────
+    // The Niva Bupa OTC API is occasionally flaky. We retry on:
+    //  • No data at all (null / empty premiumResponseDto1 with no error msg)
+    //  • "service error" / "try again" in ErrorMessage
+    //  • Fetch network errors
+    const isTransient = (json) => {
+      if (!json || !json.data) return true;                       // null / unreachable
+      if (!json.data.premiumResponseDto1?.length && !json.data.ErrorMessage) return true; // empty with no reason
+      const msg = (json.data.ErrorMessage || '').toLowerCase();
+      return msg.includes('service error') || msg.includes('try again');
+    };
+
+    let json = null;
+    for (let attempt = 1; attempt <= 3; attempt++) {
+      try {
+        const resp = await fetch('/api/premium', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        json = await resp.json();
+      } catch (fetchErr) {
+        if (attempt < 3) { await new Promise(r => setTimeout(r, 800 * attempt)); continue; }
+        throw fetchErr;
+      }
+      if (!isTransient(json)) break;                             // clean result or hard error
+      if (attempt < 3) await new Promise(r => setTimeout(r, 800 * attempt)); // 800 ms, 1600 ms
+    }
+
+    if (!json || !json.data?.premiumResponseDto1?.length) {
+      const msg = json?.error || json?.data?.ErrorMessage || 'Service temporarily unavailable — please try again in a moment.';
+      showError(msg);
+      _emitStatus('failed');
+      return;
+    }
+    renderResult(json.data);
+    _emitStatus('ready');
+    if (_hubAutoAdd) { try { nivaAddToCompare(); } catch(e){} }
+  } catch(e) {
+    showError('Network error: ' + e.message);
+    _emitStatus('down');
+  } finally {
+    setLoading(false);
+  }
+}
+
+// ── Year Tenure ────────────────────────────
+const modeLabels = { Anually:'Annual', 'Half Yearly':'Half-Yearly', Quarterly:'Quarterly', Monthly:'Monthly' };
+
+function renderYearTenure(years) {
+  const container = document.getElementById('tenureOptions');
+  const SHOW_MAX = 3;
+  const show = years.slice(0, SHOW_MAX);
+  const hasMore = years.length > SHOW_MAX;
+
+  container.innerHTML =
+    show.map((y, idx) =>
+      `<div class="tenure-card ${idx === 0 ? 'selected' : ''}" onclick="selectYear(${idx})">
+        <div class="tenure-card-year">${y.PremiumYear} Year${y.PremiumYear > 1 ? 's' : ''}</div>
+        <div class="tenure-card-price">₹${Number(y.TotalPremium).toLocaleString('en-IN')}</div>
+      </div>`
+    ).join('') +
+    (hasMore
+      ? `<div class="tenure-view-more" onclick="showAllYears()">View More Options ▼</div>`
+      : '');
+}
+
+function selectYear(idx) {
+  const y = allYearData[idx];
+  if (!y) return;
+
+  // Update selected state
+  document.querySelectorAll('.tenure-card').forEach((c, i) => c.classList.toggle('selected', i === idx));
+
+  // Update premium display
+  const ann    = (y.multipaymentMode || []).find(m => m.ModeOfPayment === 'Anually');
+  const annAmt = ann?.GrossPremiumPayMode || y.TotalPremium;
+  document.getElementById('resultAmount').textContent = '₹' + Number(annAmt).toLocaleString('en-IN');
+  document.getElementById('resultGST').textContent =
+    y.GSTTax > 0
+      ? `Incl. GST ₹${Number(y.GSTTax).toLocaleString('en-IN')} | Base ₹${Number(y.BasePremium).toLocaleString('en-IN')}`
+      : `Base ₹${Number(y.BasePremium).toLocaleString('en-IN')}`;
+
+  // Update payment modes if available for this year
+  if (y.multipaymentMode && y.multipaymentMode.length) {
+    document.getElementById('payModes').innerHTML = y.multipaymentMode.map(m =>
+      `<div class="pay-mode-card">
+        <div class="pay-mode-label">${modeLabels[m.ModeOfPayment] || m.ModeOfPayment}</div>
+        <div class="pay-mode-amount">₹${Number(m.GrossPremiumPayMode).toLocaleString('en-IN')}</div>
+      </div>`).join('');
+  }
+}
+
+function showAllYears() {
+  const container = document.getElementById('tenureOptions');
+  container.innerHTML = allYearData.map((y, idx) =>
+    `<div class="tenure-card ${idx === 0 ? 'selected' : ''}" onclick="selectYear(${idx})">
+      <div class="tenure-card-year">${y.PremiumYear} Year${y.PremiumYear > 1 ? 's' : ''}</div>
+      <div class="tenure-card-price">₹${Number(y.TotalPremium).toLocaleString('en-IN')}</div>
+    </div>`
+  ).join('');
+}
+
+// ── Render result ──────────────────────────
+function renderResult(data) {
+  clearResultStale();
+  // Store all years for tenure selector
+  allYearData = data.premiumResponseDto1 || [];
+  const dto    = allYearData[0];
+  if (!dto) return;
+  const riders = dto.RidersDetails || [];
+
+  const wasAddonRecalc = addonRecalc;
+  addonRecalc = false; // reset flag
+
+  // On fresh calculation: update product name, year tenure, and add-ons
+  if (!wasAddonRecalc) {
+    const sel = document.getElementById('productSelect');
+    document.getElementById('resultProduct').textContent = sel.options[sel.selectedIndex]?.text || '';
+    renderYearTenure(allYearData);
+    renderAddons(riders);
+  }
+
+  // Always update premium amounts and payment modes
+  const ann    = (dto.multipaymentMode || []).find(m => m.ModeOfPayment === 'Anually');
+  const annAmt = ann?.GrossPremiumPayMode || dto.TotalPremium;
+  document.getElementById('resultAmount').textContent = '₹' + Number(annAmt).toLocaleString('en-IN');
+  document.getElementById('resultGST').textContent =
+    dto.GSTTax > 0
+      ? `Incl. GST ₹${Number(dto.GSTTax).toLocaleString('en-IN')} | Base ₹${Number(dto.BasePremium).toLocaleString('en-IN')}`
+      : `Base ₹${Number(dto.BasePremium).toLocaleString('en-IN')}`;
+
+  // Show Add to Comparison button
+  const nivaAddBtn = document.getElementById('niva-add-btn');
+  if (nivaAddBtn) nivaAddBtn.style.display = 'inline-block';
+
+  document.getElementById('payModes').innerHTML =
+    (dto.multipaymentMode || []).map(m =>
+      `<div class="pay-mode-card">
+        <div class="pay-mode-label">${modeLabels[m.ModeOfPayment] || m.ModeOfPayment}</div>
+        <div class="pay-mode-amount">₹${Number(m.GrossPremiumPayMode).toLocaleString('en-IN')}</div>
+      </div>`).join('');
+
+  // Rider breakdown — dynamic: show all isVisible riders with a known field map
+  // Show with price if numericAmount; show without price if toggleable but no individual pricing
+  const existingChecks = addonState(); // preserve user's checked state across recalcs
+
+  // Riders to show: isVisible, parentId=null/0, and either has numeric price OR is toggleable
+  const rItems = riders.filter(r =>
+    r.isVisible && (r.ParentId == null || r.ParentId === 0) &&
+    (numericAmount(r) || !!riderFieldMap(r))
+  );
+
+  document.getElementById('ridersResult').innerHTML = rItems.length
+    ? rItems.map(r => {
+        const inMap  = !!riderFieldMap(r);
+        const apiChecked = isRiderChecked(r);
+        const checked    = (existingChecks[r.ID] !== undefined) ? existingChecks[r.ID] : apiChecked;
+        const priceHTML  = numericAmount(r)
+          ? `<div class="rider-result-premium">₹${Number(r.Amount).toLocaleString('en-IN')}</div>`
+          : `<div class="rider-result-premium" style="font-size:.73rem;color:#888">optional</div>`;
+        return `
+        <div class="rider-result-item ${checked ? 'selected' : 'deselected'}"
+             onclick="toggleBreakdown(${r.ID})">
+          <div class="rider-result-name">
+            <input class="rider-cb" type="checkbox" data-addon="${r.ID}"
+              ${checked ? 'checked' : ''}
+              ${!inMap ? 'disabled title="Included in base plan"' : ''}
+              onclick="event.stopPropagation()" onchange="onAddonChange(this)"/>
+            ${r.label}
+          </div>
+          ${priceHTML}
+        </div>`;
+      }).join('')
+    : '<div style="color:#888;font-size:.84rem;grid-column:1/-1;text-align:center;padding:8px">No optional add-ons for this plan.</div>';
+
+  document.getElementById('result').style.display = 'block';
+  if (!wasAddonRecalc) {
+    document.getElementById('result').scrollIntoView({ behavior:'smooth', block:'start' });
+  }
+}
+
+// ── Helpers ────────────────────────────────
+function setLoading(on) {
+  document.getElementById('calcBtn').disabled        = on;
+  document.getElementById('calcLabel').style.display = on ? 'none' : '';
+  document.getElementById('calcSpinner').style.display = on ? 'block' : 'none';
+}
+function showError(msg) { const e=document.getElementById('errorBanner'); e.textContent=msg; e.style.display='block'; }
+function clearError()   { document.getElementById('errorBanner').style.display='none'; }
+function showInfo(msg)  { const e=document.getElementById('infoNote');    e.textContent=msg; e.style.display='block'; }
+function clearInfo()    { document.getElementById('infoNote').style.display='none'; }
+
+// ── Add to Comparison (postMessage to parent unified.html) ─────────────────
+function nivaAddToCompare() {
+  const planName = document.getElementById('resultProduct')?.textContent || '';
+  const premium  = document.getElementById('resultAmount')?.textContent  || '';
+  if (!premium || premium === '₹0') return;
+
+  const siSel = document.getElementById('sumInsured');
+  const siOpt = siSel ? siSel.options[siSel.selectedIndex]?.text : '';
+  const sumAssured = siOpt || '';
+
+  // Collect active addons (checked checkboxes). The rider name lives as text inside
+  // .rider-result-name (right after the checkbox) — NOT in a <label>, and the checkbox
+  // has no value attribute (so cb.value would wrongly be "on").
+  const addons = [];
+  document.querySelectorAll('#ridersResult input[type="checkbox"]:checked').forEach(cb => {
+    const nameEl = cb.closest('.rider-result-name');
+    const lbl = (nameEl ? nameEl.textContent : '').replace(/\s+/g,' ').trim();
+    if (lbl) addons.push(lbl);
+  });
+
+  // Report the tenure that is actually selected on screen. Niva returns every
+  // year in one response, so the displayed premium follows the highlighted
+  // tenure card — the hub cannot infer it.
+  let tenureYrs = 1;
+  const cards = Array.from(document.querySelectorAll('.tenure-card'));
+  const selIdx = cards.findIndex(c => c.classList.contains('selected'));
+  const yearRow = allYearData[selIdx >= 0 ? selIdx : 0];
+  if (yearRow && yearRow.PremiumYear) tenureYrs = parseInt(yearRow.PremiumYear, 10) || 1;
+
+  // Plan category doubles as the cover type for Niva.
+  const coverType = (currentPlanType === 'Floater' || currentPlanType === 'FamilyFirst')
+    ? 'Floater' : 'Individual';
+
+  window.parent.postMessage({
+    type:       'add-quote',
+    company:    'Niva Bupa',
+    planName,
+    sumAssured,
+    premium,
+    addons:     addons.join(', ') || '—',
+    tenure:     tenureYrs,
+    coverType:  coverType
+  }, '*');
+}
+
+// ══════════════════════════════════════════════════════════════════
+//  HUB INTEGRATION — receive set-params from parent insurance_hub
+// ══════════════════════════════════════════════════════════════════
+// Additive: remember hub "auto-add" intent + emit lightweight status to hub
+var _hubAutoAdd = false;
+function _emitStatus(s){ try { window.parent.postMessage({ type:'calc-status', calculator:'niva', status:s }, '*'); } catch(e){} }
+// ── Stale results ───────────────────────────────────────────────────────────
+// Every calculator used to leave the previous premium on screen after an input
+// changed, with nothing to say it no longer matched the form — which is how a
+// figure for one product ends up being read out for another.
+function markResultStale() {
+  const r = document.getElementById('result');
+  if (!r || r.style.display === 'none') return;
+  r.classList.add('is-stale');
+  const b = document.getElementById('staleBanner');
+  if (b) b.style.display = 'block';
+}
+function clearResultStale() {
+  const r = document.getElementById('result');
+  if (r) r.classList.remove('is-stale');
+  const b = document.getElementById('staleBanner');
+  if (b) b.style.display = 'none';
+}
+
+// ── Pincode → city ──────────────────────────────────────────────────────────
+// Niva has no pincode field of its own; it wants a cityId. This resolver used
+// to exist only inside the hub message handler, so a standalone operator had
+// to type at least two characters and click a dropdown row for every quote.
+async function resolvePincodeToCity(pin, opts) {
+  opts = opts || {};
+  const msgEl   = document.getElementById('pinMsg');
+  const cityInp = document.getElementById('cityInput');
+  const say = (text, colour) => { if (msgEl) { msgEl.textContent = text; msgEl.style.color = colour || '#888'; } };
+
+  if (!/^\d{6}$/.test(String(pin || ''))) { say(''); return false; }
+  if (!cities.length) { say('City list not loaded yet — pick a city manually.', '#b45309'); return false; }
+
+  say('Looking up ' + pin + '…');
+  try {
+    const resp = await fetch('https://api.postalpincode.in/pincode/' + pin);
+    const data = await resp.json();
+    if (!data || !data[0] || data[0].Status !== 'Success') {
+      say('⚠️ Pincode not found — pick a city manually.', '#b45309');
+      if (cityInp && !selectedCityId) cityInp.style.borderColor = '#f59e0b';
+      return false;
+    }
+    const candidates = [];
+    (data[0].PostOffice || []).forEach(po => {
+      ['District','Division','Block','Name'].forEach(k => {
+        if (po[k] && !candidates.includes(po[k].toLowerCase())) candidates.push(po[k].toLowerCase());
+      });
+    });
+    let matched = null;
+    for (let i = 0; i < candidates.length && !matched; i++) {
+      const term = candidates[i];
+      matched = cities.find(c => {
+        const cn = c.name.toLowerCase();
+        return cn === term || cn.includes(term) || term.includes(cn);
+      });
+    }
+    if (matched) {
+      selectCity(matched.id, matched.name);
+      if (cityInp) { cityInp.style.borderColor = '#22c55e'; cityInp.style.background = '#f0fdf4'; }
+      say('✓ ' + matched.name + ' (Zone ' + (matched.zone || '?') + ')', '#15803d');
+      if (opts.thenCalculate && typeof calculate === 'function') setTimeout(calculate, 300);
+      return true;
+    }
+    say('⚠️ No matching city for this pincode — pick one manually.', '#b45309');
+    if (cityInp && !selectedCityId) cityInp.style.borderColor = '#f59e0b';
+    return false;
+  } catch (e) {
+    say('⚠️ Pincode lookup unavailable — pick a city manually.', '#b45309');
+    return false;
+  }
+}
+
+(function wirePincodeInput(){
+  const el = document.getElementById('pinInput');
+  if (!el) return;
+  let timer = null;
+  el.addEventListener('input', function () {
+    this.value = this.value.replace(/\D/g, '').slice(0, 6);
+    clearTimeout(timer);
+    const v = this.value;
+    if (v.length === 6) timer = setTimeout(() => resolvePincodeToCity(v), 350);
+    else { const m = document.getElementById('pinMsg'); if (m) m.textContent = ''; }
+  });
+})();
+
+// Only accept instructions from a page served by our own local servers.
+// Every receiver here used to take a message from any origin.
+var _ALLOWED_ORIGINS = ['http://localhost:3002','http://127.0.0.1:3002',
+  'http://localhost:3003','http://127.0.0.1:3003','http://localhost:3004',
+  'http://127.0.0.1:3004','http://localhost:3005','http://127.0.0.1:3005'];
+function _originAllowed(o){ return !o || o === 'null' || _ALLOWED_ORIGINS.indexOf(o) !== -1; }
+window.addEventListener('message', async function(ev) {
+  if (!_originAllowed(ev.origin)) return;
+  try {
+    const msg = (typeof ev.data === 'string') ? JSON.parse(ev.data) : ev.data;
+    if (!msg || msg.type !== 'set-params') return;
+    const d = msg.data || {};
+    _hubAutoAdd = !!msg.autoAdd;
+
+    // ── Plan category (from hub plan-name popup) — switch first ─
+    if (d.plan) {
+      try { await applyPlanTab(String(d.plan)); } catch(e) {}
+    }
+
+    // ── Product, then variant ──────────────────────────────────
+    // Must run before the sum-insured block below: onProductChange() rebuilds
+    // the SI, variant and deductible lists from the chosen product, so setting
+    // SI first would only have it overwritten. Before the hub could send these,
+    // whichever product headed the category's list was quoted by default.
+    var _prodUsed = null, _varUsed = null;
+    if (d.product) {
+      var _ps = document.getElementById('productSelect');
+      var _prodOpt = _ps && Array.from(_ps.options).find(function(o){ return o.value === String(d.product); });
+      if (_prodOpt) {
+        _ps.value = _prodOpt.value;
+        if (typeof onProductChange === 'function') onProductChange();
+        _prodUsed = _prodOpt.textContent.trim();
+      }
+    }
+    if (d.variant) {
+      // onProductChange() has just repopulated this, so read it fresh.
+      var _vs = document.getElementById('planVariant');
+      var _vo = _vs && Array.from(_vs.options).find(function(o){ return o.value === String(d.variant); });
+      if (_vo) { _vs.value = _vo.value; _varUsed = _vo.textContent.trim(); }
+    }
+
+    // ── Member counts ──────────────────────────────────────────
+    if (d.members) {
+      adultCount = Math.max(1, Math.min(maxAdults  || 6, d.members.adults   || 1));
+      childCount = Math.max(0, Math.min(maxChildren || 4, d.members.children || 0));
+      const acEl = document.getElementById('adultCountEl');
+      const ccEl = document.getElementById('childCountEl');
+      if (acEl) acEl.textContent = adultCount;
+      if (ccEl) ccEl.textContent = childCount;
+      if (typeof updateCounterBtns === 'function') updateCounterBtns();
+      if (typeof renderDOBs       === 'function') renderDOBs();
+
+      // ── Fill DOBs from ages (use Jan 1) ─────────────────────
+      setTimeout(function() {
+        const yr = new Date().getFullYear();
+        (d.members.adultAges || []).forEach(function(age, i) {
+          const el = document.getElementById('adultDOB' + i);
+          if (el && age > 0) el.value = (yr - age) + '-01-15';
+        });
+        (d.members.childAges || []).forEach(function(age, i) {
+          const el = document.getElementById('childDOB' + i);
+          if (el && age > 0) el.value = (yr - age) + '-06-15';
+        });
+      }, 150);
+    }
+
+    // ── Sum Insured — match closest available option ───────────
+    if (d.si) {
+      const siSel = document.getElementById('sumInsured');
+      if (siSel && siSel.options.length) {
+        let bestVal = null, bestDiff = Infinity;
+        Array.from(siSel.options).forEach(function(opt) {
+          const v = parseInt(opt.value);
+          if (!isNaN(v)) {
+            const diff = Math.abs(v - d.si);
+            if (diff < bestDiff) { bestDiff = diff; bestVal = opt.value; }
+          }
+        });
+        if (bestVal) siSel.value = bestVal;
+      }
+    }
+
+    // Tell the hub what stuck and what did not.
+    try {
+      var _cl = [];
+      if (d.tenure)   _cl.push({ field:'tenure', requested:d.tenure, used:'(all years returned)',
+        reason:'Niva returns every tenure in one quote — pick one on the result card' });
+      if (d.coverType && d.coverType !== 'ff' && d.coverType !== 'individual') {
+        _cl.push({ field:'coverType', requested:d.coverType, used:currentPlanType,
+                   reason:'Niva takes cover type from the plan category tab' });
+      }
+      var _siSel = document.getElementById('sumInsured');
+      if (d.si && _siSel && Math.abs(parseInt(_siSel.value,10) - d.si) > 1) {
+        _cl.push({ field:'si', requested:d.si, used:parseInt(_siSel.value,10),
+                   reason:'snapped to the nearest sum insured this product offers' });
+      }
+      // A product or variant the hub named but this category does not carry
+      // must be reported, not absorbed — otherwise the premium is for a
+      // different plan than the quotation says.
+      if (d.product && !_prodUsed) {
+        var _psx = document.getElementById('productSelect');
+        _cl.push({ field:'product', requested:(d.productLabel || d.product),
+                   used:(_psx && _psx.selectedOptions[0] ? _psx.selectedOptions[0].textContent.trim() : '(none)'),
+                   reason:'that product is not in this category — the calculator kept its own' });
+      }
+      if (d.variant && !_varUsed) {
+        var _vsx = document.getElementById('planVariant');
+        _cl.push({ field:'variant', requested:(d.variantLabel || d.variant),
+                   used:(_vsx && _vsx.selectedOptions[0] ? _vsx.selectedOptions[0].textContent.trim() : '(none)'),
+                   reason:'that variant is not offered by this product — the calculator kept its own' });
+      }
+      window.parent.postMessage({ type:'params-applied', calculator:'niva',
+        accepted:['plan','members','ages','si'].concat(_prodUsed ? ['product'] : [], _varUsed ? ['variant'] : []),
+        clamped:_cl }, '*');
+    } catch(e) {}
+
+    // ── Auto-lookup city from pincode ──────────────────────────
+    // Uses the same resolver as the on-form pincode box, instead of the
+    // duplicate copy that used to live here.
+    var _autoCalc = !!msg.autoCalc;
+    if (d.pincode) {
+      var _pinBox = document.getElementById('pinInput');
+      if (_pinBox) _pinBox.value = String(d.pincode);
+      resolvePincodeToCity(d.pincode, { thenCalculate: _autoCalc });
+    } else if (_autoCalc && selectedCityId && typeof calculate === 'function') {
+      setTimeout(function () { calculate(); }, 250);
+    } else if (!selectedCityId) {
+      var _ci = document.getElementById('cityInput');
+      if (_ci) { _ci.style.borderColor = '#f59e0b'; _ci.placeholder = '⚠️ Select your city here to calculate'; }
+    }
+  } catch(e) {}
+});
+
+// Signal ready
+try { window.parent.postMessage({ type: 'calc-ready', calculator: 'niva' }, '*'); } catch(e) {}
+</script>
+</body>
+</html>

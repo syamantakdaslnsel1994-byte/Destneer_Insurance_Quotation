@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Care Insurance Premium Calculator</title>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Segoe UI',Arial,sans-serif;background:#f0f4f8;min-height:100vh;display:flex;align-items:flex-start;justify-content:center;padding:30px 16px}
+    .card{background:#fff;border-radius:12px;box-shadow:0 4px 24px rgba(0,0,0,.10);width:100%;max-width:600px}
+    .card-header{background:#0057a8;color:#fff;padding:22px 28px;border-radius:12px 12px 0 0}
+    .card-header h1{font-size:1.2rem;font-weight:700}
+    .card-header p{font-size:.8rem;opacity:.8;margin-top:4px}
+    .card-body{padding:24px 28px}
+
+    .form-group{margin-bottom:16px}
+    label.field-label{display:block;font-size:.82rem;font-weight:600;color:#444;margin-bottom:5px}
+    select,input[type="text"],input[type="number"]{width:100%;padding:9px 12px;border:1px solid #ccd4de;border-radius:7px;font-size:.9rem;color:#222;background:#fafbfc;transition:border .2s}
+    select:focus,input:focus{outline:none;border-color:#0057a8;background:#fff}
+    .row{display:flex;gap:14px}
+    .row .form-group{flex:1}
+
+    .radio-group{display:flex;gap:10px;flex-wrap:wrap;margin-top:4px}
+    .radio-group label{display:flex;align-items:center;gap:6px;font-size:.88rem;color:#333;cursor:pointer;padding:7px 14px;border:1px solid #ccd4de;border-radius:6px;transition:all .2s}
+    .radio-group input[type="radio"]{accent-color:#0057a8}
+    .radio-group label:has(input:checked){border-color:#0057a8;background:#e8f1fb;color:#0057a8;font-weight:600}
+
+    .plan-row{margin-bottom:20px}
+    .plan-row label.field-label{font-size:.9rem;color:#0057a8;font-weight:700}
+
+    #dynamicFields{min-height:40px;position:relative}
+    .fields-loading{text-align:center;padding:24px;color:#888;font-size:.88rem}
+    .fields-loading .dot-spin,.updating-spin{display:inline-block;width:16px;height:16px;border:2px solid #ccd4de;border-top-color:#0057a8;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:6px}
+
+    .update-notice{background:#fff9e6;border:1px solid #ffe08a;color:#7a6000;padding:6px 12px;border-radius:6px;font-size:.78rem;margin-bottom:12px;display:flex;align-items:center;gap:6px}
+
+    button#calcBtn{width:100%;padding:12px;background:#0057a8;color:#fff;border:none;border-radius:8px;font-size:1rem;font-weight:700;cursor:pointer;margin-top:8px;transition:background .2s}
+    button#calcBtn:hover{background:#003f7d}
+    button#calcBtn:disabled{background:#aac4e0;cursor:not-allowed}
+
+    .spinner{display:inline-block;width:15px;height:15px;border:2px solid #fff;border-top-color:transparent;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:6px}
+    @keyframes spin{to{transform:rotate(360deg)}}
+
+    .error-box{background:#fff0f0;border:1px solid #f5c6cb;color:#c0392b;padding:12px 16px;border-radius:8px;font-size:.85rem;margin-top:14px;display:none}
+
+    #result{margin-top:20px;border-radius:9px;overflow:hidden;display:none}
+    .result-header{background:#003f7d;color:#fff;padding:12px 20px;font-size:.8rem;font-weight:700;letter-spacing:.5px;text-transform:uppercase}
+    .premium-box{background:#e8f1fb;padding:20px;text-align:center}
+    .premium-amount{font-size:2.4rem;font-weight:800;color:#0057a8}
+    .premium-sub{font-size:.82rem;color:#666;margin-top:3px}
+    .premium-discount{font-size:.9rem;color:#27ae60;font-weight:600;margin-top:6px}
+    .total-row{background:#0057a8;color:#fff;padding:12px 20px;text-align:center;font-size:1rem;font-weight:700}
+    .addons-section{padding:14px 20px;border-top:1px solid #dde5f0}
+    .addons-section h4{font-size:.78rem;font-weight:700;color:#555;text-transform:uppercase;letter-spacing:.4px;margin-bottom:8px}
+    .addon-item{display:flex;align-items:center;gap:8px;font-size:.86rem;color:#333;padding:3px 0}
+    .addon-item .dot{width:6px;height:6px;border-radius:50%;background:#0057a8;flex-shrink:0}
+    .result-note{font-size:.74rem;color:#888;padding:8px 20px 14px;border-top:1px solid #eee}
+
+    .no-fields{text-align:center;padding:16px;color:#aaa;font-size:.85rem;font-style:italic}
+
+    /* Field refresh indicator */
+    .field-refreshing select,.field-refreshing input{opacity:0.5;pointer-events:none}
+
+    /* Add-ons section */
+    .addons-input-section{margin-top:20px;border:1px solid #dde5f0;border-radius:9px;overflow:hidden}
+    .addons-input-header{background:#f0f4f8;padding:10px 16px;font-size:.8rem;font-weight:700;color:#0057a8;text-transform:uppercase;letter-spacing:.4px;border-bottom:1px solid #dde5f0}
+    .addons-grid{display:grid;grid-template-columns:1fr 1fr;gap:0}
+    .addon-check-item{display:flex;align-items:center;gap:9px;padding:9px 14px;border-bottom:1px solid #eef1f6;cursor:pointer;transition:background .15s}
+    .addon-check-item:hover{background:#f7f9fc}
+    .addon-check-item:last-child,.addon-check-item:nth-last-child(2):nth-child(odd){border-bottom:none}
+    .addon-check-item input[type="checkbox"]{width:15px;height:15px;accent-color:#0057a8;cursor:pointer;flex-shrink:0}
+    .addon-check-item span{font-size:.83rem;color:#333;line-height:1.3}
+    .addon-check-item.checked span{color:#0057a8;font-weight:600}
+    @media(max-width:480px){.addons-grid{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+<div class="card">
+  <div class="card-header">
+    <h1>Care Insurance — Premium Calculator</h1>
+    <p>Select a plan to load its fields. Changing dropdowns auto-updates dependent fields.</p>
+  </div>
+  <div class="card-body">
+
+    <!-- Plan selector -->
+    <div class="plan-row">
+      <label class="field-label">Plan Name</label>
+      <select id="planSelect" onchange="onPlanChange()">
+        <option value="">— Select a Plan —</option>
+        <option value="2813">Care Supreme</option>
+        <option value="7218">Care Supreme Shine</option>
+        <option value="7484">POS Care Supreme Shine</option>
+        <option value="5399">POS Care Supreme</option>
+        <option value="6541">Care Supreme - Super Saver</option>
+        <option value="7159">POS Care Supreme - Super Saver</option>
+        <option value="6043">Care Supreme - VFM</option>
+        <option value="6674">Care Supreme - VFM 2</option>
+        <option value="6676">Care Supreme - VFM 3</option>
+        <option value="6217">POS Care Supreme - VFM</option>
+        <option value="6675">POS Care Supreme - VFM 2</option>
+        <option value="6677">POS Care Supreme - VFM 3</option>
+        <option value="6619">Ultimate Care</option>
+        <option value="6725">POS Ultimate Care</option>
+        <option value="7172">Ultimate Care Senior</option>
+        <option value="3485">Care</option>
+        <option value="3486">POS Care</option>
+        <option value="5334">Care Smart Select</option>
+        <option value="5335">POS Care Smart Select</option>
+        <option value="1432">Care Classic</option>
+        <option value="1992">Care Classic - Instant Cover</option>
+        <option value="6196">Care Advantage</option>
+        <option value="1734">Super Care Advantage</option>
+        <option value="362">Super Mediclaim</option>
+        <option value="6434">Supreme Enhance</option>
+        <option value="748">Enhance</option>
+        <option value="3487">Care Senior</option>
+        <option value="3488">POS Care Senior</option>
+        <option value="2534">Sr Health Advantage - Silver</option>
+        <option value="425">Care Heart</option>
+        <option value="188">Secure</option>
+        <option value="573">POS Secure</option>
+        <option value="6384">Secure Plus</option>
+        <option value="7424">POS Secure Plus</option>
+        <option value="6740">Secure Child</option>
+        <option value="7425">POS Secure Child</option>
+        <option value="585">Cancer Mediclaim (Advance)</option>
+        <option value="102">Joy</option>
+        <option value="5955">Joy Tomorrow</option>
+        <option value="107">Student Explore</option>
+        <option value="5674">Student Explore-Health Unlimited</option>
+        <option value="5833">New Explore</option>
+        <option value="5834">POS Explore</option>
+        <option value="5412">Care Freedom</option>
+        <option value="5673">Care Global</option>
+        <option value="1186">Care Plus - Youth Plan</option>
+        <option value="1187">Care Plus - Complete Plan</option>
+        <option value="6395">Surrogacy and Ooctye Donor</option>
+      </select>
+    </div>
+
+    <!-- Dynamic fields rendered here -->
+    <div id="dynamicFields">
+      <div class="no-fields">Select a plan above to load its fields</div>
+    </div>
+
+    <!-- Add-ons section (shown when plan has add-ons) -->
+    <div id="addonsInputSection" style="display:none"></div>
+
+    <div class="error-box" id="errorBox"></div>
+
+    <!-- Result -->
+    <div id="result">
+      <div class="result-header">Your Premium Is</div>
+      <div class="premium-box">
+        <div class="premium-amount" id="premiumAmount">—</div>
+        <div class="premium-sub">Base Premium (GST Exempted)</div>
+        <div class="premium-discount" id="premiumDiscount"></div>
+      </div>
+      <div class="total-row" id="totalRow" style="display:none"></div>
+      <div class="addons-section" id="addonsSection" style="display:none">
+        <h4>Included Add-ons</h4>
+        <div id="addonsList"></div>
+      </div>
+      <div class="result-note">ℹ️ Retail Health, PA and Travel policies are GST exempted. Above premium is for New Business only.</div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  let _session = null;        // { csrf, cookies, hiddenFields }
+  let _currentFields = [];    // current field definitions
+  let _currentAddons = [];    // current add-on definitions [{ id, label, checked }]
+  let _isUpdating = false;    // flag to prevent double-update
+
+  // Fields that trigger a dynamic update when changed
+  const DYNAMIC_TRIGGER_FIELDS = new Set([
+    'field_75',  // Business Type
+    'field_23',  // Plan Type
+    'field_9',   // Cover Type
+    'field_1',   // Total Members
+  ]);
+
+  /* ── Render a single field ── */
+  function renderField(f, savedValues) {
+    const id  = 'inp_' + f.id;
+    const saved = savedValues ? savedValues[f.id] : null;
+    let html = `<div class="form-group" id="grp_${f.id}">
+      <label class="field-label" for="${id}">${f.label}</label>`;
+
+    if (f.type === 'select') {
+      const isDynamic = DYNAMIC_TRIGGER_FIELDS.has(f.id);
+      const onchg = isDynamic ? ` onchange="onDynamicFieldChange('${f.id}')"` : '';
+      html += `<select id="${id}" data-field="${f.id}"${onchg}>`;
+      f.options.forEach(o => {
+        const sel = (saved !== null ? o.value === saved : o.value === f.default) ? ' selected' : '';
+        html += `<option value="${o.value}"${sel}>${o.label}</option>`;
+      });
+      html += `</select>`;
+
+    } else if (f.type === 'text') {
+      const v = saved !== null ? saved : (f.default || '');
+      html += `<input type="text" id="${id}" data-field="${f.id}" value="${v}" placeholder="Enter ${f.label}"/>`;
+
+    } else if (f.type === 'radio') {
+      html += `<div class="radio-group">`;
+      f.options.forEach((o, i) => {
+        const chk = (saved !== null ? o.value === saved : i === 0) ? ' checked' : '';
+        html += `<label><input type="radio" name="radio_${f.id}" value="${o.value}"${chk} data-field="${f.id}"> ${o.label}</label>`;
+      });
+      html += `</div>`;
+    }
+
+    html += `</div>`;
+    return html;
+  }
+
+  /* ── Pair fields into rows of 2 where sensible ── */
+  function renderAllFields(fields, savedValues) {
+    const wideTypes = ['radio', 'text'];
+    const wideLabelKeywords = ['pincode', 'income', 'insured', 'sum'];
+    let html = '';
+    let i = 0;
+    while (i < fields.length) {
+      const f = fields[i];
+      const isWide = wideTypes.includes(f.type) || wideLabelKeywords.some(k => f.label.toLowerCase().includes(k));
+      if (isWide || i === fields.length - 1) {
+        html += renderField(f, savedValues);
+        i++;
+      } else {
+        html += `<div class="row">${renderField(fields[i], savedValues)}${renderField(fields[i+1], savedValues)}</div>`;
+        i += 2;
+      }
+    }
+    return html;
+  }
+
+  /* ── Render add-ons as checkboxes ── */
+  function renderAddons(addons, savedChecked) {
+    const sec = document.getElementById('addonsInputSection');
+    if (!addons || addons.length === 0) { sec.style.display = 'none'; return; }
+
+    let html = `<div class="addons-input-section">
+      <div class="addons-input-header">Optional Add-ons <span style="font-weight:400;text-transform:none;font-size:.75rem;color:#666">(selecting changes premium)</span></div>
+      <div class="addons-grid">`;
+
+    addons.forEach(a => {
+      const isChecked = savedChecked ? (savedChecked[a.id] !== undefined ? savedChecked[a.id] : a.checked) : a.checked;
+      const chk = isChecked ? ' checked' : '';
+      const cls = isChecked ? ' checked' : '';
+      html += `<label class="addon-check-item${cls}" id="addon_lbl_${a.id}">
+        <input type="checkbox" id="addon_${a.id}" data-addon="${a.id}"${chk} onchange="onAddonChange()">
+        <span>${a.label}</span>
+      </label>`;
+    });
+
+    html += `</div></div>`;
+    sec.innerHTML = html;
+    sec.style.display = 'block';
+  }
+
+  /* ── Collect current add-on selections ── */
+  function collectAddons() {
+    const addons = {};
+    document.querySelectorAll('#addonsInputSection [data-addon]').forEach(el => {
+      addons[el.dataset.addon] = el.checked;
+    });
+    return addons;
+  }
+
+  /* ── When an add-on is toggled: update label style + recalculate if result visible ── */
+  function onAddonChange() {
+    // Update visual state of the label
+    document.querySelectorAll('#addonsInputSection [data-addon]').forEach(cb => {
+      const lbl = document.getElementById('addon_lbl_' + cb.dataset.addon);
+      if (lbl) lbl.classList.toggle('checked', cb.checked);
+    });
+    // Auto-recalculate if a result is already showing
+    if (document.getElementById('result').style.display !== 'none') {
+      calculate();
+    }
+  }
+
+  /* ── Collect current field values from the rendered form ── */
+  function collectFields() {
+    const values = {};
+    document.querySelectorAll('#dynamicFields [data-field]').forEach(el => {
+      const fid = el.dataset.field;
+      if (el.tagName === 'SELECT') {
+        values[fid] = el.value;
+      } else if (el.tagName === 'INPUT') {
+        if (el.type === 'radio') { if (el.checked) values[fid] = el.value; }
+        else values[fid] = el.value;
+      }
+    });
+    return values;
+  }
+
+  /* ── On plan change: load fields fresh ── */
+  async function onPlanChange() {
+    const plan      = document.getElementById('planSelect').value;
+    const container = document.getElementById('dynamicFields');
+    document.getElementById('result').style.display   = 'none';
+    document.getElementById('errorBox').style.display = 'none';
+    document.getElementById('addonsInputSection').style.display = 'none';
+    _session       = null;
+    _currentFields = [];
+    _currentAddons = [];
+
+    if (!plan) {
+      container.innerHTML = '<div class="no-fields">Select a plan above to load its fields</div>';
+      return;
+    }
+
+    container.innerHTML = `<div class="fields-loading"><span class="dot-spin"></span>Loading fields for this plan...</div>`;
+
+    try {
+      const resp = await fetch(`/api/plan-fields?plan=${plan}`);
+      const data = await resp.json();
+      if (data.error) throw new Error(data.error);
+
+      _session       = { csrf: data.csrf, cookies: data.cookies, hiddenFields: data.hiddenFields };
+      _currentFields = data.fields || [];
+      _currentAddons = data.addons || [];
+
+      if (_currentFields.length === 0) {
+        container.innerHTML = '<div class="no-fields">No configurable fields found for this plan.</div>';
+      } else {
+        container.innerHTML = renderAllFields(_currentFields, null) +
+          `<button id="calcBtn" onclick="calculate()">Calculate Premium</button>`;
+      }
+      renderAddons(_currentAddons, null);
+    } catch (err) {
+      container.innerHTML = '';
+      showError('Could not load fields: ' + err.message);
+    }
+  }
+
+  /* ── On a dynamic dropdown change: refresh dependent fields ── */
+  async function onDynamicFieldChange(changedFieldId) {
+    if (_isUpdating || !_session) return;
+    _isUpdating = true;
+
+    // Save current values before re-render
+    const saved       = collectFields();
+    const savedAddons = collectAddons();
+
+    // Show a subtle updating indicator
+    const notice = document.createElement('div');
+    notice.id = 'updateNotice';
+    notice.className = 'update-notice';
+    notice.innerHTML = '<span class="updating-spin"></span>Updating fields...';
+    const container = document.getElementById('dynamicFields');
+    container.classList.add('field-refreshing');
+    const calcBtn = document.getElementById('calcBtn');
+    if (calcBtn) calcBtn.insertAdjacentElement('beforebegin', notice);
+
+    try {
+      const resp = await fetch('/api/update-fields', {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify({
+          csrf:         _session.csrf,
+          cookies:      _session.cookies,
+          hiddenFields: _session.hiddenFields,
+          plan:         document.getElementById('planSelect').value,
+          fields:       saved,
+          addons:       savedAddons
+        })
+      });
+      const data = await resp.json();
+      if (data.error) throw new Error(data.error);
+
+      // Update session
+      _session.csrf         = data.csrf;
+      _session.cookies      = data.cookies;
+      _session.hiddenFields = data.hiddenFields;
+      _currentFields        = data.fields || [];
+      _currentAddons        = data.addons || _currentAddons;
+
+      // Re-render with saved values preserved
+      container.innerHTML = renderAllFields(_currentFields, saved) +
+        `<button id="calcBtn" onclick="calculate()">Calculate Premium</button>`;
+
+      // If pincode was filled, keep it
+      const pincodeEl = document.querySelector('#dynamicFields input[data-field="field_54"]');
+      if (pincodeEl && saved['field_54']) pincodeEl.value = saved['field_54'];
+
+      // Re-render add-ons preserving user's selections
+      renderAddons(_currentAddons, savedAddons);
+
+    } catch (err) {
+      // On error, remove notice and silently continue with existing fields
+      console.warn('Field update failed:', err.message);
+    } finally {
+      container.classList.remove('field-refreshing');
+      const n = document.getElementById('updateNotice');
+      if (n) n.remove();
+      _isUpdating = false;
+    }
+  }
+
+  /* ── Calculate premium ── */
+  async function calculate() {
+    const btn      = document.getElementById('calcBtn');
+    const errorBox = document.getElementById('errorBox');
+    const plan     = document.getElementById('planSelect').value;
+
+    errorBox.style.display = 'none';
+    document.getElementById('result').style.display = 'none';
+
+    if (!_session) return showError('Please select a plan first.');
+
+    // Validate pincode if present
+    const pincodeEl = document.querySelector('#dynamicFields input[data-field="field_54"]');
+    if (pincodeEl && !/^\d{6}$/.test(pincodeEl.value.trim())) {
+      return showError('Please enter a valid 6-digit pincode.');
+    }
+
+    btn.disabled  = true;
+    btn.innerHTML = '<span class="spinner"></span>Calculating...';
+
+    try {
+      const fields = collectFields();
+      const addons = collectAddons();
+
+      const resp = await fetch('/api/premium', {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify({
+          csrf:         _session.csrf,
+          cookies:      _session.cookies,
+          hiddenFields: _session.hiddenFields,
+          plan,
+          fields,
+          addons
+        })
+      });
+
+      const data = await resp.json();
+      if (data.error) throw new Error(data.error);
+      displayResult(data);
+
+    } catch (err) {
+      showError(err.message || 'Something went wrong. Please try again.');
+    } finally {
+      btn.disabled  = false;
+      btn.innerHTML = 'Calculate Premium';
+    }
+  }
+
+  /* ── Display result ── */
+  function displayResult(data) {
+    const result        = document.getElementById('result');
+    const amountEl      = document.getElementById('premiumAmount');
+    const discEl        = document.getElementById('premiumDiscount');
+    const totalRow      = document.getElementById('totalRow');
+    const addonsSection = document.getElementById('addonsSection');
+    const addonsList    = document.getElementById('addonsList');
+
+    const base = data.basePremium || '----';
+    amountEl.textContent = (base !== '----' && base !== '---')
+      ? '₹' + Number(base).toLocaleString('en-IN')
+      : base;
+
+    discEl.textContent = data.discountPremium || '';
+
+    if (data.totalPremium) {
+      totalRow.textContent  = data.totalPremium;
+      totalRow.style.display = 'block';
+    } else {
+      totalRow.style.display = 'none';
+    }
+
+    const addons = data.addons || [];
+    if (addons.length > 0) {
+      addonsSection.style.display = 'block';
+      addonsList.innerHTML = addons.map(a =>
+        `<div class="addon-item"><span class="dot"></span>${a}</div>`
+      ).join('');
+    } else {
+      addonsSection.style.display = 'none';
+    }
+
+    result.style.display = 'block';
+    result.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+
+  function showError(msg) {
+    const errorBox = document.getElementById('errorBox');
+    errorBox.textContent  = '⚠️ ' + msg;
+    errorBox.style.display = 'block';
+  }
+</script>
+</body>
+</html>

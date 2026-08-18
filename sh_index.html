@@ -1,0 +1,1757 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Star Health Premium Calculator</title>
+  <style>
+    :root {
+      --primary: #415EB4;
+      --primary-dark: #2D4899;
+      --primary-light: #EEF1FB;
+      --primary-mid: #6E89CC;
+      --white: #ffffff;
+      --gray-50:  #F9FAFB;
+      --gray-100: #F3F4F6;
+      --gray-200: #E5E7EB;
+      --gray-400: #9CA3AF;
+      --gray-600: #6B7280;
+      --gray-800: #1F2937;
+      --success: #059669;
+      --error: #DC2626;
+      --gold: #F59E0B;
+      --blue-badge: #0EA5E9;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #F0F4FF; color: var(--gray-800);
+      min-height: 100vh; font-size: 14px;
+    }
+
+    /* ── Header ── */
+    .header {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+      padding: 0 24px; height: 64px;
+      display: flex; align-items: center; gap: 14px;
+      box-shadow: 0 2px 12px rgba(65,94,180,.35);
+      position: sticky; top: 0; z-index: 100;
+    }
+    .header-logo {
+      width: 40px; height: 40px; background: white;
+      border-radius: 10px; display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; box-shadow: 0 2px 8px rgba(0,0,0,.15);
+    }
+    .header-title { color: white; font-size: 18px; font-weight: 700; }
+    .header-sub   { color: rgba(255,255,255,.75); font-size: 12px; margin-top: 1px; }
+    .header-badge {
+      margin-left: auto; background: rgba(255,255,255,.15); color: white;
+      font-size: 11px; font-weight: 600; padding: 4px 12px; border-radius: 20px;
+      border: 1px solid rgba(255,255,255,.25);
+    }
+
+    /* ── Container ── */
+    .container { max-width: 900px; margin: 0 auto; padding: 24px 16px 48px; }
+
+    /* ── Card ── */
+    .card {
+      background: white; border-radius: 14px; padding: 22px 24px;
+      margin-bottom: 16px;
+      box-shadow: 0 1px 4px rgba(0,0,0,.06), 0 4px 16px rgba(65,94,180,.04);
+      border: 1px solid rgba(65,94,180,.08);
+    }
+    .card-title {
+      font-size: 12px; font-weight: 700; color: var(--primary);
+      text-transform: uppercase; letter-spacing: .7px;
+      margin-bottom: 18px; padding-bottom: 12px;
+      border-bottom: 2px solid var(--primary-light);
+    }
+
+    /* ── Grid ── */
+    .fg   { display: grid; gap: 14px; }
+    .fg-2 { grid-template-columns: 1fr 1fr; }
+    .fg-3 { grid-template-columns: 1fr 1fr 1fr; }
+
+    /* ── Field ── */
+    .field { display: flex; flex-direction: column; gap: 5px; }
+    .field label { font-size: 12px; font-weight: 600; color: var(--gray-600); text-transform: uppercase; letter-spacing: .4px; }
+    .field select, .field input {
+      padding: 10px 12px; border: 1.5px solid var(--gray-200);
+      border-radius: 8px; font-size: 14px; color: var(--gray-800);
+      background: white; outline: none;
+      transition: border-color .18s, box-shadow .18s; width: 100%;
+    }
+    .field select:focus, .field input:focus {
+      border-color: var(--primary); box-shadow: 0 0 0 3px rgba(65,94,180,.1);
+    }
+    .field-hint { font-size: 11px; color: var(--gray-400); margin-top: 2px; }
+    .field-ok   { font-size: 11px; color: var(--success); margin-top: 2px; font-weight: 500; }
+    .field-err  { font-size: 11px; color: var(--error);   margin-top: 2px; font-weight: 500; }
+
+    /* ── Pills ── */
+    .pill-group { display: flex; gap: 8px; flex-wrap: wrap; }
+    .pill {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 8px 16px; border-radius: 24px;
+      border: 1.5px solid var(--gray-200); cursor: pointer;
+      font-size: 13px; font-weight: 500; color: var(--gray-600);
+      transition: all .18s; user-select: none; background: white;
+    }
+    .pill:hover { border-color: var(--primary); color: var(--primary); background: var(--primary-light); }
+    .pill.on    { border-color: var(--primary); color: var(--primary); background: var(--primary-light); font-weight: 600; }
+    .pill input { display: none; }
+
+    /* ── Age Grid ── */
+    .age-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px,1fr)); gap: 10px; margin-top: 14px; }
+    .age-card { border: 1.5px solid var(--gray-200); border-radius: 10px; padding: 12px 10px; background: var(--gray-50); }
+    .age-card-label { font-size: 11px; font-weight: 700; color: var(--primary); text-transform: uppercase; letter-spacing: .4px; margin-bottom: 8px; }
+    .age-card select { width: 100%; padding: 7px 8px; border: 1.5px solid var(--gray-200); border-radius: 6px; font-size: 13px; background: white; outline: none; }
+    .age-card select:focus { border-color: var(--primary); }
+
+    .divider { border: none; border-top: 1px solid var(--gray-200); margin: 18px 0; }
+
+    /* ── Button ── */
+    .btn {
+      width: 100%; padding: 14px;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+      color: white; border: none; border-radius: 10px;
+      font-size: 16px; font-weight: 700; cursor: pointer;
+      transition: opacity .2s; box-shadow: 0 4px 14px rgba(65,94,180,.35);
+    }
+    .btn:hover { opacity: .9; }
+    .btn:disabled { opacity: .5; cursor: not-allowed; }
+    .form-error {
+      background: #FEF2F2; border: 1px solid #FECACA; color: var(--error);
+      padding: 12px 16px; border-radius: 8px; font-size: 13px;
+      margin-bottom: 14px; display: none;
+    }
+
+    /* ── Loading ── */
+    #loadingSection { display: none; }
+    .loading-card { text-align: center; padding: 48px 24px; }
+    .spinner {
+      width: 44px; height: 44px; margin: 0 auto 16px;
+      border: 3.5px solid var(--primary-light); border-top-color: var(--primary);
+      border-radius: 50%; animation: spin .75s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .loading-title { font-size: 17px; font-weight: 700; color: var(--primary); }
+    .loading-sub   { font-size: 13px; color: var(--gray-600); margin-top: 4px; }
+    .loading-steps { margin: 20px auto 0; max-width: 300px; display: flex; flex-direction: column; gap: 8px; text-align: left; }
+    .step-item { display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--gray-600); padding: 8px 12px; border-radius: 8px; background: var(--gray-50); }
+    .step-item.active { color: var(--primary); background: var(--primary-light); font-weight: 600; }
+    .step-item.done   { color: var(--success); }
+
+    /* ── Results ── */
+    #resultsSection { display: none; }
+    .results-topbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; }
+    .results-heading { font-size: 20px; font-weight: 800; color: var(--primary); }
+    .btn-back {
+      background: none; border: 1.5px solid var(--primary); color: var(--primary);
+      padding: 8px 20px; border-radius: 8px; cursor: pointer;
+      font-size: 13px; font-weight: 600; transition: all .18s;
+    }
+    .btn-back:hover { background: var(--primary-light); }
+
+    .summary-bar {
+      background: var(--primary-light); border-radius: 10px;
+      padding: 12px 18px; margin-bottom: 20px;
+      font-size: 13px; color: var(--primary); line-height: 1.8;
+    }
+
+    /* ── Plan Cards ── */
+    .plans-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px,1fr));
+      gap: 16px;
+    }
+
+    .plan-card {
+      border: 1.5px solid var(--gray-200); border-radius: 14px;
+      overflow: hidden; background: white;
+      display: flex; flex-direction: column;
+      transition: box-shadow .2s, transform .15s;
+    }
+    .plan-card:hover { box-shadow: 0 6px 24px rgba(65,94,180,.15); transform: translateY(-2px); }
+
+    /* top badge strip */
+    .plan-top-badge {
+      font-size: 11px; font-weight: 700; text-align: center;
+      padding: 5px 0; letter-spacing: .5px; text-transform: uppercase;
+    }
+    .plan-top-badge.fire  { background: #FEE2E2; color: #DC2626; }
+    .plan-top-badge.star  { background: #E0F2FE; color: #0369A1; }
+    .plan-top-badge.empty { display: none; }
+
+    /* plan image */
+    .plan-img-wrap { padding: 12px 16px 0; background: var(--gray-50); }
+    .plan-img { width: 100%; height: 80px; object-fit: contain; border-radius: 8px; }
+
+    /* plan identity */
+    .plan-identity { padding: 12px 16px 0; background: var(--gray-50); border-bottom: 1px solid var(--gray-200); padding-bottom: 12px; }
+    .plan-title { font-size: 16px; font-weight: 800; color: var(--gray-800); }
+    .plan-subtitle { font-size: 13px; color: var(--primary); font-weight: 600; margin-top: 2px; }
+
+    /* premium */
+    .plan-premium-section { padding: 14px 16px 10px; }
+    .premium-loading { display: flex; align-items: center; gap: 8px; color: var(--gray-400); font-size: 13px; }
+    .premium-mini-spinner {
+      width: 16px; height: 16px; border: 2px solid var(--gray-200); border-top-color: var(--primary);
+      border-radius: 50%; animation: spin .7s linear infinite; flex-shrink: 0;
+    }
+    .premium-amount { font-size: 28px; font-weight: 800; color: var(--primary); line-height: 1; }
+    .premium-per    { font-size: 12px; color: var(--gray-400); margin-top: 3px; }
+    .premium-saved  { font-size: 12px; color: var(--success); font-weight: 600; margin-top: 4px; }
+    .premium-error  { font-size: 12px; color: var(--error); }
+
+    /* benefits tags */
+    .plan-tags { padding: 0 16px 12px; display: flex; flex-wrap: wrap; gap: 5px; }
+    .tag {
+      font-size: 11px; padding: 3px 8px; border-radius: 12px;
+      background: var(--primary-light); color: var(--primary);
+      font-weight: 500; white-space: nowrap;
+    }
+
+    /* per-card SI controls */
+    .plan-controls {
+      padding: 10px 16px 14px;
+      border-top: 1px solid var(--gray-200);
+      margin-top: auto;
+      display: flex; gap: 8px; align-items: flex-end;
+    }
+    .plan-controls .field { flex: 1; }
+    .plan-controls .field label { font-size: 10px; }
+    .plan-controls .field select { padding: 7px 8px; font-size: 12px; }
+    .plan-calc-btn {
+      flex-shrink: 0;
+      background: var(--primary); color: white; border: none;
+      padding: 7px 10px; border-radius: 7px; cursor: pointer;
+      font-size: 12px; font-weight: 600; white-space: nowrap;
+      transition: opacity .18s; align-self: flex-end;
+    }
+    .plan-calc-btn:hover { opacity: .85; }
+    .plan-calc-btn:disabled { opacity: .5; cursor: not-allowed; }
+
+    .results-error {
+      background: #FEF2F2; border: 1px solid #FECACA; color: var(--error);
+      padding: 14px 16px; border-radius: 10px; font-size: 13px; margin-top: 14px; display: none;
+    }
+
+    @media (max-width: 640px) {
+      .fg-2 { grid-template-columns: 1fr; }
+      .fg-3 { grid-template-columns: 1fr 1fr; }
+      .plans-grid { grid-template-columns: 1fr; }
+      .header-badge { display: none; }
+    }
+
+    /* ═══ CUSTOMIZE PANEL ══════════════════════════════════════════════════ */
+    #customizeOverlay {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: #F0F4FF;
+      z-index: 500;
+      overflow-y: auto;
+    }
+    .cust-header {
+      background: var(--primary);
+      color: #fff;
+      padding: 12px 20px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    }
+    .cust-back-btn {
+      background: rgba(255,255,255,0.15);
+      border: 1px solid rgba(255,255,255,0.3);
+      color: #fff;
+      padding: 6px 14px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 600;
+      white-space: nowrap;
+      transition: background .15s;
+    }
+    .cust-back-btn:hover { background: rgba(255,255,255,0.25); }
+    .cust-header-title { font-size: 16px; font-weight: 700; flex: 1; }
+    .cust-body {
+      display: flex;
+      gap: 16px;
+      padding: 16px;
+      max-width: 1100px;
+      margin: 0 auto;
+      align-items: flex-start;
+    }
+    .cust-left  { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 12px; }
+    .cust-right { width: 280px; flex-shrink: 0; }
+    .cust-card {
+      background: #fff;
+      border-radius: 12px;
+      padding: 16px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+    }
+    .cust-section-title {
+      font-size: 14px; font-weight: 700; color: var(--gray-800);
+      margin-bottom: 12px; display: flex; align-items: center; gap: 6px;
+    }
+    /* SI */
+    .cust-si-select {
+      width: 100%; padding: 10px 12px;
+      border: 1.5px solid var(--gray-200); border-radius: 8px;
+      font-size: 14px; font-weight: 600; color: var(--gray-800);
+      background: var(--gray-50); outline: none; cursor: pointer;
+      transition: border-color .15s;
+    }
+    .cust-si-select:focus { border-color: var(--primary); }
+    /* Period cards */
+    .period-cards { display: flex; gap: 8px; }
+    .period-card {
+      flex: 1; border: 2px solid var(--gray-200); border-radius: 10px;
+      padding: 10px 6px; cursor: pointer; text-align: center; transition: all .15s;
+    }
+    .period-card:hover  { border-color: var(--primary); background: var(--primary-light); }
+    .period-card.active { border-color: var(--primary); background: var(--primary-light); }
+    .pc-label { font-size: 13px; font-weight: 700; color: var(--gray-800); }
+    .pc-prem  { font-size: 12px; color: var(--primary); font-weight: 700; margin-top: 3px; }
+    .pc-save  { font-size: 11px; color: var(--success); margin-top: 2px; font-weight: 600; }
+    /* Mandatory cover rows */
+    .mcover-item {
+      display: flex; align-items: flex-start; gap: 10px;
+      padding: 10px 0; border-bottom: 1px solid var(--gray-100);
+    }
+    .mcover-item:last-child { border-bottom: none; padding-bottom: 0; }
+    .mcover-icon {
+      width: 30px; height: 30px; border-radius: 7px;
+      background: var(--primary-light); display: flex;
+      align-items: center; justify-content: center;
+      font-size: 13px; flex-shrink: 0;
+    }
+    .mcover-body { flex: 1; min-width: 0; }
+    .mcover-title { font-size: 13px; font-weight: 700; color: var(--gray-800); }
+    .mcover-desc  { font-size: 12px; color: var(--gray-600); margin-top: 2px; line-height: 1.4; }
+    .mcover-sublimit { font-size: 11px; color: var(--primary); font-weight: 600; margin-top: 3px; }
+    .mcover-badge {
+      font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 4px;
+      white-space: nowrap; flex-shrink: 0;
+      background: #DCFCE7; color: #15803D;
+    }
+    /* Cover top badge */
+    .ctbadge {
+      display: inline-block; font-size: 10px; font-weight: 700;
+      padding: 2px 7px; border-radius: 3px; margin-bottom: 3px;
+    }
+    .ctbadge-fire     { background: #FEF3C7; color: #92400E; }
+    .ctbadge-rec      { background: #DCFCE7; color: #15803D; }
+    .ctbadge-first    { background: #EEF2FF; color: #3730A3; }
+    .ctbadge-excl     { background: #FDF4FF; color: #7E22CE; }
+    .ctbadge-discount { background: #FEF9C3; color: #854D0E; }
+    /* Additional cover cards */
+    .acover-card {
+      border: 1.5px solid var(--gray-200); border-radius: 10px;
+      padding: 12px; margin-bottom: 8px; transition: border-color .15s, background .15s;
+    }
+    .acover-card:last-child { margin-bottom: 0; }
+    .acover-card.is-added { border-color: var(--primary); background: #F8FAFF; }
+    .acover-top { display: flex; align-items: flex-start; gap: 10px; }
+    .acover-info { flex: 1; min-width: 0; }
+    .acover-title { font-size: 13px; font-weight: 700; color: var(--gray-800); }
+    .acover-desc  { font-size: 12px; color: var(--gray-600); margin-top: 2px; line-height: 1.4; }
+    .acover-sublimit { font-size: 11px; color: var(--primary); font-weight: 600; margin-top: 3px; }
+    .acover-add-btn {
+      padding: 6px 14px; border-radius: 6px; font-size: 12px; font-weight: 700;
+      cursor: pointer; white-space: nowrap; flex-shrink: 0;
+      border: 1.5px solid var(--primary); background: #fff; color: var(--primary);
+      transition: all .15s;
+    }
+    .acover-add-btn.remove { background: var(--primary); color: #fff; }
+    .acover-options { margin-top: 10px; display: none; }
+    .acover-options.show { display: block; }
+    .acover-options label { font-size: 11px; color: var(--gray-600); font-weight: 600; display: block; margin-bottom: 4px; }
+    .acover-options select {
+      width: 100%; padding: 7px 10px;
+      border: 1.5px solid var(--gray-200); border-radius: 6px;
+      font-size: 13px; background: var(--gray-50); outline: none;
+    }
+    /* Premium sidebar */
+    .prem-sticky { position: sticky; top: 68px; }
+    .prem-card {
+      background: #fff; border-radius: 12px; padding: 20px;
+      box-shadow: 0 2px 10px rgba(65,94,180,0.12);
+    }
+    .prem-label { font-size: 11px; color: var(--gray-600); font-weight: 700; text-transform: uppercase; letter-spacing: .5px; }
+    .prem-amount { font-size: 30px; font-weight: 800; color: var(--primary); margin: 6px 0 2px; }
+    .prem-loading { font-size: 20px; color: var(--gray-400); margin: 6px 0 2px; }
+    .prem-sub { font-size: 12px; color: var(--gray-400); }
+    .prem-divider { border: none; border-top: 1px solid var(--gray-100); margin: 12px 0; }
+    .prem-breakup-row {
+      display: flex; justify-content: space-between;
+      font-size: 13px; padding: 4px 0; color: var(--gray-600);
+    }
+    .prem-breakup-row .bval { font-weight: 700; color: var(--gray-800); }
+    .btn-continue {
+      width: 100%; background: var(--primary); color: #fff;
+      border: none; padding: 13px; border-radius: 10px;
+      font-size: 14px; font-weight: 700; cursor: pointer;
+      margin-top: 14px; transition: background .15s;
+    }
+    .btn-continue:hover { background: var(--primary-dark); }
+    .btn-cust-compare {
+      width: 100%; background: #fff; color: var(--primary);
+      border: 1.5px solid var(--primary); padding: 10px; border-radius: 10px;
+      font-size: 13px; font-weight: 700; cursor: pointer; margin-top: 8px;
+      transition: all .15s;
+    }
+    .btn-cust-compare:hover { background: var(--primary-light); }
+    .cust-loading-wrap {
+      display: flex; align-items: center; justify-content: center;
+      flex-direction: column; gap: 12px; color: var(--gray-600);
+      min-height: 300px; width: 100%;
+    }
+    /* Plan card proceed button */
+    .btn-proceed {
+      width: 100%; background: var(--primary); color: #fff;
+      border: none; padding: 8px 14px; border-radius: 4px;
+      font-size: 12px; font-weight: 700; cursor: pointer; margin-top: 8px;
+      transition: background .15s;
+    }
+    .btn-proceed:hover { background: var(--primary-dark); }
+    @media (max-width: 700px) {
+      .cust-body { flex-direction: column; }
+      .cust-right { width: 100%; }
+      .prem-sticky { position: static; }
+      .period-cards { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-logo">
+    <svg viewBox="0 0 28 28" width="26" height="26" fill="none">
+      <rect x="10" y="2" width="8" height="24" rx="2" fill="#415EB4"/>
+      <rect x="2" y="10" width="24" height="8" rx="2" fill="#415EB4"/>
+      <rect x="11" y="3" width="6" height="22" rx="1.5" fill="#6E89CC"/>
+      <rect x="3" y="11" width="22" height="6" rx="1.5" fill="#6E89CC"/>
+    </svg>
+  </div>
+  <div>
+    <div class="header-title">Star Health</div>
+    <div class="header-sub">Premium Calculator</div>
+  </div>
+  <div class="header-badge">Health Insurance</div>
+</div>
+
+<div class="container">
+
+  <!-- ════ FORM ════ -->
+  <div id="formSection">
+
+    <div class="card">
+      <div class="card-title">📍 Location & Product</div>
+      <div class="fg fg-2">
+        <div class="field">
+          <label>Customer Pincode</label>
+          <input type="text" id="pinCode" placeholder="e.g. 700041" maxlength="6" autocomplete="off">
+          <span id="pincodeMsg" class="field-hint"></span>
+        </div>
+        <div class="field">
+          <label>Product</label>
+          <select id="product">
+            <option value="REC0011">⭐ Recommend Me</option>
+            <option value="BPRD-038" selected>🏆 Super Star (Trending)</option>
+            <option value="BPRD-034">🏥 Health Assure (Most Bought)</option>
+            <option value="BPRD-029">🛡️ Star Comprehensive</option>
+            <option value="BPRD-024">💰 Super Surplus</option>
+            <option value="BPRD-028">👴 Senior Citizen Red Carpet</option>
+            <option value="BPRD-011">🌱 Young Star</option>
+            <option value="BPRD-030">🌿 Arogya Sanjeevani</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">📋 Policy Details</div>
+      <div style="margin-bottom:18px;">
+        <div class="field" style="margin-bottom:8px;"><label>Policy Plan</label></div>
+        <div class="pill-group">
+          <label class="pill on" id="pill_fresh">
+            <input type="radio" name="policyPlan" value="FRESH" checked onchange="onPlanChange()"> 🆕 Fresh
+          </label>
+          <label class="pill" id="pill_port">
+            <input type="radio" name="policyPlan" value="PORTABILITY" onchange="onPlanChange()"> 🔄 Portability
+          </label>
+        </div>
+      </div>
+      <div id="portSection" style="display:none; margin-bottom:18px;">
+        <div class="field">
+          <label>Previous Sum Insured (₹)</label>
+          <input type="number" id="previousSumInsured" placeholder="e.g. 500000" min="50000">
+          <span class="field-hint">Inclusive of cumulative bonus from previous insurer</span>
+        </div>
+      </div>
+      <div>
+        <div class="field" style="margin-bottom:8px;"><label>Policy Type</label></div>
+        <div class="pill-group">
+          <label class="pill" id="pill_floater">
+            <input type="radio" name="policyType" value="FLOATER" onchange="onTypeChange()"> 👨‍👩‍👧 Floater Family
+          </label>
+          <label class="pill on" id="pill_individual">
+            <input type="radio" name="policyType" value="INDIVIDUAL" checked onchange="onTypeChange()"> 👤 Individual
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">👥 Member Details</div>
+      <div class="fg fg-3" id="memberCountRow">
+        <div class="field">
+          <label>Adults</label>
+          <select id="adults" onchange="renderAges()">
+            <option value="1" selected>1 Adult</option>
+            <option value="2">2 Adults</option>
+          </select>
+          <span class="field-hint">Age 18–100 yrs</span>
+        </div>
+        <div class="field" id="childField">
+          <label>Children</label>
+          <select id="child" onchange="renderAges()">
+            <option value="0">0 Children</option>
+            <option value="1" selected>1 Child</option>
+            <option value="2">2 Children</option>
+            <option value="3">3 Children</option>
+            <option value="4">4 Children</option>
+          </select>
+          <span class="field-hint">16 days – 25 yrs</span>
+        </div>
+        <div class="field" id="parentField">
+          <label>Parents</label>
+          <select id="parents" onchange="renderAges()">
+            <option value="0" selected>0 Parents</option>
+            <option value="1">1 Parent</option>
+            <option value="2">2 Parents</option>
+            <option value="3">3 Parents</option>
+            <option value="4">4 Parents</option>
+          </select>
+          <span class="field-hint">Age 18–75 yrs</span>
+        </div>
+      </div>
+      <div class="age-grid" id="ageGrid"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">🏥 Health & Quote Options</div>
+      <div style="margin-bottom:18px;">
+        <div class="field" style="margin-bottom:8px;"><label>Pre-existing Diseases (PED)?</label></div>
+        <div class="pill-group">
+          <label class="pill" id="pill_ped_yes">
+            <input type="radio" name="ped" value="yes" onchange="onPedChange()"> ✔ Yes
+          </label>
+          <label class="pill on" id="pill_ped_no">
+            <input type="radio" name="ped" value="no" checked onchange="onPedChange()"> ✖ No
+          </label>
+        </div>
+      </div>
+      <hr class="divider">
+      <div class="fg fg-2">
+        <div class="field">
+          <label>Default Sum Insured</label>
+          <select id="sumInsured">
+            <option value="300000">₹3 Lakhs</option>
+            <option value="500000">₹5 Lakhs</option>
+            <option value="750000">₹7.5 Lakhs</option>
+            <option value="1000000" selected>₹10 Lakhs</option>
+            <option value="1500000">₹15 Lakhs</option>
+            <option value="2000000">₹20 Lakhs</option>
+            <option value="2500000">₹25 Lakhs</option>
+            <option value="5000000">₹50 Lakhs</option>
+            <option value="10000000">₹1 Crore</option>
+          </select>
+          <span class="field-hint">Each plan card has its own SI selector</span>
+        </div>
+        <div class="field">
+          <label>Policy Period</label>
+          <select id="policyPeriod">
+            <option value="1" selected>1 Year</option>
+            <option value="2">2 Years</option>
+            <option value="3">3 Years</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-error" id="formError"></div>
+    <button class="btn" onclick="getQuote()">🔍 &nbsp;Calculate Premium</button>
+  </div>
+
+  <!-- ════ LOADING ════ -->
+  <div id="loadingSection">
+    <div class="card loading-card">
+      <div class="spinner"></div>
+      <div class="loading-title">Fetching Premiums…</div>
+      <div class="loading-sub">Connecting to Star Health systems</div>
+      <div class="loading-steps">
+        <div class="step-item" id="step1"><span>⏳</span> Getting product recommendations</div>
+        <div class="step-item" id="step2"><span>⏳</span> Calculating premiums for all plans</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════ RESULTS ════ -->
+  <div id="resultsSection">
+    <div class="results-topbar">
+      <div class="results-heading">Premium Results</div>
+      <button class="btn-back" onclick="resetForm()">← Edit Details</button>
+    </div>
+    <div class="summary-bar" id="summaryBar"></div>
+    <!-- Apply one sum insured / period to every card at once. Star returns a
+         grid of sub-products, each with its own selectors and its own ↻, so
+         comparing one alternative used to be N changes plus N clicks. -->
+    <div id="bulkBar" style="display:none;align-items:center;gap:10px;flex-wrap:wrap;
+         margin:0 0 14px;padding:11px 14px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px">
+      <strong style="font-size:12.5px;color:#334155">Apply to all plans:</strong>
+      <label style="font-size:12px;color:#64748b">Sum Insured
+        <select id="bulkSI" style="margin-left:5px;padding:5px 8px;border:1px solid #cbd5e1;border-radius:5px;font:inherit;font-size:12px"></select>
+      </label>
+      <label style="font-size:12px;color:#64748b">Period
+        <select id="bulkPP" style="margin-left:5px;padding:5px 8px;border:1px solid #cbd5e1;border-radius:5px;font:inherit;font-size:12px"></select>
+      </label>
+      <button id="bulkApplyBtn" onclick="applyToAllCards()"
+        style="padding:6px 14px;border:none;border-radius:5px;background:#1a7a3a;color:#fff;
+               font:inherit;font-size:12px;font-weight:700;cursor:pointer">Apply &amp; recalculate all</button>
+      <span id="bulkMsg" style="font-size:11.5px;color:#64748b"></span>
+    </div>
+    <div class="plans-grid" id="plansGrid"></div>
+    <div class="results-error" id="resultsError"></div>
+  </div>
+
+</div><!-- /container -->
+
+<!-- ════ CUSTOMIZE OVERLAY ════════════════════════════════════════════════ -->
+<div id="customizeOverlay">
+  <div class="cust-header">
+    <button class="cust-back-btn" onclick="closeCustomize()">← Back to Plans</button>
+    <div class="cust-header-title" id="custHeaderTitle">Plan Customization</div>
+  </div>
+  <div id="custBody" class="cust-body">
+    <div class="cust-loading-wrap"><div class="premium-mini-spinner"></div>Loading…</div>
+  </div>
+</div>
+
+<script>
+const API = 'http://localhost:3004';
+
+// Saved member payload for re-pricing
+let lastPayload = null;
+// Product objects from recommend-me
+let lastProducts = [];
+
+/* ── UI state ── */
+function isFloater() { return document.querySelector('input[name="policyType"]:checked').value === 'FLOATER'; }
+function getPlan()   { return document.querySelector('input[name="policyPlan"]:checked').value; }
+function getPed()    { return document.querySelector('input[name="ped"]:checked').value; }
+
+function pill(id, on) { document.getElementById(id).className = 'pill' + (on ? ' on' : ''); }
+
+function onPlanChange() {
+  const port = getPlan() === 'PORTABILITY';
+  pill('pill_fresh', !port); pill('pill_port', port);
+  document.getElementById('portSection').style.display = port ? 'block' : 'none';
+}
+function onTypeChange() {
+  const fl = isFloater();
+  pill('pill_floater', fl); pill('pill_individual', !fl);
+  document.getElementById('childField').style.display  = fl ? '' : 'none';
+  document.getElementById('parentField').style.display = fl ? '' : 'none';
+  if (!fl) document.getElementById('adults').value = '1';
+  renderAges();
+}
+function onPedChange() {
+  const yes = getPed() === 'yes';
+  pill('pill_ped_yes', yes); pill('pill_ped_no', !yes);
+}
+
+/* ── Age selects ── */
+function renderAges() {
+  const grid = document.getElementById('ageGrid');
+  // Snapshot whatever the operator has already entered. This used to blow the
+  // whole grid away on any count change — so correcting "2 adults" to "3"
+  // meant re-selecting every age from scratch.
+  const kept = {};
+  grid.querySelectorAll('select[id]').forEach(sel => { if (sel.value) kept[sel.id] = sel.value; });
+
+  grid.innerHTML = '';
+  const fl = isFloater();
+  const nA = parseInt(document.getElementById('adults').value) || 1;
+  const nC = fl ? (parseInt(document.getElementById('child').value)   || 0) : 0;
+  const nP = fl ? (parseInt(document.getElementById('parents').value) || 0) : 0;
+  for (let i=1;i<=nA;i++) addAgeCard(grid,`adult${i}`, `Adult ${i}`, 18,100,false);
+  for (let i=1;i<=nC;i++) addAgeCard(grid,`child${i}`, `Child ${i}`,  0, 25,true);
+  for (let i=1;i<=nP;i++) addAgeCard(grid,`parent${i}`,`Parent ${i}`,18, 75,false);
+
+  // Put the ages back wherever the slot still exists and the value is legal.
+  Object.keys(kept).forEach(id => {
+    const sel = document.getElementById(id);
+    if (sel && Array.prototype.some.call(sel.options, o => o.value === kept[id])) {
+      sel.value = kept[id];
+    }
+  });
+}
+function addAgeCard(grid, id, label, min, max, isChild) {
+  const div = document.createElement('div'); div.className = 'age-card';
+  let opts = isChild ? `<option value="">Age</option><option value="0">&lt;1 yr</option>`
+                     : `<option value="">Age</option>`;
+  for (let a = isChild?1:min; a<=max; a++) opts += `<option value="${a}">${a} yr${a===1?'':'s'}</option>`;
+  div.innerHTML = `<div class="age-card-label">${label}</div><select id="${id}">${opts}</select>`;
+  grid.appendChild(div);
+}
+
+/* ── Pincode validation ── */
+let pincodeTimer = null;
+document.getElementById('pinCode').addEventListener('input', function() {
+  const v = this.value.trim(); const el = document.getElementById('pincodeMsg');
+  el.className = 'field-hint'; el.textContent = '';
+  clearTimeout(pincodeTimer);
+  if (v.length===6 && /^[1-9][0-9]{5}$/.test(v))
+    pincodeTimer = setTimeout(() => doValidatePincode(v), 500);
+});
+async function doValidatePincode(pin) {
+  const el = document.getElementById('pincodeMsg');
+  el.className = 'field-hint'; el.textContent = 'Checking…';
+  try {
+    const d = await fetch(`${API}/pre-quote/validate-pincode?pinCode=${pin}`).then(r=>r.json());
+    if (d.statusCode===200 && d.data) {
+      const loc = [d.data.city||d.data.district||'', d.data.state||''].filter(Boolean).join(', ');
+      el.className='field-ok'; el.textContent=`✓ ${loc}`;
+    } else { el.className='field-err'; el.textContent='✗ Invalid pincode'; }
+  } catch { el.className='field-hint'; el.textContent=''; }
+}
+
+/* ── Validate form ── */
+function validateForm() {
+  const pin = document.getElementById('pinCode').value.trim();
+  if (!pin||pin.length!==6||!/^[1-9][0-9]{5}$/.test(pin)) return 'Please enter a valid 6-digit pincode.';
+  const fl=isFloater();
+  const nA=parseInt(document.getElementById('adults').value)||1;
+  const nC=fl?(parseInt(document.getElementById('child').value)||0):0;
+  const nP=fl?(parseInt(document.getElementById('parents').value)||0):0;
+  for(let i=1;i<=nA;i++){const el=document.getElementById(`adult${i}`); if(el&&el.value==='') return `Please select age for Adult ${i}.`;}
+  for(let i=1;i<=nC;i++){const el=document.getElementById(`child${i}`); if(el&&el.value==='') return `Please select age for Child ${i}.`;}
+  for(let i=1;i<=nP;i++){const el=document.getElementById(`parent${i}`);if(el&&el.value==='') return `Please select age for Parent ${i}.`;}
+  return null;
+}
+
+/* ── Build payload ── */
+function buildPayload() {
+  const pin=document.getElementById('pinCode').value.trim();
+  const product=document.getElementById('product').value;
+  const policyPlan=getPlan();
+  const policyType=document.querySelector('input[name="policyType"]:checked').value;
+  const pedButton=getPed();
+  const sumInsured=document.getElementById('sumInsured').value;
+  const policyPeriod=document.getElementById('policyPeriod').value;
+  const fl=policyType==='FLOATER';
+  const adults=document.getElementById('adults').value;
+  const child=fl?document.getElementById('child').value:'0';
+
+  const p={
+    policyGroupType:'retail', pinCode:pin, productCategory:'HEALTH',
+    product, productCode:product, policyPlan, policyType,
+    isRblEnabled:false, adults, pedButton,
+    previousSumInsured: policyPlan==='PORTABILITY'?(document.getElementById('previousSumInsured').value||''):'',
+    sumInsured, policyPeriod
+  };
+  if(fl) p.child=child;
+
+  const nA=parseInt(adults), nC=fl?parseInt(child):0, nP=fl?parseInt(document.getElementById('parents').value||'0'):0;
+  for(let i=1;i<=nA;i++){const el=document.getElementById(`adult${i}`); if(el) p[`adult${i}`]={age:String(el.value)};}
+  for(let i=1;i<=nC;i++){const el=document.getElementById(`child${i}`); if(el) p[`child${i}`]={age:String(el.value)};}
+  for(let i=1;i<=nP;i++){const el=document.getElementById(`parent${i}`);if(el) p[`parent${i}`]={age:String(el.value)};}
+  return p;
+}
+
+/* ════ MAIN FLOW ════ */
+async function getQuote() {
+  const err = validateForm();
+  if (err) { const el=document.getElementById('formError'); el.textContent=err; el.style.display='block'; return; }
+  document.getElementById('formError').style.display='none';
+  const _rerr = document.getElementById('resultsError');
+  if (_rerr) _rerr.style.display = 'none';
+  lastPayload = buildPayload();
+  showSection('loading');
+  setStep(1,'active');
+
+  try {
+    // Step 1: recommend-me → get product list
+    const recData = await post('/recommend-me', { quickQuotePayload: lastPayload });
+    if (recData.statusCode!==200) throw new Error(recData.message||'recommend-me failed');
+    setStep(1,'done'); setStep(2,'active');
+
+    // Parse products from response
+    lastProducts = parseProducts(recData);
+
+    // Build summary bar
+    buildSummaryBar(lastPayload);
+
+    // Render skeleton cards
+    showSection('results');
+    renderPlanSkeletons(lastProducts);
+
+    // Step 2: pricing for each plan (parallel)
+    populateBulkBar(lastProducts);
+    const pricedCount = await fetchAllPricing(lastProducts, lastPayload);
+    setStep(2,'done');
+    // Report the sum insured the cards were actually priced at. The
+    // params-applied sent from set-params is guesswork — it fires before any
+    // product is known, so it cannot see a product that does not sell the
+    // requested cover. This one is measured.
+    try {
+      const _priced = lastProducts.length ? parseInt(wantedSI(lastProducts[0]), 10) : NaN;
+      const _asked  = parseInt(lastPayload.sumInsured, 10);
+      if (!isNaN(_priced) && !isNaN(_asked) && _priced !== _asked) {
+        window.parent.postMessage({ type:'params-applied', calculator:'star',
+          accepted:['pincode','members','ages','tenure'],
+          clamped:[{ field:'si', requested:_asked, used:_priced,
+            reason:'this product does not sell that cover — priced at the nearest it does' }] }, '*');
+      }
+    } catch(e) {}
+    // Tell the hub what actually happened. Every card can fail while the
+    // request itself succeeds — reporting 'ready' then shows a green tick
+    // in the hub over a grid of "Premium not available".
+    _emitStatus(pricedCount > 0 ? 'ready' : 'failed');
+    if (pricedCount === 0) {
+      const rerr = document.getElementById('resultsError');
+      if (rerr) {
+        rerr.textContent = '⚠️ No premiums returned for this combination. '
+          + 'Try a different sum insured, product or pincode.';
+        rerr.style.display = 'block';
+      }
+    }
+    if (_hubAutoAdd && pricedCount > 0) {
+      // auto-add the first (top) plan card to the hub comparison
+      const b = document.querySelector('button[onclick^="shAddToCompare"]');
+      if (b) { try { b.click(); } catch(e){} }
+    }
+  } catch(e) {
+    showSection('form');
+    const el=document.getElementById('formError');
+    el.textContent=`❌ ${e.message}. Is the Star Health server running on port 3004?`;
+    el.style.display='block';
+    _emitStatus('down');
+  }
+}
+
+/* ── Parse products from recommend-me response ── */
+function parseProducts(recData) {
+  const ps = recData && recData.data && recData.data.productsSection
+    && recData.data.productsSection.products;
+  if (ps && ps.length) return ps;
+
+  // No fallback. This used to substitute five hardcoded Super Star
+  // sub-products for ANY product whose response shape changed — so an
+  // operator who chose Arogya Sanjeevani was shown Super Star cards and
+  // priced with subProductCode 'SUPER_STAR_VALUE_PLUS'. Failing loudly is
+  // the only safe behaviour when the upstream shape is not what we expect.
+  const chosen = document.getElementById('product');
+  const label  = chosen ? (chosen.options[chosen.selectedIndex]?.text || chosen.value) : 'this product';
+  throw new Error('Star Health returned no product list for ' + label
+    + '. Their response format may have changed — quote it on atompro.starhealth.in and let the developer know');
+}
+
+/* ── SI options for a product ── */
+function getSIOptions(product) {
+  try {
+    const fields = product.productModifyOptions.form[0].fields;
+    const siField = fields.find(f=>f.id==='sumInsured');
+    return siField ? siField.options : null;
+  } catch { return null; }
+}
+function getPeriodOptions(product) {
+  try {
+    const fields = product.productModifyOptions.form[0].fields;
+    const ppField = fields.find(f=>f.id==='policyPeriod');
+    return ppField ? ppField.options : null;
+  } catch { return null; }
+}
+function getDefaultSI(product) {
+  try { return product.productModifyOptions.form[0].fields.find(f=>f.id==='sumInsured').defaultValue; } catch { return lastPayload.sumInsured; }
+}
+function getDefaultPP(product) {
+  try { return product.productModifyOptions.form[0].fields.find(f=>f.id==='policyPeriod').defaultValue; } catch { return lastPayload.policyPeriod; }
+}
+
+// What the card should actually be priced at: the value the operator asked for
+// when this product sells it, the nearest rung when it does not, and the
+// product's own default only when the API gives no ladder to choose from.
+//
+// fetchAllPricing used to price every card at getDefaultSI(product), which
+// silently discarded the requested sum insured — a 5 L or 20 L request came
+// back priced at the API's default (usually 10 L) with nothing on screen or in
+// the hub to show it had been ignored.
+function pickFromLadder(options, fallback, want) {
+  if (want === undefined || want === null || want === '') return fallback;
+  const w = parseInt(want, 10);
+  if (isNaN(w)) return fallback;
+  if (!options || !options.length) return fallback;
+  const exact = options.find(o => parseInt(o.value, 10) === w);
+  if (exact) return exact.value;
+  return options.reduce((best, o) =>
+    Math.abs(parseInt(o.value, 10) - w) < Math.abs(parseInt(best, 10) - w) ? o.value : best,
+    String(fallback));
+}
+function wantedSI(product) {
+  return pickFromLadder(getSIOptions(product), getDefaultSI(product),
+                        lastPayload && lastPayload.sumInsured);
+}
+function wantedPP(product) {
+  return pickFromLadder(getPeriodOptions(product), getDefaultPP(product),
+                        lastPayload && lastPayload.policyPeriod);
+}
+
+/* ── Render skeleton cards ── */
+function renderPlanSkeletons(products) {
+  const grid = document.getElementById('plansGrid'); grid.innerHTML='';
+  products.forEach((p,i) => {
+    const uid = p.uniqueId || (p.subProductCode||i);
+    const card = document.createElement('div');
+    card.className = 'plan-card';
+    card.id = `plancard_${uid}`;
+
+    const badge = p.topBadge || {};
+    const badgeHtml = badge.text
+      ? `<div class="plan-top-badge ${badge.color||'fire'}">✦ ${badge.text}</div>` : '';
+
+    const imgHtml = p.image
+      ? `<div class="plan-img-wrap"><img class="plan-img" src="${p.image}" alt="${p.subTitle}"></div>` : '';
+
+    const siOptions  = getSIOptions(p);
+    const ppOptions  = getPeriodOptions(p);
+    // Pre-select what the card will be priced at, so the selector under the
+    // premium agrees with the premium above it.
+    const defaultSI  = wantedSI(p);
+    const defaultPP  = wantedPP(p);
+
+    const siOptsHtml = siOptions
+      ? siOptions.map(o=>`<option value="${o.value}" ${o.value==defaultSI?'selected':''}>${o.label}${o.tag?` ★`:''}<!-- ${o.tag?o.tag.text:''} --></option>`).join('')
+      : `<option value="${defaultSI}">₹${fmtSI(defaultSI)}</option>`;
+
+    const ppOptsHtml = ppOptions
+      ? ppOptions.map(o=>`<option value="${o.value}" ${o.value==defaultPP?'selected':''}>${o.label}</option>`).join('')
+      : `<option value="1">1 Year</option><option value="2">2 Years</option><option value="3">3 Years</option>`;
+
+    card.innerHTML = `
+      ${badgeHtml}
+      ${imgHtml}
+      <div class="plan-identity">
+        <div class="plan-title">${p.title||'Star Health'}</div>
+        <div class="plan-subtitle">${p.subTitle||p.subProductCode}</div>
+      </div>
+      <div class="plan-premium-section" id="premium_${uid}">
+        <div class="premium-loading"><div class="premium-mini-spinner"></div> Calculating…</div>
+      </div>
+      <div class="plan-tags" id="tags_${uid}">
+        ${(p.benefitsSection&&p.benefitsSection.tags||[]).map(t=>`<span class="tag">${t}</span>`).join('')}
+      </div>
+      <div class="plan-controls">
+        <div class="field">
+          <label>Sum Insured</label>
+          <select id="si_${uid}" onchange="markCardStale('${uid}')">${siOptsHtml}</select>
+        </div>
+        <div class="field">
+          <label>Period</label>
+          <select id="pp_${uid}" onchange="markCardStale('${uid}')">${ppOptsHtml}</select>
+        </div>
+        <button class="plan-calc-btn" id="calcbtn_${uid}" onclick="recalcCard('${uid}','${p.subProductCode}','${p.subTitle}')">↻</button>
+      </div>`;
+    grid.appendChild(card);
+  });
+}
+
+/* ── Fetch all pricing in parallel ── */
+// Returns how many cards actually produced a premium, so the caller can tell
+// the hub the truth. Previously every outcome — including all cards failing —
+// was reported to the hub as a successful quote.
+async function fetchAllPricing(products, basePayload) {
+  const results = await Promise.allSettled(products.map(p => {
+    const uid = p.uniqueId || (p.subProductCode);
+    const si  = wantedSI(p);
+    const pp  = wantedPP(p);
+    return fetchOnePrice(uid, p.subProductCode, p.subTitle, si, pp, basePayload);
+  }));
+  return results.filter(r => r.status === 'fulfilled' && r.value === true).length;
+}
+
+/* ── Stale cards ── */
+// Changing a card's sum insured or period does nothing until ↻ is pressed, so
+// the premium above it silently stops matching the selectors below it.
+function markCardStale(uid) {
+  const card = document.getElementById(`plancard_${uid}`);
+  const prem = document.getElementById(`premium_${uid}`);
+  if (!card || !prem) return;
+  if (card.querySelector('.stale-flag')) return;
+  prem.style.opacity = '.4';
+  prem.style.filter  = 'grayscale(.8)';
+  const flag = document.createElement('div');
+  flag.className = 'stale-flag';
+  flag.style.cssText = 'margin-top:6px;padding:5px 8px;background:#fffbeb;border:1px solid #fcd34d;'
+    + 'border-radius:5px;font-size:11px;color:#8a6100;font-weight:700';
+  flag.textContent = '⚠️ Changed — press ↻ to reprice';
+  prem.parentNode.insertBefore(flag, prem.nextSibling);
+  const btn = document.getElementById(`calcbtn_${uid}`);
+  if (btn) { btn.style.background = '#b45309'; btn.style.color = '#fff'; }
+}
+function clearCardStale(uid) {
+  const card = document.getElementById(`plancard_${uid}`);
+  const prem = document.getElementById(`premium_${uid}`);
+  if (prem) { prem.style.opacity = ''; prem.style.filter = ''; }
+  if (card) card.querySelectorAll('.stale-flag').forEach(f => f.remove());
+  const btn = document.getElementById(`calcbtn_${uid}`);
+  if (btn) { btn.style.background = ''; btn.style.color = ''; }
+}
+
+/* ── Apply one sum insured / period to every card ── */
+function populateBulkBar(products) {
+  const bar = document.getElementById('bulkBar');
+  if (!bar || !products || !products.length) { if (bar) bar.style.display = 'none'; return; }
+  const siSel = document.getElementById('bulkSI');
+  const ppSel = document.getElementById('bulkPP');
+
+  // Union of every card's options, so the bar can offer anything any card sells.
+  const siMap = new Map(), ppMap = new Map();
+  products.forEach(p => {
+    (getSIOptions(p)     || []).forEach(o => { if (!siMap.has(String(o.value))) siMap.set(String(o.value), o.label); });
+    (getPeriodOptions(p) || []).forEach(o => { if (!ppMap.has(String(o.value))) ppMap.set(String(o.value), o.label); });
+  });
+  // Cards can arrive with no productModifyOptions at all; fall back to the
+  // form-level selectors so the bar is still usable.
+  if (!siMap.size) {
+    const formSI = document.getElementById('sumInsured');
+    if (formSI) Array.from(formSI.options).forEach(o => siMap.set(o.value, o.text));
+  }
+  if (!ppMap.size) [['1','1 Year'],['2','2 Years'],['3','3 Years']].forEach(([v, l]) => ppMap.set(v, l));
+
+  const opt = m => [...m.entries()].map(([v,l]) => `<option value="${v}">${l}</option>`).join('');
+  siSel.innerHTML = opt(siMap);
+  ppSel.innerHTML = opt(ppMap);
+  const first = products[0];
+  siSel.value = String(getDefaultSI(first));
+  ppSel.value = String(getDefaultPP(first));
+  bar.style.display = 'flex';
+  document.getElementById('bulkMsg').textContent = '';
+}
+
+async function applyToAllCards() {
+  if (!lastProducts || !lastProducts.length) return;
+  const si  = document.getElementById('bulkSI').value;
+  const pp  = document.getElementById('bulkPP').value;
+  const btn = document.getElementById('bulkApplyBtn');
+  const msg = document.getElementById('bulkMsg');
+  btn.disabled = true;
+  const originalLabel = btn.textContent;
+  btn.textContent = 'Recalculating…';
+
+  let applied = 0, skipped = 0;
+  const jobs = lastProducts.map(p => {
+    const uid = p.uniqueId || p.subProductCode;
+    // Only push values this card actually offers — silently pricing a card at
+    // a sum insured it does not sell is exactly the class of bug we removed.
+    const siOk = (getSIOptions(p)     || []).some(o => String(o.value) === si);
+    const ppOk = (getPeriodOptions(p) || []).some(o => String(o.value) === pp);
+    const useSI = siOk ? si : getDefaultSI(p);
+    const usePP = ppOk ? pp : getDefaultPP(p);
+    if (!siOk || !ppOk) skipped++; else applied++;
+    const siEl = document.getElementById(`si_${uid}`); if (siEl && siOk) siEl.value = si;
+    const ppEl = document.getElementById(`pp_${uid}`); if (ppEl && ppOk) ppEl.value = pp;
+    return fetchOnePrice(uid, p.subProductCode, p.subTitle, useSI, usePP, lastPayload);
+  });
+  const results = await Promise.allSettled(jobs);
+  const priced = results.filter(r => r.status === 'fulfilled' && r.value === true).length;
+
+  btn.disabled = false;
+  btn.textContent = originalLabel;
+  msg.textContent = `${priced} of ${lastProducts.length} repriced`
+    + (skipped ? ` · ${skipped} kept their own values (this plan does not offer that combination)` : '');
+  msg.style.color = skipped ? '#b45309' : '#15803d';
+  _emitStatus(priced > 0 ? 'ready' : 'failed');
+}
+
+/* ── Fetch price for one card ── */
+async function fetchOnePrice(uid, subProductCode, subTitle, sumInsured, policyPeriod, basePayload) {
+  const premEl = document.getElementById(`premium_${uid}`);
+  if (!premEl) return false;
+  clearCardStale(uid);
+  premEl.innerHTML = `<div class="premium-loading"><div class="premium-mini-spinner"></div> Calculating…</div>`;
+
+  try {
+    const payload = { ...basePayload, sumInsured, policyPeriod };
+    if (subProductCode) { payload.subProductCode = subProductCode; payload.subTitle = subTitle; }
+
+    const d = await post('/recommend-me/pricing', { quickQuotePayload: payload });
+
+    if (d.statusCode===200 && d.data && d.data.pricingSection) {
+      const ps = d.data.pricingSection;
+      const amt     = ps.amount    || (ps.amountInt ? `₹${parseInt(ps.amountInt).toLocaleString('en-IN')}` : null);
+      const saved   = ps.savedAmount;
+
+      // Update tags if pricing returns updated benefits
+      if (d.data.benefitsSection && d.data.benefitsSection.tags) {
+        const tagsEl = document.getElementById(`tags_${uid}`);
+        if (tagsEl) tagsEl.innerHTML = d.data.benefitsSection.tags.map(t=>`<span class="tag">${t}</span>`).join('');
+      }
+
+      const safeTitle    = (subTitle||subProductCode).replace(/'/g,"\\'");
+      const safeSI       = String(sumInsured);
+      const safePP       = String(policyPeriod);
+      premEl.innerHTML = amt
+        ? `<div class="premium-amount">${amt}</div>
+           <div class="premium-per">per year (incl. GST)</div>
+           ${saved?`<div class="premium-saved">🎉 You save ${saved}</div>`:''}
+           <button class="btn-proceed"
+             onclick="shProceed('${uid}','${subProductCode}','${safeTitle}','${safeSI}','${safePP}')">
+             Customize &amp; Proceed →
+           </button>
+           <button onclick="shAddToCompare('${uid}','${safeTitle}','${safeSI}','${amt}')"
+             style="background:#1a7a3a;color:#fff;border:none;padding:7px 14px;border-radius:4px;font-size:12px;font-weight:600;cursor:pointer;margin-top:6px;width:100%">
+             ➕ Add to Comparison
+           </button>`
+        : `<div class="premium-error">⚠️ Premium not available</div>`;
+      return !!amt;
+    } else {
+      premEl.innerHTML = `<div class="premium-error">⚠️ ${d.message||'No premium returned'}</div>`;
+      return false;
+    }
+  } catch(e) {
+    if (premEl) premEl.innerHTML = `<div class="premium-error">⚠️ ${e.message}</div>`;
+    return false;
+  }
+}
+
+/* ── Per-card recalculate ── */
+async function recalcCard(uid, subProductCode, subTitle) {
+  const btn = document.getElementById(`calcbtn_${uid}`);
+  if (btn) { btn.disabled=true; btn.textContent='…'; }
+  const si = document.getElementById(`si_${uid}`)?.value || lastPayload.sumInsured;
+  const pp = document.getElementById(`pp_${uid}`)?.value || lastPayload.policyPeriod;
+  await fetchOnePrice(uid, subProductCode, subTitle, si, pp, lastPayload);
+  if (btn) { btn.disabled=false; btn.textContent='↻'; }
+}
+
+/* ── Summary bar ── */
+function buildSummaryBar(p) {
+  const PNAMES = {'REC0011':'Recommend Me','BPRD-038':'Super Star','BPRD-034':'Health Assure','BPRD-029':'Star Comprehensive','BPRD-024':'Super Surplus','BPRD-028':'Senior Citizen Red Carpet','BPRD-011':'Young Star','BPRD-030':'Arogya Sanjeevani'};
+  const fl = p.policyType==='FLOATER';
+  const parts = [
+    `Product: <strong>${PNAMES[p.product]||p.product}</strong>`,
+    `Type: <strong>${p.policyType}</strong>`,
+    `Plan: <strong>${p.policyPlan}</strong>`,
+    `Adults: <strong>${p.adults}</strong>`,
+    fl&&p.child>'0' ? `Children: <strong>${p.child}</strong>` : '',
+    `PED: <strong>${p.pedButton==='yes'?'Yes':'No'}</strong>`,
+    `Pincode: <strong>${p.pinCode}</strong>`,
+  ].filter(Boolean);
+  document.getElementById('summaryBar').innerHTML = parts.join(' &nbsp;|&nbsp; ');
+}
+
+/* ── Helpers ── */
+// One formatter for every sum insured Star shows or reports, because there
+// used to be two and they disagreed. shAddToCompare rounded to whole lakhs
+// with toFixed(0), so Value Plus's real 7.5 L floor was sent to the hub as
+// "8 Lakhs" — a cover the product does not sell, and 6.7% above the truth.
+// Fractional lakhs and crores are kept; only trailing zeros are trimmed.
+//
+// Star also uses 9999999999 in its sum-insured ladders to mean unlimited.
+// Both formatters divided it, producing "1000 Cr" and "100000 Lakhs".
+const SH_SI_UNLIMITED = 999999999;
+function shFmtSI(v, unit) {
+  const n = parseInt(v, 10);
+  if (!isFinite(n) || n <= 0) return String(v == null ? '—' : v);
+  if (n >= SH_SI_UNLIMITED) return 'Unlimited';
+  const trim = x => String(parseFloat(x.toFixed(2)));   // 7.5 stays 7.5, 10.00 → 10
+  if (n >= 10000000) return trim(n / 10000000) + (unit === 'long' ? ' Crore' : ' Cr');
+  if (n >= 100000)   return trim(n / 100000)   + (unit === 'long' ? ' Lakhs' : ' L');
+  return n.toLocaleString('en-IN');
+}
+function fmtSI(n) { return shFmtSI(n); }
+
+async function post(path, body) {
+  const r = await fetch(`${API}${path}`, {
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify(body)
+  });
+  return r.json();
+}
+
+function showSection(s) {
+  document.getElementById('formSection').style.display    = s==='form'    ? 'block' : 'none';
+  document.getElementById('loadingSection').style.display = s==='loading' ? 'block' : 'none';
+  document.getElementById('resultsSection').style.display = s==='results' ? 'block' : 'none';
+}
+
+function setStep(n, state) {
+  const el = document.getElementById(`step${n}`); if(!el) return;
+  el.className = `step-item ${state}`;
+  const icons = {active:'⏳',done:'✅'};
+  const labels = {1:'Getting product recommendations',2:'Calculating premiums for all plans'};
+  el.innerHTML = `<span>${icons[state]||'⏳'}</span> ${labels[n]}`;
+}
+
+function resetForm() { showSection('form'); }
+
+/* ── Init ── */
+document.addEventListener('DOMContentLoaded', () => { onTypeChange(); renderAges(); });
+
+// ═══════════════════════════════════════════════════════════════════════════
+// CUSTOMIZE PANEL
+// ═══════════════════════════════════════════════════════════════════════════
+
+let custPayload      = null;   // current payload being customized
+let custData         = null;   // last checkout response data
+let custAddedCovers  = {};     // coverId → selected option value
+let custPeriodPrems  = {};     // periodValue → premium string (from checkout options)
+
+async function shProceed(uid, subProductCode, subTitle, sumInsured, policyPeriod) {
+  custPayload = { ...lastPayload, subProductCode, subTitle,
+                  sumInsured: String(sumInsured), policyPeriod: String(policyPeriod) };
+  custAddedCovers = {};
+  custPeriodPrems  = {};
+
+  const overlay = document.getElementById('customizeOverlay');
+  overlay.style.display = 'block';
+  overlay.scrollTop = 0;
+  document.getElementById('custHeaderTitle').textContent = subTitle || subProductCode;
+  document.getElementById('custBody').innerHTML =
+    '<div class="cust-loading-wrap"><div class="premium-mini-spinner"></div>Loading plan details…</div>';
+
+  try {
+    const d = await post('/checkout', { quickQuotePayload: custPayload });
+    if (d.statusCode !== 200) throw new Error(d.message || 'Checkout API failed');
+    custData = d.data;
+    renderCustomize(d.data);
+  } catch(e) {
+    document.getElementById('custBody').innerHTML =
+      `<div class="cust-loading-wrap" style="color:var(--error)">❌ ${e.message}<br><small>Is the Star Health server running on port 3004?</small></div>`;
+  }
+}
+
+function closeCustomize() {
+  document.getElementById('customizeOverlay').style.display = 'none';
+  custData = null; custPayload = null; custAddedCovers = {}; custPeriodPrems = {};
+}
+
+function buildCoversPayload() {
+  // Build the covers object in the format Star Health API expects
+  const covers = {};
+  Object.entries(custAddedCovers).forEach(([coverId, val]) => {
+    covers[coverId] = {
+      name: coverId,
+      values: [{ name: coverId, value: val }]
+    };
+  });
+  return covers;
+}
+
+function renderCustomize(data) {
+  const info      = data.productInfo || {};
+  const modOpts   = (data.productModifyOptions || {}).form || [];
+  const mandCovers = (data.mandatoryCovers  || {}).bundleCovers || [];
+  const addCovers  = (data.additionalCovers || {}).covers || [];
+  const pricing    = data.pricingSection || {};
+
+  // Pre-populate custAddedCovers with covers that are already added (isAdded: true)
+  // These are sent in every /checkout request (e.g. FLEXI_RIDER_ROOM_RENT_MODIFICATION)
+  addCovers.forEach(c => {
+    if (c.isAdded) {
+      const formFields = (c.form && c.form[0] && c.form[0].fields) || [];
+      const sf = formFields[0];
+      custAddedCovers[c.id] = sf ? sf.defaultValue : 'true';
+    }
+  });
+
+  document.getElementById('custHeaderTitle').textContent =
+    [info.title, info.subTitle].filter(Boolean).join(' — ');
+
+  // ── SI selector ──────────────────────────────────────────────────────────
+  const siField = modOpts.find(f => f.id === 'sumInsured');
+  const siHtml  = siField ? `
+    <div class="cust-card">
+      <div class="cust-section-title">💰 Sum Insured</div>
+      <select class="cust-si-select" id="custSI" onchange="custChangeSI()">
+        ${siField.options.map(o =>
+          `<option value="${o.value}"${o.value === siField.defaultValue ? ' selected' : ''}>${o.label}</option>`
+        ).join('')}
+      </select>
+    </div>` : '';
+
+  // ── Policy period cards ───────────────────────────────────────────────────
+  const ppField = modOpts.find(f => f.id === 'policyPeriod');
+  if (ppField) {
+    ppField.options.forEach(o => { custPeriodPrems[o.value] = { prem: o.premium||'', save: o.caption||'' }; });
+  }
+  const ppHtml = ppField ? `
+    <div class="cust-card">
+      <div class="cust-section-title">📅 Policy Period</div>
+      <div class="period-cards">
+        ${ppField.options.map(o => `
+          <div class="period-card${o.value === ppField.defaultValue ? ' active' : ''}"
+               id="pcard_${o.value}" onclick="custSelectPP('${o.value}')">
+            <div class="pc-label">${o.label}</div>
+            <div class="pc-prem">${o.premium || ''}</div>
+            ${o.caption ? `<div class="pc-save">🎉 ${o.caption}</div>` : ''}
+          </div>`).join('')}
+      </div>
+    </div>` : '';
+
+  // ── Mandatory covers ──────────────────────────────────────────────────────
+  const mandHtml = mandCovers.length ? `
+    <div class="cust-card">
+      <div class="cust-section-title">🛡️ ${data.mandatoryCovers.title || 'Built-In Covers'}</div>
+      ${mandCovers.map(c => {
+        const badge = c.topBadge || {};
+        const bl = badge.title || '';
+        const bclass = bl==='Recommended'||bl==='Must have' ? 'ctbadge-rec'
+                     : bl.includes('First')||bl.includes('first') ? 'ctbadge-first'
+                     : bl.includes('Exclusively') ? 'ctbadge-excl'
+                     : bl.includes('Discount') ? 'ctbadge-discount' : 'ctbadge-fire';
+        return `
+        <div class="mcover-item">
+          <div class="mcover-icon">🏥</div>
+          <div class="mcover-body">
+            ${bl ? `<span class="ctbadge ${bclass}">${bl}</span>` : ''}
+            <div class="mcover-title">${c.title}</div>
+            <div class="mcover-desc">${c.description}</div>
+            ${c.subLimitTitle && c.subLimitValue
+              ? `<div class="mcover-sublimit">${c.subLimitTitle}: ${c.subLimitValue}</div>` : ''}
+          </div>
+          <span class="mcover-badge">✓ Inbuilt</span>
+        </div>`;
+      }).join('')}
+    </div>` : '';
+
+  // ── Additional covers ─────────────────────────────────────────────────────
+  const addHtml = addCovers.length ? `
+    <div class="cust-card">
+      <div class="cust-section-title">➕ ${data.additionalCovers.title || 'Additional Covers'}</div>
+      ${addCovers.map(c => {
+        const badge = c.topBadge || {};
+        const bl = badge.title || '';
+        const bclass = bl==='Recommended' ? 'ctbadge-rec'
+                     : bl.includes('First') ? 'ctbadge-first'
+                     : bl.includes('Exclusively') ? 'ctbadge-excl'
+                     : bl.includes('Discount') ? 'ctbadge-discount' : 'ctbadge-fire';
+        const formFields = (c.form && c.form[0] && c.form[0].fields) || [];
+        const sf = formFields[0];
+        // isAdded=true means pre-selected; isEnabled=false means non-toggleable (locked in)
+        const preAdded   = c.isAdded === true;
+        const canToggle  = c.isEnabled !== false;
+        const btnText    = preAdded ? (canToggle ? 'Remove' : 'Inbuilt') : 'Add';
+        const btnCls     = preAdded && canToggle ? 'acover-add-btn remove' : 'acover-add-btn';
+        const cardCls    = preAdded ? 'acover-card is-added' : 'acover-card';
+        const optsCls    = preAdded ? 'acover-options show' : 'acover-options';
+        const btnDisabled = !canToggle ? ' disabled' : '';
+        return `
+        <div class="${cardCls}" id="acover_${c.id}">
+          <div class="acover-top">
+            <div class="acover-info">
+              ${bl ? `<span class="ctbadge ${bclass}">${bl}</span>` : ''}
+              <div class="acover-title">${c.title}</div>
+              <div class="acover-desc">${c.description}</div>
+              ${c.subLimitTitle && c.subLimitValue
+                ? `<div class="acover-sublimit">${c.subLimitTitle}: ${c.subLimitValue}</div>` : ''}
+            </div>
+            <button class="${btnCls}" id="acbtn_${c.id}"
+                    onclick="toggleCover('${c.id}')"${btnDisabled}>${btnText}</button>
+          </div>
+          ${sf ? `
+          <div class="${optsCls}" id="acopts_${c.id}">
+            <label>${sf.tag || sf.label}</label>
+            <select id="acsel_${c.id}" onchange="custCoverSelChange('${c.id}',this.value)">
+              ${sf.options.map(o =>
+                `<option value="${o.value}"${o.value===sf.defaultValue?' selected':''}>${o.label}</option>`
+              ).join('')}
+            </select>
+          </div>` : ''}
+        </div>`;
+      }).join('')}
+    </div>` : '';
+
+  // ── Right: Premium card ───────────────────────────────────────────────────
+  const breakup = (pricing.priceBreakupSection || {}).breakup || [];
+  const premRight = `
+    <div class="prem-sticky">
+      <div class="prem-card">
+        <div class="prem-label">Total Premium</div>
+        <div class="prem-amount" id="custPremAmt">${pricing.amount || '—'}</div>
+        <div class="prem-sub" id="custPremSub">${pricing.sumInsured||''} · ${pricing.policyPeriod||''}</div>
+        ${breakup.length ? `<hr class="prem-divider">
+          ${breakup.map(b =>
+            `<div class="prem-breakup-row"><span>${b.label}</span><span class="bval">${b.value}</span></div>`
+          ).join('')}` : ''}
+        <hr class="prem-divider">
+        <button class="btn-continue" onclick="custContinue()">Continue →</button>
+        <button class="btn-cust-compare" onclick="custAddToCompare()">➕ Add to Comparison</button>
+      </div>
+    </div>`;
+
+  document.getElementById('custBody').innerHTML = `
+    <div class="cust-left">${siHtml}${ppHtml}${mandHtml}${addHtml}</div>
+    <div class="cust-right">${premRight}</div>`;
+}
+
+// ── SI changed → reload checkout for updated period premiums ──────────────
+async function custChangeSI() {
+  const si = document.getElementById('custSI')?.value;
+  if (!si) return;
+  custPayload.sumInsured = si;
+
+  const amtEl = document.getElementById('custPremAmt');
+  if (amtEl) amtEl.className = 'prem-loading';
+  if (amtEl) amtEl.textContent = '…';
+
+  try {
+    const siPayload = { ...custPayload };
+    const covers = buildCoversPayload();
+    if (Object.keys(covers).length > 0) siPayload.covers = covers;
+
+    const d = await post('/checkout', { quickQuotePayload: siPayload });
+    if (d.statusCode === 200 && d.data) {
+      const ps = d.data.pricingSection || {};
+      if (amtEl) { amtEl.className = 'prem-amount'; amtEl.textContent = ps.amount || '—'; }
+      const subEl = document.getElementById('custPremSub');
+      if (subEl) subEl.textContent = `${ps.sumInsured||''} · ${ps.policyPeriod||''}`;
+      // Update period card premiums
+      const ppOpts = ((d.data.productModifyOptions||{}).form||[]).find(f=>f.id==='policyPeriod');
+      if (ppOpts) {
+        ppOpts.options.forEach(o => {
+          custPeriodPrems[o.value] = { prem: o.premium||'', save: o.caption||'' };
+          const card = document.getElementById(`pcard_${o.value}`);
+          if (card) {
+            card.querySelector('.pc-prem').textContent = o.premium || '';
+            const saveEl = card.querySelector('.pc-save');
+            if (saveEl) saveEl.textContent = o.caption ? `🎉 ${o.caption}` : '';
+          }
+        });
+      }
+    }
+  } catch(e) {
+    if (amtEl) { amtEl.className = 'prem-amount'; amtEl.textContent = '—'; }
+  }
+}
+
+// ── Period changed → update premium from cached values ────────────────────
+async function custSelectPP(val) {
+  custPayload.policyPeriod = val;
+  document.querySelectorAll('.period-card').forEach(c => c.classList.remove('active'));
+  const card = document.getElementById(`pcard_${val}`);
+  if (card) card.classList.add('active');
+
+  const pp = custPeriodPrems[val] || {};
+  const amtEl = document.getElementById('custPremAmt');
+  if (amtEl && pp.prem) amtEl.textContent = pp.prem;
+
+  // Also recalc via API for accurate premium with current SI.
+  // The selected covers MUST be attached — every other recalculation path in
+  // this panel does so. Without them the API reprices the base plan, and the
+  // figure shown excludes riders that are still ticked on screen.
+  try {
+    const q = { ...custPayload };
+    const covers = buildCoversPayload();
+    if (covers && Object.keys(covers).length) q.covers = covers;
+
+    const d = await post('/recommend-me/pricing', { quickQuotePayload: q });
+    if (d.statusCode === 200 && d.data && d.data.pricingSection) {
+      const ps = d.data.pricingSection;
+      if (amtEl) amtEl.textContent = ps.amount || (ps.amountInt
+        ? '₹' + parseInt(ps.amountInt).toLocaleString('en-IN') : amtEl.textContent);
+    }
+  } catch(_) {}
+}
+
+// ── Toggle optional cover ─────────────────────────────────────────────────
+function toggleCover(coverId) {
+  const card   = document.getElementById(`acover_${coverId}`);
+  const btn    = document.getElementById(`acbtn_${coverId}`);
+  const opts   = document.getElementById(`acopts_${coverId}`);
+  const adding = btn.textContent.trim() === 'Add';
+
+  if (adding) {
+    btn.textContent = 'Remove';
+    btn.classList.add('remove');
+    card.classList.add('is-added');
+    if (opts) opts.classList.add('show');
+    const sel = document.getElementById(`acsel_${coverId}`);
+    custAddedCovers[coverId] = sel ? sel.value : 'true';
+  } else {
+    btn.textContent = 'Add';
+    btn.classList.remove('remove');
+    card.classList.remove('is-added');
+    if (opts) opts.classList.remove('show');
+    delete custAddedCovers[coverId];
+  }
+
+  // Recalculate premium with updated covers
+  custRecalcWithCovers();
+}
+
+function custCoverSelChange(coverId, val) {
+  custAddedCovers[coverId] = val;
+  // Recalculate premium when option value changes
+  custRecalcWithCovers();
+}
+
+// ── Recalculate premium including all currently-added covers ─────────────
+async function custRecalcWithCovers() {
+  const amtEl = document.getElementById('custPremAmt');
+  const subEl = document.getElementById('custPremSub');
+  if (amtEl) { amtEl.className = 'prem-loading'; amtEl.textContent = '…'; }
+
+  // Build payload with covers in the correct Star Health API format:
+  // quickQuotePayload.covers = { COVER_ID: { name, values: [{name, value}] } }
+  const payload = { ...custPayload };
+  const covers = buildCoversPayload();
+  if (Object.keys(covers).length > 0) payload.covers = covers;
+
+  try {
+    const d = await post('/checkout', { quickQuotePayload: payload });
+    if (d.statusCode === 200 && d.data && d.data.pricingSection) {
+      const ps = d.data.pricingSection;
+      if (amtEl) {
+        amtEl.className = 'prem-amount';
+        amtEl.textContent = ps.amount || '—';
+      }
+      if (subEl) subEl.textContent = `${ps.sumInsured||''} · ${ps.policyPeriod||''}`;
+
+      // Also refresh period card premiums if they changed with new covers
+      const ppOpts = ((d.data.productModifyOptions||{}).form||[]).find(f => f.id==='policyPeriod');
+      if (ppOpts) {
+        ppOpts.options.forEach(o => {
+          custPeriodPrems[o.value] = { prem: o.premium||'', save: o.caption||'' };
+          const card = document.getElementById(`pcard_${o.value}`);
+          if (card) {
+            const pEl = card.querySelector('.pc-prem');
+            if (pEl) pEl.textContent = o.premium || '';
+            const sEl = card.querySelector('.pc-save');
+            if (sEl) sEl.textContent = o.caption ? `🎉 ${o.caption}` : '';
+          }
+        });
+      }
+    } else {
+      if (amtEl) { amtEl.className = 'prem-amount'; amtEl.textContent = '—'; }
+    }
+  } catch(e) {
+    if (amtEl) { amtEl.className = 'prem-amount'; amtEl.textContent = '⚠️ Error'; }
+  }
+}
+
+// ── Continue → open Star Health proposal page ─────────────────────────────
+function custContinue() {
+  if (!custPayload) return;
+  const p = custPayload;
+  const params = new URLSearchParams({
+    product:        p.product       || '',
+    subProductCode: p.subProductCode|| '',
+    sumInsured:     p.sumInsured    || '',
+    policyPeriod:   p.policyPeriod  || '',
+    pinCode:        p.pinCode       || '',
+    policyType:     p.policyType    || '',
+    policyPlan:     p.policyPlan    || '',
+    adults:         p.adults        || '',
+    pedButton:      p.pedButton     || 'no',
+  });
+  window.open(`https://atompro.starhealth.in/v1/product-customize/?${params}`, '_blank');
+}
+
+// ── Add to Comparison from the customize panel ────────────────────────────
+function custAddToCompare() {
+  if (!custPayload || !custData) return;
+  const info    = custData.productInfo || {};
+  const pricing = custData.pricingSection || {};
+  const amtEl   = document.getElementById('custPremAmt');
+  const premium = amtEl ? amtEl.textContent : pricing.amount || '—';
+  const siEl    = document.getElementById('custSI');
+  const siLabel = siEl ? siEl.options[siEl.selectedIndex]?.text : pricing.sumInsured || '';
+  const addons  = Object.keys(custAddedCovers).map(id => {
+    const card = document.getElementById(`acover_${id}`);
+    return card ? card.querySelector('.acover-title')?.textContent?.trim() : id;
+  }).filter(Boolean).join(', ') || '—';
+
+  // The customize panel has its own period selector; custPayload tracks it.
+  const tenureYrs = parseInt(String((custPayload && custPayload.policyPeriod) || '1')
+    .replace(/[^0-9]/g, ''), 10) || 1;
+  const coverType = document.querySelector('input[name="policyType"]:checked')?.value || '';
+
+  window.parent.postMessage({
+    type:       'add-quote',
+    company:    'Star Health',
+    planName:   [info.title, info.subTitle].filter(Boolean).join(' — '),
+    sumAssured: siLabel,
+    premium,
+    addons,
+    tenure:     tenureYrs,
+    coverType:  coverType
+  }, '*');
+}
+
+// ── Add to Comparison (postMessage to parent unified.html) ─────────────────
+function shAddToCompare(uid, planTitle, siVal, premium) {
+  // Format SI — 'long' so the hub reads "7.5 Lakhs" / "1 Crore", which its
+  // parseSIRupees understands and its report bands are labelled with.
+  const siLabel = shFmtSI(siVal, 'long');
+
+  // Each card carries its own period selector, so read this card's value
+  // rather than the form-level fallback.
+  const ppEl = document.getElementById(`pp_${uid}`);
+  const tenureYrs = parseInt(String(ppEl ? ppEl.value : (lastPayload && lastPayload.policyPeriod) || '1')
+    .replace(/[^0-9]/g, ''), 10) || 1;
+  const coverType = document.querySelector('input[name="policyType"]:checked')?.value || '';
+
+  window.parent.postMessage({
+    type:       'add-quote',
+    company:    'Star Health',
+    planName:   planTitle,
+    sumAssured: siLabel,
+    premium,
+    addons:     '—',
+    tenure:     tenureYrs,
+    coverType:  coverType
+  }, '*');
+}
+
+// ══════════════════════════════════════════════════════════════════
+//  HUB INTEGRATION — receive set-params from parent insurance_hub
+// ══════════════════════════════════════════════════════════════════
+// Additive: remember hub "auto-add" intent + emit lightweight status to hub
+var _hubAutoAdd = false;
+function _emitStatus(s){ try { window.parent.postMessage({ type:'calc-status', calculator:'star', status:s }, '*'); } catch(e){} }
+// Only accept instructions from a page served by our own local servers.
+// Every receiver here used to take a message from any origin.
+var _ALLOWED_ORIGINS = ['http://localhost:3002','http://127.0.0.1:3002',
+  'http://localhost:3003','http://127.0.0.1:3003','http://localhost:3004',
+  'http://127.0.0.1:3004','http://localhost:3005','http://127.0.0.1:3005'];
+function _originAllowed(o){ return !o || o === 'null' || _ALLOWED_ORIGINS.indexOf(o) !== -1; }
+window.addEventListener('message', function(ev) {
+  if (!_originAllowed(ev.origin)) return;
+  try {
+    const msg = (typeof ev.data === 'string') ? JSON.parse(ev.data) : ev.data;
+    if (!msg || msg.type !== 'set-params') return;
+    const d = msg.data || {};
+    _hubAutoAdd = !!msg.autoAdd;
+
+    // ── Product / plan selection (from hub plan-name popup) ────
+    if (d.plan) {
+      const prodEl = document.getElementById('product');
+      if (prodEl && Array.from(prodEl.options).some(function(o){ return o.value === String(d.plan); })) {
+        prodEl.value = String(d.plan);
+      }
+    }
+
+    // ── Pincode ────────────────────────────────────────────────
+    if (d.pincode) {
+      const pinEl = document.getElementById('pinCode');
+      if (pinEl) {
+        pinEl.value = d.pincode;
+        if (typeof doValidatePincode === 'function') {
+          clearTimeout(window._starPinTimer);
+          window._starPinTimer = setTimeout(function() { doValidatePincode(); }, 400);
+        }
+      }
+    }
+
+    // ── Policy type ────────────────────────────────────────────
+    if (d.coverType) {
+      const ptype = (d.coverType === 'individual') ? 'INDIVIDUAL' : 'FLOATER';
+      document.querySelectorAll('input[name="policyType"]').forEach(function(r) {
+        r.checked = (r.value === ptype);
+      });
+      if (typeof onTypeChange === 'function') onTypeChange();
+    }
+
+    // ── Adults / Children counts ───────────────────────────────
+    if (d.members) {
+      const isFloat = d.coverType !== 'individual';
+      const adultsEl = document.getElementById('adults');
+      if (adultsEl) adultsEl.value = String(Math.min(2, d.members.adults || 1));
+      if (isFloat) {
+        const childEl = document.getElementById('child');
+        if (childEl) childEl.value = String(Math.min(4, d.members.children || 0));
+      }
+    }
+
+    // Re-render age dropdowns
+    if (typeof renderAges === 'function') renderAges();
+
+    // ── Fill age dropdowns (after render) ─────────────────────
+    setTimeout(function() {
+      const aA = d.members?.adultAges  || [];
+      const cA = d.members?.childAges  || [];
+      aA.forEach(function(age, i) {
+        const el = document.getElementById('adult' + (i + 1));
+        if (el) el.value = String(Math.max(18, Math.min(100, age)));
+      });
+      cA.forEach(function(age, i) {
+        const el = document.getElementById('child' + (i + 1));
+        if (el) el.value = String(Math.max(0, Math.min(25, age)));
+      });
+    }, 150);
+
+    // ── Sum Insured ────────────────────────────────────────────
+    if (d.si) {
+      const siSel = document.getElementById('sumInsured');
+      if (siSel && siSel.options.length) {
+        let bestVal = null, bestDiff = Infinity;
+        Array.from(siSel.options).forEach(function(opt) {
+          const v = parseInt(opt.value);
+          if (!isNaN(v)) {
+            const diff = Math.abs(v - d.si);
+            if (diff < bestDiff) { bestDiff = diff; bestVal = opt.value; }
+          }
+        });
+        if (bestVal) siSel.value = bestVal;
+      }
+    }
+
+    // ── Policy period ──────────────────────────────────────────
+    if (d.tenure) {
+      const ppSel = document.getElementById('policyPeriod');
+      if (ppSel) ppSel.value = String(d.tenure);
+    }
+
+    // Tell the hub what stuck and what did not.
+    try {
+      const _cl = [];
+      if (d.members && d.members.adults > 2) _cl.push({ field:'members', requested:d.members.adults,
+        used:2, reason:'Star quotes at most 2 adults here' });
+      if (d.coverType === 'mi') _cl.push({ field:'coverType', requested:'mi', used:'FLOATER',
+        reason:'Star prices individual or floater only' });
+      const _siEl = document.getElementById('sumInsured');
+      const _siGot = _siEl ? parseInt(_siEl.value, 10) : NaN;
+      // NaN fails every comparison, so an empty or unmatched selector used to
+      // report "nothing was clamped" — the one case most worth reporting.
+      if (d.si && !isNaN(_siGot) && Math.abs(_siGot - d.si) > 1) {
+        _cl.push({ field:'si', requested:d.si, used:_siGot,
+                   reason:'snapped to the nearest sum insured Star offers' });
+      } else if (d.si && isNaN(_siGot)) {
+        _cl.push({ field:'si', requested:d.si, used:'(form selector empty)',
+                   reason:'the sum-insured selector held no value, so Star priced at its own default' });
+      }
+      window.parent.postMessage({ type:'params-applied', calculator:'star',
+        accepted:['pincode','members','ages','si','tenure'], clamped:_cl }, '*');
+    } catch(e) {}
+
+    // ── Auto-calculate if requested ────────────────────────────
+    if (msg.autoCalc && typeof getQuote === 'function') {
+      setTimeout(function() { getQuote(); }, 600);
+    }
+  } catch(e) {}
+});
+
+// Signal ready
+try { window.parent.postMessage({ type: 'calc-ready', calculator: 'star' }, '*'); } catch(e) {}
+</script>
+</body>
+</html>
