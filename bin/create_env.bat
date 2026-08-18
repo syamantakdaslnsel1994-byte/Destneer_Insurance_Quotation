@@ -9,7 +9,7 @@ REM  .env holds the ManipalCigna gateway credential and payload key. It is
 REM  git-ignored and must never be committed.
 REM ===========================================================================
 
-cd /d "%~dp0"
+cd /d "%~dp0\.."
 
 if exist ".env" (
   echo.

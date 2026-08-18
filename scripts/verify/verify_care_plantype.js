@@ -18,9 +18,10 @@
 // ─────────────────────────────────────────────────────────────────────────────
 const fs = require('fs');
 const { JSDOM } = require('jsdom');
-const W = __dirname + '/';
+const ROOT = __dirname + '/../../';
+const W = ROOT + 'public/calculators/';
 
-const CAT = JSON.parse(fs.readFileSync(W + 'care_plans.json', 'utf8'));
+const CAT = JSON.parse(fs.readFileSync(ROOT + 'data/care_plans.json', 'utf8'));
 
 let pass = 0, fail = 0;
 function ok(name, cond, extra) {

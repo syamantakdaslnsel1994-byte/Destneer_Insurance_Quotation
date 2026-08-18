@@ -16,11 +16,11 @@
 // ─────────────────────────────────────────────────────────────────────────────
 const fs = require('fs');
 const { JSDOM } = require('jsdom');
-const W = __dirname + '/';
-const feat = JSON.parse(fs.readFileSync(W + 'feature_comparison.json', 'utf8'));
-const cat  = JSON.parse(fs.readFileSync(W + 'care_plans.json', 'utf8'));
+const ROOT = __dirname + '/../../';
+const feat = JSON.parse(fs.readFileSync(ROOT + 'data/feature_comparison.json', 'utf8'));
+const cat  = JSON.parse(fs.readFileSync(ROOT + 'data/care_plans.json', 'utf8'));
 
-const dom = new JSDOM(fs.readFileSync(W + 'insurance_hub.html', 'utf8'), {
+const dom = new JSDOM(fs.readFileSync(ROOT + 'public/hub/insurance_hub.html', 'utf8'), {
   runScripts: 'dangerously', url: 'http://localhost:3005/hub', pretendToBeVisual: true,
   beforeParse(w) {
     w.ExcelJS = require('exceljs');

@@ -2,8 +2,29 @@ const express = require('express');
 const fetch = require('node-fetch');
 const cors = require('cors');
 const path = require('path');
+const fs = require('fs');
 
 const app = express();
+
+// ── Public origins ────────────────────────────────────────────────────────
+// See care_server.js for why this exists: every calculator page hardcodes
+// each other's origin for iframe/postMessage/API purposes. Unset, everything
+// defaults to today's exact localhost behaviour.
+const PUBLIC_ORIGIN_CARE = process.env.PUBLIC_ORIGIN_CARE || 'http://localhost:3005';
+const PUBLIC_ORIGIN_NIVA = process.env.PUBLIC_ORIGIN_NIVA || 'http://localhost:3002';
+const PUBLIC_ORIGIN_MC   = process.env.PUBLIC_ORIGIN_MC   || 'http://localhost:3003';
+const PUBLIC_ORIGIN_STAR = process.env.PUBLIC_ORIGIN_STAR || 'http://localhost:3004';
+const ORIGIN_SUBS = [
+  ['http://localhost:3002', PUBLIC_ORIGIN_NIVA],
+  ['http://localhost:3003', PUBLIC_ORIGIN_MC],
+  ['http://localhost:3004', PUBLIC_ORIGIN_STAR],
+  ['http://localhost:3005', PUBLIC_ORIGIN_CARE],
+];
+function sendTemplated(res, filePath) {
+  let html = fs.readFileSync(filePath, 'utf8');
+  for (const [from, to] of ORIGIN_SUBS) html = html.split(from).join(to);
+  res.type('html').send(html);
+}
 // ── Local-only access control ─────────────────────────────────────────────────
 // These servers proxy live insurer APIs with no authentication of their own.
 // Binding to 127.0.0.1 keeps them off the network, and the origin allow-list
@@ -14,6 +35,7 @@ const LOCAL_ORIGINS = new Set([
   'http://localhost:3004','http://127.0.0.1:3004',
   'http://localhost:3005','http://127.0.0.1:3005',
 ]);
+[PUBLIC_ORIGIN_CARE, PUBLIC_ORIGIN_NIVA, PUBLIC_ORIGIN_MC, PUBLIC_ORIGIN_STAR].forEach(o => LOCAL_ORIGINS.add(o));
 function localCors(req, res, next) {
   const origin = req.headers.origin;
   if (origin && LOCAL_ORIGINS.has(origin)) {
@@ -40,7 +62,7 @@ const productConfigCache = new Map();
 
 // Serve frontend
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'niva_index.html'));
+  sendTemplated(res, path.join(__dirname, '..', 'public', 'calculators', 'niva_index.html'));
 });
 
 // ─────────────────────────────────────────────
@@ -213,7 +235,12 @@ app.get('/exceljs.js', (req, res) => {
   res.status(404).send('// ExcelJS not found');
 });
 
-const PORT = 3002;
-app.listen(PORT, '127.0.0.1', () => {
-  console.log(`✅  Niva Bupa premium calculator running on http://localhost:${PORT}`);
-});
+const PORT = Number(process.env.PORT) || 3002;
+// Guarded so this file can also be require()'d as a router (see
+// server/combined_server.js) without binding its own port.
+if (require.main === module) {
+  app.listen(PORT, '127.0.0.1', () => {
+    console.log(`✅  Niva Bupa premium calculator running on http://localhost:${PORT}`);
+  });
+}
+module.exports = app;

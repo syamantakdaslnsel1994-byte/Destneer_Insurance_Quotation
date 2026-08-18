@@ -27,7 +27,7 @@ const path = require('path');
 
 const HOST = '127.0.0.1';
 const PORT = 3005;
-const CATALOGUE_PATH = path.join(__dirname, 'care_plans.json');
+const CATALOGUE_PATH = path.join(__dirname, '..', '..', 'data', 'care_plans.json');
 
 const args      = process.argv.slice(2);
 const REPORT_ONLY = args.includes('--report');
@@ -198,7 +198,8 @@ async function main() {
   const errored = rows.filter(r => !r.ok).length;
   const summary = { checked: rows.length, drifted, errored, failed: !REPORT_ONLY && (drifted > 0 || errored > 0) };
 
-  const outFile = path.join(__dirname, 'care_audit_report.html');
+  const outFile = path.join(__dirname, '..', '..', 'reports', 'care_audit_report.html');
+  fs.mkdirSync(path.dirname(outFile), { recursive: true });
   fs.writeFileSync(outFile, buildReport(rows, summary), 'utf8');
 
   console.log('\n' + '─'.repeat(64));

@@ -5,25 +5,25 @@ echo  Servers — Please Wait...
 echo ============================================
 echo.
 
-cd /d "%~dp0"
+cd /d "%~dp0\.."
 
 echo [1/4] Starting Niva Bupa    (PORT 3002)...
-start "Niva Bupa    :3002" cmd /k "node niva_server.js"
+start "Niva Bupa    :3002" cmd /k "node server\niva_server.js"
 
 timeout /t 1 /nobreak >nul
 
 echo [2/4] Starting ManipalCigna (PORT 3003)...
-start "ManipalCigna :3003" cmd /k "node mc_server.js"
+start "ManipalCigna :3003" cmd /k "node server\mc_server.js"
 
 timeout /t 1 /nobreak >nul
 
 echo [3/4] Starting Star Health  (PORT 3004)...
-start "Star Health  :3004" cmd /k "node sh_server.js"
+start "Star Health  :3004" cmd /k "node server\sh_server.js"
 
 timeout /t 1 /nobreak >nul
 
 echo [4/4] Starting Care Health  (PORT 3005)...
-start "Care Health  :3005" cmd /k "node care_server.js"
+start "Care Health  :3005" cmd /k "node server\care_server.js"
 
 timeout /t 2 /nobreak >nul
 

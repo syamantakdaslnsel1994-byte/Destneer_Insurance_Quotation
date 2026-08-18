@@ -83,16 +83,16 @@ origins. They are not reachable from the network.
 | Command | What it does |
 |---|---|
 | `npm run audit:care` | Check the live Care portal against `care_plans.json`. Exits 1 on drift. |
-| `node care_audit.js --plan 2813` | Check one plan |
-| `node care_audit.js --update` | Print suggested catalogue changes |
-| `node care_audit.js --report` | Write the report, always exit 0 |
+| `node scripts/audit/care_audit.js --plan 2813` | Check one plan |
+| `node scripts/audit/care_audit.js --update` | Print suggested catalogue changes |
+| `node scripts/audit/care_audit.js --report` | Write the report, always exit 0 |
 | `npm run verify:picker` | Check the plan picker's eligibility rules, guard and overrides. Exits 1 on failure. |
 | `npm run verify:mc` | Check ManipalCigna's Plan Type and resident-Indian handling, server and UI. Exits 1 on failure. |
 | `npm run verify:excel` | Check the spreadsheet format against the client reference file. Exits 1 on drift. |
 | `npm run verify:pdf` | Build the Excel and the PDF from one fixture and check they agree, cell for cell. Exits 1 on drift. |
 | `npm run verify` | All four of the above. |
-| `decode_mc_url.bat` | Decode a captured ManipalCigna quick-quote payload. See `docs_mc_plan_type_capture.md`. |
-| `archive_legacy.bat` | Move superseded files into `_old\` |
+| `bin\decode_mc_url.bat` | Decode a captured ManipalCigna quick-quote payload. See `docs/docs_mc_plan_type_capture.md`. |
+| `bin\archive_legacy.bat` | Move superseded files into `_old\` |
 
 The verify scripts need jsdom, which is test-only and not a dependency
 (`verify_mc_plantype.js` is the exception — it needs nothing extra):
@@ -295,11 +295,11 @@ the name — ExcelJS cannot embed WebP at all. It is flattened onto white (it ha
 partial transparency, which would have rendered three different ways) and
 trimmed, giving `logo.png`, 130×97.
 
-To replace the logo, drop a new `logo.png` in this folder and regenerate the
-constant:
+To replace the logo, drop a new `logo.png` in `assets/` and regenerate the
+constant (run from the repo root):
 
 ```powershell
-node -e "const fs=require('fs');const b=fs.readFileSync('logo.png').toString('base64');const p='insurance_hub.html';const s=fs.readFileSync(p,'utf8');fs.writeFileSync(p,s.replace(/const LOGO_PNG_B64 = '[^']*'/,\"const LOGO_PNG_B64 = '\"+b+\"'\"));console.log('logo updated',b.length,'chars')"
+node -e "const fs=require('fs');const b=fs.readFileSync('assets/logo.png').toString('base64');const p='public/hub/insurance_hub.html';const s=fs.readFileSync(p,'utf8');fs.writeFileSync(p,s.replace(/const LOGO_PNG_B64 = '[^']*'/,\"const LOGO_PNG_B64 = '\"+b+\"'\"));console.log('logo updated',b.length,'chars')"
 ```
 
 Then update `LOGO_W` / `LOGO_H` beside it if the new file's proportions differ.
@@ -380,7 +380,7 @@ fallback and is kept — not cleared — when the catalogue does not carry the
 field, because `care_server.js` reads `care_plans.json` once at boot: a server
 left running after the file changed would otherwise blank the map and hide the
 row for all 48 plans. **Restart `care_server.js` after editing the catalogue.**
-Covered by `node verify_care_plantype.js`, which boots the form against both a
+Covered by `node scripts/verify/verify_care_plantype.js`, which boots the form against both a
 fresh and a stripped catalogue.
 
 `Enhance` (748) is flagged `planTypeField: true` but its options were never
@@ -677,35 +677,43 @@ Documented during the work, deliberately left for a later batch.
 
 ## Where things live
 
+The project is organized into folders: `server/` (the 5 Express backends),
+`public/` (`hub/`, `calculators/`, `legacy/` — every HTML page), `data/`
+(catalogue JSON and fixtures), `scripts/` (`verify/`, `audit/`, `mc-tools/`),
+`docs/`, `reference-files/`, `reports/` (generated output), `assets/`, and
+`bin/` (the `.bat` launchers). `quotations/`, `.env`/`.env.example`,
+`package.json` and this README stay at the repo root.
+
 | File | Role |
 |---|---|
-| `insurance_hub.html` | The hub — members, comparison, report, Excel, PDF, history |
-| `login.html` | The sign-in page, served at `/login`. Also runs first-time account setup |
+| `public/hub/insurance_hub.html` | The hub — members, comparison, report, Excel, PDF, history |
+| `public/hub/login.html` | The sign-in page, served at `/login`. Also runs first-time account setup |
 | `quotations/` | Saved quotations, plus `users.json` and `config.json`. Gitignored — real client data |
-| `care_index.html` · `niva_index.html` · `mc_multi.html` · `sh_index.html` | The four replica calculators |
-| `care_server.js` · `niva_server.js` · `mc_server.js` · `sh_server.js` | Backend proxies |
-| `care_plans.json` | **Single source of truth** for the 48 Care plans |
-| `feature_comparison.json` | Hand-maintained feature matrix — the Feature Comparison sheet's only source |
-| `care_audit.js` | Portal regression test |
-| `verify_excel_fixture.js` · `verify_excel_format.py` | Spreadsheet format regression test |
-| `verify_plan_picker.js` | Plan picker regression test |
-| `Vivek Bhaia_Quote.xlsx` | The client reference file the format is checked against |
-| `docs_reference_quotation_format.md` | Excel format provenance, competitor data, open portal questions |
-| `docs_mc_plan_type_capture.md` | How to capture ManipalCigna's Plan Type codes, and why it cannot be inferred |
-| `mc_decode_url.js` · `decode_mc_url.bat` · `mc_captures.txt` | Offline decoder for captured ManipalCigna payloads |
-| `mc_capture_snippet.js` | Paste into Chrome's Console on the real ManipalCigna page to capture payloads without using the Network tab |
-| `docs_mc_live_capture_findings.md` | What the live portal actually sends — field names, values, and what is still unverified |
-| `verify_mc_plantype.js` · `verify_mc_ui.js` | ManipalCigna Plan Type regression tests |
-| `verify_pdf_report.js` | Checks the PDF and the Excel agree, cell for cell, and that the logo reaches all three outputs |
-| `logo.png` | The brand mark. `insurance_hub.html` carries a base64 copy; this is the source for regenerating it |
+| `public/calculators/care_index.html` · `niva_index.html` · `mc_multi.html` · `sh_index.html` | The four replica calculators |
+| `server/care_server.js` · `niva_server.js` · `mc_server.js` · `sh_server.js` | Backend proxies |
+| `data/care_plans.json` | **Single source of truth** for the 48 Care plans |
+| `data/feature_comparison.json` | Hand-maintained feature matrix — the Feature Comparison sheet's only source |
+| `scripts/audit/care_audit.js` | Portal regression test |
+| `scripts/verify/verify_excel_fixture.js` · `verify_excel_format.py` | Spreadsheet format regression test |
+| `scripts/verify/verify_plan_picker.js` | Plan picker regression test |
+| `reference-files/Vivek Bhaia_Quote.xlsx` | The client reference file the format is checked against |
+| `docs/docs_reference_quotation_format.md` | Excel format provenance, competitor data, open portal questions |
+| `docs/docs_mc_plan_type_capture.md` | How to capture ManipalCigna's Plan Type codes, and why it cannot be inferred |
+| `scripts/mc-tools/mc_decode_url.js` · `bin/decode_mc_url.bat` · `mc_captures.txt` | Offline decoder for captured ManipalCigna payloads |
+| `scripts/mc-tools/mc_capture_snippet.js` | Paste into Chrome's Console on the real ManipalCigna page to capture payloads without using the Network tab |
+| `docs/docs_mc_live_capture_findings.md` | What the live portal actually sends — field names, values, and what is still unverified |
+| `scripts/verify/verify_mc_plantype.js` · `verify_mc_ui.js` | ManipalCigna Plan Type regression tests |
+| `scripts/verify/verify_pdf_report.js` | Checks the PDF and the Excel agree, cell for cell, and that the logo reaches all three outputs |
+| `assets/logo.png` | The brand mark. `insurance_hub.html` carries a base64 copy; this is the source for regenerating it |
 | `.env` / `.env.example` | Credentials and configuration |
-| `archive_legacy.bat` | Moves superseded files to `_old\` |
+| `bin/archive_legacy.bat` | Moves superseded files to `_old\` |
 | `_backup_pre_tier*.zip` | Rollback points, one per tier |
 
-Kept on purpose despite being superseded: `server.js` (the only cheerio
-reference implementation), `quote_generator.html` (the only way to hand-enter a
-competitor premium), `mc_probe*.js` (the only documentation of ManipalCigna's
-API contract), `analyze_excel.py` (needed if `Vivek Bhaia_Quote.xlsx` resurfaces).
+Kept on purpose despite being superseded: `server/legacy/server.js` (the only
+cheerio reference implementation), `public/legacy/quote_generator.html` (the
+only way to hand-enter a competitor premium), `scripts/mc-tools/mc_probe*.js`
+(the only documentation of ManipalCigna's API contract), `analyze_excel.py`
+(needed if `Vivek Bhaia_Quote.xlsx` resurfaces).
 
 ---
 

@@ -41,7 +41,7 @@ default-width   H and P are an explicit 9 in the reference; ours inherit
 import sys, openpyxl
 from openpyxl.utils import get_column_letter as L
 
-REF_PATH = 'Vivek Bhaia_Quote.xlsx'
+REF_PATH = 'reference-files/Vivek Bhaia_Quote.xlsx'
 SHEET    = 'Four Member Quote'
 
 # Row bands of the reference family sheet, so a diff can be attributed.

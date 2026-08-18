@@ -4,8 +4,30 @@
 const express = require('express');
 const fetch   = require('node-fetch');
 const path    = require('path');
+const fs      = require('fs');
 const app     = express();
-const PORT    = 3005;
+const PORT    = Number(process.env.PORT) || 3005;
+
+// ── Public origins ────────────────────────────────────────────────────────
+// Every calculator page and the hub hardcode each other's origin (iframe src,
+// API base, postMessage allow-list) so they work with zero config on
+// localhost. In production these env vars swap in the real domain per
+// service; unset, everything defaults to today's exact localhost behaviour.
+const PUBLIC_ORIGIN_CARE = process.env.PUBLIC_ORIGIN_CARE || 'http://localhost:3005';
+const PUBLIC_ORIGIN_NIVA = process.env.PUBLIC_ORIGIN_NIVA || 'http://localhost:3002';
+const PUBLIC_ORIGIN_MC   = process.env.PUBLIC_ORIGIN_MC   || 'http://localhost:3003';
+const PUBLIC_ORIGIN_STAR = process.env.PUBLIC_ORIGIN_STAR || 'http://localhost:3004';
+const ORIGIN_SUBS = [
+  ['http://localhost:3002', PUBLIC_ORIGIN_NIVA],
+  ['http://localhost:3003', PUBLIC_ORIGIN_MC],
+  ['http://localhost:3004', PUBLIC_ORIGIN_STAR],
+  ['http://localhost:3005', PUBLIC_ORIGIN_CARE],
+];
+function sendTemplated(res, filePath) {
+  let html = fs.readFileSync(filePath, 'utf8');
+  for (const [from, to] of ORIGIN_SUBS) html = html.split(from).join(to);
+  res.type('html').send(html);
+}
 
 app.use(express.json({ limit: '10mb' }));
 
@@ -20,6 +42,7 @@ const LOCAL_ORIGINS = new Set([
   'http://localhost:3004','http://127.0.0.1:3004',
   'http://localhost:3005','http://127.0.0.1:3005',
 ]);
+[PUBLIC_ORIGIN_CARE, PUBLIC_ORIGIN_NIVA, PUBLIC_ORIGIN_MC, PUBLIC_ORIGIN_STAR].forEach(o => LOCAL_ORIGINS.add(o));
 function localCors(req, res, next) {
   const origin = req.headers.origin;
   if (origin && LOCAL_ORIGINS.has(origin)) {
@@ -362,7 +385,7 @@ app.get('/debug', async (req, res) => {
 // live-portal audit; where they disagreed, the measured portal won.
 const PLAN_CATALOGUE = (() => {
   try {
-    const raw = require('fs').readFileSync(require('path').join(__dirname, 'care_plans.json'), 'utf8');
+    const raw = require('fs').readFileSync(require('path').join(__dirname, '..', 'data', 'care_plans.json'), 'utf8');
     const parsed = JSON.parse(raw);
     if (!parsed.plans || !parsed.plans.length) throw new Error('no plans in file');
     console.log(`[Care] Loaded ${parsed.plans.length} plans from care_plans.json`);
@@ -1054,16 +1077,16 @@ app.get('/debug-fields/:id', async (req, res) => {
 });
 
 // ── Serve HTML ───────────────────────────────────────────────────────────────
-app.get('/',              (req, res) => res.sendFile(path.join(__dirname, 'care_index.html')));
+app.get('/',              (req, res) => sendTemplated(res, path.join(__dirname, '..', 'public', 'calculators', 'care_index.html')));
 // /unified served the 14 Jul hub. It is superseded by /hub, and its one
 // unique feature (the print view) now lives there. Once unified.html is
 // archived this redirects instead of 404-ing on an old bookmark.
 app.get('/unified', (req, res) => {
-  const legacy = path.join(__dirname, 'unified.html');
+  const legacy = path.join(__dirname, '..', 'public', 'hub', 'unified.html');
   if (require('fs').existsSync(legacy)) return res.sendFile(legacy);
   res.redirect('/hub');
 });
-app.get('/hub',           (req, res) => res.sendFile(path.join(__dirname, 'insurance_hub.html')));
+app.get('/hub',           (req, res) => sendTemplated(res, path.join(__dirname, '..', 'public', 'hub', 'insurance_hub.html')));
 
 // ═════════════════════════════════════════════════════════════════════════════
 //  QUOTATION STORE — history, and saving to a folder of the operator's choosing
@@ -1078,7 +1101,7 @@ app.get('/hub',           (req, res) => res.sendFile(path.join(__dirname, 'insur
 // does not re-price them.
 const fsp   = require('fs').promises;
 const fss   = require('fs');
-const QROOT = path.join(__dirname, 'quotations');
+const QROOT = path.join(__dirname, '..', 'quotations');
 const QINDEX = path.join(QROOT, 'index.json');
 const QCONF  = path.join(QROOT, 'config.json');
 
@@ -1220,7 +1243,7 @@ function authRequired(req, res, next){
   next();
 }
 
-app.get('/login', (req, res) => res.sendFile(path.join(__dirname, 'login.html')));
+app.get('/login', (req, res) => res.sendFile(path.join(__dirname, '..', 'public', 'hub', 'login.html')));
 
 // Does this install have accounts yet?
 app.get('/auth/status', async (req, res) => {
@@ -1501,9 +1524,9 @@ app.post('/save-destination', authRequired, async (req, res) => {
 // the fetch 404'd, FEATURE_DATA stayed null, and both the Excel and the PDF
 // silently dropped their Feature Comparison section — no error anywhere.
 app.get('/feature_comparison.json', (req, res) => {
-  const p = path.join(__dirname, 'feature_comparison.json');
+  const p = path.join(__dirname, '..', 'data', 'feature_comparison.json');
   if (!require('fs').existsSync(p))
-    return res.status(404).json({ error: 'feature_comparison.json not found beside care_server.js' });
+    return res.status(404).json({ error: 'feature_comparison.json not found in data/' });
   res.setHeader('Content-Type', 'application/json');
   res.sendFile(p);
 });
@@ -1541,16 +1564,21 @@ app.get('/jspdf.js', (req, res) => {
 });
 
 // ── Start ─────────────────────────────────────────────────────────────────────
-app.listen(PORT, '127.0.0.1', async () => {
-  console.log('\n╔══════════════════════════════════════════════╗');
-  console.log('║  Care Health Premium Calculator — Server    ║');
-  console.log('╚══════════════════════════════════════════════╝');
-  console.log(`\n  Local:    http://localhost:${PORT}`);
-  console.log(`  Debug:    http://localhost:${PORT}/debug`);
-  console.log(`  Proxy:    https://${CARE_HOST}/religare`);
-  console.log('\n  Open care_index.html in your browser to start.\n');
-  // Warm-up only: proves the upstream is reachable at boot. The session it
-  // returns is deliberately discarded — every request makes its own.
-  try   { await initSession(); console.log('[Care] Upstream reachable.'); }
-  catch (e) { console.warn('[Care] Startup check failed:', e.message, '— will retry on first request.'); }
-});
+// Guarded so this file can also be require()'d as a router (see
+// server/combined_server.js) without binding its own port.
+if (require.main === module) {
+  app.listen(PORT, '127.0.0.1', async () => {
+    console.log('\n╔══════════════════════════════════════════════╗');
+    console.log('║  Care Health Premium Calculator — Server    ║');
+    console.log('╚══════════════════════════════════════════════╝');
+    console.log(`\n  Local:    http://localhost:${PORT}`);
+    console.log(`  Debug:    http://localhost:${PORT}/debug`);
+    console.log(`  Proxy:    https://${CARE_HOST}/religare`);
+    console.log('\n  Open care_index.html in your browser to start.\n');
+    // Warm-up only: proves the upstream is reachable at boot. The session it
+    // returns is deliberately discarded — every request makes its own.
+    try   { await initSession(); console.log('[Care] Upstream reachable.'); }
+    catch (e) { console.warn('[Care] Startup check failed:', e.message, '— will retry on first request.'); }
+  });
+}
+module.exports = app;

@@ -14,7 +14,7 @@
 // ─────────────────────────────────────────────────────────────────────────────
 const fs = require('fs');
 const { JSDOM } = require('jsdom');
-const W = __dirname + '/';
+const W = __dirname + '/../../public/calculators/';
 
 const dom = new JSDOM(fs.readFileSync(W + 'sh_index.html', 'utf8'), {
   runScripts: 'dangerously', url: 'http://localhost:3004/', pretendToBeVisual: true,

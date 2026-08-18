@@ -13,6 +13,7 @@
 
 const express = require('express');
 const fetch   = require('node-fetch');
+const path    = require('path');
 
 /* ─────────────────────────────────────────────────────────
    Hardcoded Sum Insured options per plan (from live scan of all 48 plans).
@@ -103,7 +104,7 @@ const BROWSER_HEADERS = {
 
 app.use(cors());
 app.use(express.json());
-app.use(express.static(__dirname));
+app.use(express.static(path.join(__dirname, '..', '..', 'public', 'legacy')));
 
 /* ─────────────────────────────────────────────────────────
    Core helper: POST to calculate-premium, return text

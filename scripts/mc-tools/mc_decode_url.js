@@ -33,7 +33,7 @@ const fs     = require('fs');
 
 // ── .env loader — same zero-dependency one mc_server.js uses ────────────────
 (function loadEnv() {
-  for (const p of [path.join(__dirname, '.env'), path.join(__dirname, '..', '.env')]) {
+  for (const p of [path.join(__dirname, '.env'), path.join(__dirname, '..', '.env'), path.join(__dirname, '..', '..', '.env')]) {
     if (!fs.existsSync(p)) continue;
     for (const raw of fs.readFileSync(p, 'utf8').split(/\r?\n/)) {
       const line = raw.trim();

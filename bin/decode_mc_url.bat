@@ -10,19 +10,19 @@ REM    1. Put your captures in mc_captures.txt (one per line) and run this.
 REM    2. Run this with the file empty and paste a single value when asked.
 REM ===========================================================================
 
-cd /d "%~dp0"
+cd /d "%~dp0\.."
 
 REM Any line in mc_captures.txt that is not blank and not a comment?
 set FOUND=
-if exist "mc_captures.txt" (
-  for /f "usebackq tokens=* delims=" %%L in (`findstr /v /r /c:"^#" /c:"^$" "mc_captures.txt"`) do set FOUND=1
+if exist "scripts\mc-tools\mc_captures.txt" (
+  for /f "usebackq tokens=* delims=" %%L in (`findstr /v /r /c:"^#" /c:"^$" "scripts\mc-tools\mc_captures.txt"`) do set FOUND=1
 )
 
 if defined FOUND (
   echo.
-  echo   Reading captures from mc_captures.txt
+  echo   Reading captures from scripts\mc-tools\mc_captures.txt
   echo.
-  node mc_decode_url.js --file mc_captures.txt
+  node scripts\mc-tools\mc_decode_url.js --file scripts\mc-tools\mc_captures.txt
   echo.
   pause
   exit /b
@@ -45,6 +45,6 @@ if not defined VALUE (
 )
 
 echo.
-node mc_decode_url.js "%VALUE%"
+node scripts\mc-tools\mc_decode_url.js "%VALUE%"
 echo.
 pause

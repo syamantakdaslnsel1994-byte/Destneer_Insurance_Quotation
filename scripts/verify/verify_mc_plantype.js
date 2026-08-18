@@ -9,8 +9,10 @@
 // Exits 1 on failure. No jsdom needed.
 // ---------------------------------------------------------------------------
 const http = require('http');
+const path = require('path');
 const crypto = require('crypto');
 const { spawn } = require('child_process');
+const ROOT = path.join(__dirname, '..', '..');
 
 const KEY = Buffer.from('lv39eptlvuhaqqer', 'utf8');
 const dec = b64 => {
@@ -73,8 +75,8 @@ const MEMBERS_2A = [
   const upPort = upstream.address().port;
 
   // point the server's gateway at the fake one
-  const srv = spawn(process.execPath, ['mc_server.js'], {
-    cwd: __dirname,
+  const srv = spawn(process.execPath, [path.join(ROOT, 'server', 'mc_server.js')], {
+    cwd: ROOT,
     env: { ...process.env, PORT: '3993',
            MC_GATEWAY: `http://127.0.0.1:${upPort}`,
            MC_AUTH_TOKEN: 'dGVzdDp0ZXN0', MC_AES_KEY: 'lv39eptlvuhaqqer' },

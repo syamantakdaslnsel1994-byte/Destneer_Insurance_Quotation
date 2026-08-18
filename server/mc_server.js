@@ -86,6 +86,25 @@ function request(url, options = {}, body = null) {
 }
 
 const app = express();
+
+// ── Public origins ────────────────────────────────────────────────────────
+// See care_server.js for why this exists.
+const PUBLIC_ORIGIN_CARE = process.env.PUBLIC_ORIGIN_CARE || 'http://localhost:3005';
+const PUBLIC_ORIGIN_NIVA = process.env.PUBLIC_ORIGIN_NIVA || 'http://localhost:3002';
+const PUBLIC_ORIGIN_MC   = process.env.PUBLIC_ORIGIN_MC   || 'http://localhost:3003';
+const PUBLIC_ORIGIN_STAR = process.env.PUBLIC_ORIGIN_STAR || 'http://localhost:3004';
+const ORIGIN_SUBS = [
+  ['http://localhost:3002', PUBLIC_ORIGIN_NIVA],
+  ['http://localhost:3003', PUBLIC_ORIGIN_MC],
+  ['http://localhost:3004', PUBLIC_ORIGIN_STAR],
+  ['http://localhost:3005', PUBLIC_ORIGIN_CARE],
+];
+function sendTemplated(res, filePath) {
+  let html = fs.readFileSync(filePath, 'utf8');
+  for (const [from, to] of ORIGIN_SUBS) html = html.split(from).join(to);
+  res.type('html').send(html);
+}
+
 // ── Local-only access control ─────────────────────────────────────────────────
 // These servers proxy live insurer APIs with no authentication of their own.
 // Binding to 127.0.0.1 keeps them off the network, and the origin allow-list
@@ -96,6 +115,7 @@ const LOCAL_ORIGINS = new Set([
   'http://localhost:3004','http://127.0.0.1:3004',
   'http://localhost:3005','http://127.0.0.1:3005',
 ]);
+[PUBLIC_ORIGIN_CARE, PUBLIC_ORIGIN_NIVA, PUBLIC_ORIGIN_MC, PUBLIC_ORIGIN_STAR].forEach(o => LOCAL_ORIGINS.add(o));
 function localCors(req, res, next) {
   const origin = req.headers.origin;
   if (origin && LOCAL_ORIGINS.has(origin)) {
@@ -850,7 +870,7 @@ app.get('/', (req, res) => {
   if (fs.existsSync(legacy)) return res.sendFile(legacy);
   res.redirect('/multi');
 });
-app.get('/multi',   (req, res) => res.sendFile(path.join(__dirname, 'mc_multi.html')));
+app.get('/multi',   (req, res) => sendTemplated(res, path.join(__dirname, '..', 'public', 'calculators', 'mc_multi.html')));
 
 // ── GET /api/location/:pincode ────────────────────────────────────
 app.get('/api/location/:pincode', async (req, res) => {
@@ -1384,6 +1404,11 @@ app.get('/api/health', async (req, res) => {
 // Overridable so a second instance can be started against a stand-in gateway
 // for testing without disturbing the one on 3003. Defaults are unchanged.
 const PORT = Number(process.env.PORT) || 3003;
-app.listen(PORT, '127.0.0.1', () =>
-  console.log(`✅  ManipalCigna multi-plan calculator on http://localhost:${PORT}\n   Multi: http://localhost:${PORT}/multi\n   LT:    http://localhost:${PORT}/`)
-);
+// Guarded so this file can also be require()'d as a router (see
+// server/combined_server.js) without binding its own port.
+if (require.main === module) {
+  app.listen(PORT, '127.0.0.1', () =>
+    console.log(`✅  ManipalCigna multi-plan calculator on http://localhost:${PORT}\n   Multi: http://localhost:${PORT}/multi\n   LT:    http://localhost:${PORT}/`)
+  );
+}
+module.exports = app;

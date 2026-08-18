@@ -15,11 +15,11 @@
 //     npm prune
 // ---------------------------------------------------------------------------
 const fs=require('fs');const {JSDOM}=require('jsdom');
-const W=__dirname + '/';
-const feat=JSON.parse(fs.readFileSync(W+'feature_comparison.json','utf8'));
-const cat=JSON.parse(fs.readFileSync(W+'care_plans.json','utf8'));
+const ROOT=__dirname + '/../../';
+const feat=JSON.parse(fs.readFileSync(ROOT+'data/feature_comparison.json','utf8'));
+const cat=JSON.parse(fs.readFileSync(ROOT+'data/care_plans.json','utf8'));
 
-const dom=new JSDOM(fs.readFileSync(W+'insurance_hub.html','utf8'),{
+const dom=new JSDOM(fs.readFileSync(ROOT+'public/hub/insurance_hub.html','utf8'),{
   runScripts:'dangerously', url:'http://localhost:3005/hub', pretendToBeVisual:true,
   beforeParse(w){
     w.ExcelJS = require('exceljs');
@@ -154,7 +154,10 @@ setTimeout(async ()=>{
   await new Promise(r=>setTimeout(r,600));
   if(!written){ console.log('FAIL — no workbook produced'); process.exit(1); }
   const buf=Buffer.concat(written._parts.map(p=>Buffer.from(p)));
-  fs.writeFileSync(W+'_test_output.xlsx', buf);
+  // Written to the invoking cwd (repo root via npm), not this script's own
+  // folder — `npm run verify:excel` hands this filename to a separate Python
+  // process by bare name, resolved against that same cwd.
+  fs.writeFileSync(require('path').join(process.cwd(), '_test_output.xlsx'), buf);
   console.log('workbook written:', buf.length, 'bytes');
   process.exit(0);
 },900);

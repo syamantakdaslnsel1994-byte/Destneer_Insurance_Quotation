@@ -23,6 +23,9 @@ quotations/
 # care_audit_report.html is deliberately NOT ignored — it is the only
 # record of several portal fields the live code does not handle.
 
+# Python bytecode cache (verify_excel_format.py / analyze_excel.py)
+__pycache__/
+
 # Editor / OS noise
 .vscode/
 .idea/

@@ -292,13 +292,13 @@ def print_report(report):
 
 if __name__ == "__main__":
     import sys
-    filepath = sys.argv[1] if len(sys.argv) > 1 else r"Vivek Bhaia_Quote.xlsx"
+    filepath = sys.argv[1] if len(sys.argv) > 1 else r"reference-files/Vivek Bhaia_Quote.xlsx"
 
     print(f"Analyzing: {filepath}")
     report = analyze_file(filepath)
 
     # Save JSON report
-    json_out  = sys.argv[2] if len(sys.argv) > 2 else "excel_report.json"
+    json_out  = sys.argv[2] if len(sys.argv) > 2 else "data/fixtures/excel_report.json"
     with open(json_out, "w", encoding="utf-8") as f:
         json.dump(report, f, indent=2, default=str, ensure_ascii=False)
     print(f"\nJSON report saved to: {json_out}")

@@ -13,7 +13,7 @@
 // ---------------------------------------------------------------------------
 const fs = require('fs');
 const { JSDOM } = require('jsdom');
-const W = __dirname + '/';
+const W = __dirname + '/../../public/calculators/';
 
 let pass = 0, fail = 0;
 const ok = (n, c, extra) => { if (c) { pass++; console.log('  PASS  ' + n); }

@@ -265,6 +265,13 @@ select:disabled{background:#f5f5f5;color:#999}
 </div>
 
 <script>
+// Base path for this service's own API — same convention care_index.html /
+// mc_multi.html / sh_index.html already use. The server templates this exact
+// literal string in production (see niva_server.js's ORIGIN_SUBS); left
+// unsubstituted it's just this page's own origin, so standalone use is
+// unaffected.
+const API = 'http://localhost:3002';
+
 // ═══════════════════════════════════════════
 // DYNAMIC: rider.name → payload field
 // The 'name' field is consistent across ALL
@@ -358,7 +365,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 // ── Config ─────────────────────────────────
 async function loadConfig() {
   try {
-    const r = await fetch('/api/config');
+    const r = await fetch(API + '/api/config');
     const j = await r.json();
     cities = j.cities || [];
   } catch(e) { showError('Could not load city list.'); }
@@ -383,7 +390,7 @@ async function loadProducts(planType) {
   sel.innerHTML = '<option value="">Loading products...</option>';
   sel.disabled = true;
   try {
-    const r = await fetch(`/api/products/${planType}`);
+    const r = await fetch(`${API}/api/products/${planType}`);
     const j = await r.json();
     currentProducts = j.products || [];
     renderProductDropdown();
@@ -894,7 +901,7 @@ async function calculate() {
     let json = null;
     for (let attempt = 1; attempt <= 3; attempt++) {
       try {
-        const resp = await fetch('/api/premium', {
+        const resp = await fetch(API + '/api/premium', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload)

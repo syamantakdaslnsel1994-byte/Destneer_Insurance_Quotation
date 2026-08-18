@@ -15,9 +15,9 @@
 // stubbed, so nothing reaches a live insurer.
 // ---------------------------------------------------------------------------
 const fs=require('fs');const {JSDOM}=require('jsdom');
-const W=__dirname + '/';
-const cat=JSON.parse(fs.readFileSync(W+'care_plans.json','utf8'));
-const feat=JSON.parse(fs.readFileSync(W+'feature_comparison.json','utf8'));
+const ROOT=__dirname + '/../../';
+const cat=JSON.parse(fs.readFileSync(ROOT+'data/care_plans.json','utf8'));
+const feat=JSON.parse(fs.readFileSync(ROOT+'data/feature_comparison.json','utf8'));
 
 // Niva's /api/products/<category> response, shaped exactly as the live API
 // returns it: products carry their variant tier inside planSubCategory.
@@ -54,7 +54,7 @@ const nivaProducts = {
 // ManipalCigna's /api/plans response, read straight out of mc_server.js's
 // PLAN_CONFIG so this fixture cannot drift from the server it stands in for.
 const mcPlans = (function(){
-  const s = fs.readFileSync(W+'mc_server.js','utf8');
+  const s = fs.readFileSync(ROOT+'server/mc_server.js','utf8');
   const i = s.indexOf('const PLAN_CONFIG = {');
   const cfg = new Function('return ' + s.slice(s.indexOf('{', i), s.indexOf('\n};', i) + 2))();
   return { plans: Object.entries(cfg).map(([id,c]) => ({ id, name:c.name,
@@ -66,7 +66,7 @@ const mcPlans = (function(){
 // environment, not on `window`, so state has to be reached through w.eval.
 // Function declarations are on `window` and can be called directly.
 
-const dom=new JSDOM(fs.readFileSync(W+'insurance_hub.html','utf8'),{
+const dom=new JSDOM(fs.readFileSync(ROOT+'public/hub/insurance_hub.html','utf8'),{
   runScripts:'dangerously', url:'http://localhost:3005/hub', pretendToBeVisual:true,
   beforeParse(w){
     w.ExcelJS=require('exceljs');

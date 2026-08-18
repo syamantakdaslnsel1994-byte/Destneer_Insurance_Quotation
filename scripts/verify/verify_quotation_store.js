@@ -29,34 +29,39 @@ function ok(name, cond, extra) {
 
 // The store lives beside care_server.js, so the whole test runs in a copy of the
 // project folder — care_server.js is required, not spawned, so QROOT points at
-// __dirname and must not be the real one.
+// __dirname and must not be the real one. The copy mirrors care_server.js's
+// real layout (server/ + data/ + public/) since its own internal paths are
+// now relative to that structure, not flat.
 const WORK = fs.mkdtempSync(path.join(os.tmpdir(), 'qstore-'));
-const HERE = __dirname;
-for (const f of ['care_server.js', 'care_plans.json', 'feature_comparison.json',
-                 'care_index.html', 'insurance_hub.html']) {
-  if (fs.existsSync(path.join(HERE, f))) fs.copyFileSync(path.join(HERE, f), path.join(WORK, f));
+const ROOT = path.join(__dirname, '..', '..');
+for (const dir of ['server', 'data', path.join('public', 'calculators'), path.join('public', 'hub')]) {
+  fs.mkdirSync(path.join(WORK, dir), { recursive: true });
+}
+const COPIES = [
+  ['server/care_server.js',            'server/care_server.js'],
+  ['data/care_plans.json',             'data/care_plans.json'],
+  ['data/feature_comparison.json',     'data/feature_comparison.json'],
+  ['public/calculators/care_index.html', 'public/calculators/care_index.html'],
+  ['public/hub/insurance_hub.html',    'public/hub/insurance_hub.html'],
+];
+for (const [src, dst] of COPIES) {
+  const s = path.join(ROOT, src), d = path.join(WORK, dst);
+  if (fs.existsSync(s)) fs.copyFileSync(s, d);
 }
 // node_modules is resolved upward from the copy, so link it if it is not visible.
-if (!fs.existsSync(path.join(WORK, 'node_modules')) && fs.existsSync(path.join(HERE, 'node_modules'))) {
-  try { fs.symlinkSync(path.join(HERE, 'node_modules'), path.join(WORK, 'node_modules'), 'junction'); }
-  catch (e) { /* resolution from HERE will do */ }
+if (!fs.existsSync(path.join(WORK, 'node_modules')) && fs.existsSync(path.join(ROOT, 'node_modules'))) {
+  try { fs.symlinkSync(path.join(ROOT, 'node_modules'), path.join(WORK, 'node_modules'), 'junction'); }
+  catch (e) { /* resolution from ROOT will do */ }
 }
 
 const DEST = fs.mkdtempSync(path.join(os.tmpdir(), 'qdest-'));
 const QROOT = path.join(WORK, 'quotations');
 
-// Stop care_server from talking to the insurer or binding a port.
-process.env.CARE_NO_LISTEN = '1';
-
-let app;
-(function loadApp() {
-  const src = fs.readFileSync(path.join(WORK, 'care_server.js'), 'utf8')
-    // Neuter the listen call and the upstream warm-up; export the app instead.
-    .replace(/app\.listen\(PORT[\s\S]*$/, 'module.exports = app;\n');
-  const stub = path.join(WORK, '_care_server_undertest.js');
-  fs.writeFileSync(stub, src);
-  app = require(stub);
-})();
+// care_server.js guards its own app.listen() behind `require.main === module`
+// and unconditionally does `module.exports = app` — so requiring it (rather
+// than running it directly) already gets the app with no port bound and no
+// upstream warm-up attempted, with no source-text surgery needed.
+const app = require(path.join(WORK, 'server', 'care_server.js'));
 
 const server = http.createServer(app);
 
