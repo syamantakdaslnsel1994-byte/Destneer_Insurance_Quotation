@@ -18,6 +18,10 @@ const fs=require('fs');const {JSDOM}=require('jsdom');
 const ROOT=__dirname + '/../../';
 const feat=JSON.parse(fs.readFileSync(ROOT+'data/feature_comparison.json','utf8'));
 const cat=JSON.parse(fs.readFileSync(ROOT+'data/care_plans.json','utf8'));
+const careLive=JSON.parse(fs.readFileSync(ROOT+'data/care_features_mapped.json','utf8'));
+const nivaLive=JSON.parse(fs.readFileSync(ROOT+'data/niva_features_mapped.json','utf8'));
+const mcLive=JSON.parse(fs.readFileSync(ROOT+'data/mc_features_mapped.json','utf8'));
+const starLive=JSON.parse(fs.readFileSync(ROOT+'data/star_features_mapped.json','utf8'));
 
 const dom=new JSDOM(fs.readFileSync(ROOT+'public/hub/insurance_hub.html','utf8'),{
   runScripts:'dangerously', url:'http://localhost:3005/hub', pretendToBeVisual:true,
@@ -27,6 +31,10 @@ const dom=new JSDOM(fs.readFileSync(ROOT+'public/hub/insurance_hub.html','utf8')
     w.fetch = (u)=>{
       const s=String(u);
       if(s.includes('feature_comparison.json')) return Promise.resolve({ok:true,json:()=>Promise.resolve(feat)});
+      if(s.includes('care_features_mapped.json')) return Promise.resolve({ok:true,json:()=>Promise.resolve(careLive)});
+      if(s.includes('niva_features_mapped.json')) return Promise.resolve({ok:true,json:()=>Promise.resolve(nivaLive)});
+      if(s.includes('mc_features_mapped.json'))    return Promise.resolve({ok:true,json:()=>Promise.resolve(mcLive)});
+      if(s.includes('star_features_mapped.json'))  return Promise.resolve({ok:true,json:()=>Promise.resolve(starLive)});
       if(s.includes('/plans')) return Promise.resolve({ok:true,json:()=>Promise.resolve(cat)});
       return Promise.reject(new Error('offline'));
     };

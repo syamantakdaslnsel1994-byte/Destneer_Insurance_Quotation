@@ -1,0 +1,197 @@
+{
+  "_comment": "Built from data/mc_features_live.json — see scripts/build_mc_feature_mapping.js. Keyed by tier (e.g. \"lifetime-india\", \"prohealth-prime-protect\"). Sarvah has no public product page and is not covered.",
+  "_builtAt": "2026-08-27T08:22:19.074Z",
+  "_mappedCount": 9,
+  "_avgRowsFoundPerMappedPlan": 10.222222222222221,
+  "plans": {
+    "lifetime-india": {
+      "tierKey": "lifetime-india",
+      "rows": {
+        "Room Rent": "Available",
+        "Pre hospitalization": "Available",
+        "Post Hospitalisation": "Available",
+        "AYUSH Cover": "Available",
+        "Day Care Treatments": "Available",
+        "Domiciliary": "Available",
+        "Ambulance Cover": "Covered up to Sum Insured",
+        "Organ Donor Cover": "Available",
+        "Annual Health Check-Up": "Available",
+        "Recharge Of Sum Insured": "Multiple Restorations of base Sum Insured in a policy year for unrelated illnesses",
+        "Modern Treatments": "Available",
+        "Co-pay": null,
+        "ICU Charges": null,
+        "Zone wise Co-pay": null,
+        "Waiting Period for PED": "24 Months",
+        "Add ons": "Lump sum payment of Sum Insured, upon diagnosis of a Critical Illness available through ManipalCigna ...Read More"
+      }
+    },
+    "lifetime-global": {
+      "tierKey": "lifetime-global",
+      "rows": {
+        "Room Rent": "Available",
+        "Pre hospitalization": "Available",
+        "Post Hospitalisation": "Available",
+        "AYUSH Cover": "Available",
+        "Day Care Treatments": "Available",
+        "Domiciliary": "Available",
+        "Ambulance Cover": "Covered up to Sum Insured",
+        "Organ Donor Cover": "Available",
+        "Annual Health Check-Up": "Available",
+        "Recharge Of Sum Insured": "Multiple Restorations of base Sum Insured in a policy year for unrelated illnesses",
+        "Modern Treatments": "Available",
+        "Co-pay": null,
+        "ICU Charges": null,
+        "Zone wise Co-pay": null,
+        "Waiting Period for PED": "24 Months",
+        "Add ons": "Lump sum payment of Sum Insured, upon diagnosis of a Critical Illness available through ManipalCigna ...Read More"
+      }
+    },
+    "prohealth-prime-protect": {
+      "tierKey": "prohealth-prime-protect",
+      "rows": {
+        "Room Rent": "Single Private AC Room ICU: Up to SI",
+        "Pre hospitalization": "60 days; Up to SI",
+        "Post Hospitalisation": "180 days; Up to SI",
+        "AYUSH Cover": "Up to SI",
+        "Day Care Treatments": "Up to SI",
+        "Domiciliary": "10% of SI",
+        "Ambulance Cover": "Up to SI",
+        "Organ Donor Cover": "Covered up to the Sum Insured • Pre & Post Hospitalization expenses (Up to 30 days each) of the donor. • Cost towards donor screening once in a Policy year for successful transplant. • Complications arising during hospitalization or up to 30 days from date of discharge - Covered up to 25% of SI subject to maximum of ₹2 Lacs, Over and above SI. We will not cover expenses towards the Donor in respect of cost associated to the acquisition of the organ.",
+        "Annual Health Check-Up": "Annually from 1st year onwards, for all adults insured. Limits / Test basis opted SI, offered through Network only.",
+        "Recharge Of Sum Insured": "Unlimited times for related/unrelated illnesses",
+        "Modern Treatments": null,
+        "Co-pay": null,
+        "ICU Charges": null,
+        "Zone wise Co-pay": null,
+        "Waiting Period for PED": "Up to SI ₹ 5Lacs - 36 months For SI >= ₹ 7.5Lacs - 24 months",
+        "Add ons": "Infertility treatment limited to IUI and/or IVF - Coverage up to ₹ 2.5Lacs, over and above the Maternity limit - Waiting period of 36 months"
+      }
+    },
+    "prohealth-prime-advantage": {
+      "tierKey": "prohealth-prime-advantage",
+      "rows": {
+        "Room Rent": "Single Private AC Room ICU: Up to SI",
+        "Pre hospitalization": "60 days; Up to SI",
+        "Post Hospitalisation": "180 days; Up to SI",
+        "AYUSH Cover": "Up to SI",
+        "Day Care Treatments": "Up to SI",
+        "Domiciliary": "10% of SI",
+        "Ambulance Cover": "Up to SI",
+        "Organ Donor Cover": "Covered up to the Sum Insured • Pre & Post Hospitalization expenses (Up to 30 days each) of the donor. • Cost towards donor screening once in a Policy year for successful transplant. • Complications arising during hospitalization or up to 30 days from date of discharge - Covered up to 25% of SI subject to maximum of ₹2 Lacs, Over and above SI. We will not cover expenses towards the Donor in respect of cost associated to the acquisition of the organ.",
+        "Annual Health Check-Up": "Annually from 1st year onwards, for all adults insured. Limits / Test basis opted SI, offered through Network only.",
+        "Recharge Of Sum Insured": "Unlimited times for related/unrelated illnesses",
+        "Modern Treatments": null,
+        "Co-pay": null,
+        "ICU Charges": null,
+        "Zone wise Co-pay": null,
+        "Waiting Period for PED": "Up to SI ₹ 5Lacs - 36 months For SI >= ₹ 7.5Lacs - 24 months",
+        "Add ons": "Infertility treatment limited to IUI and/or IVF - Coverage up to ₹ 2.5Lacs, over and above the Maternity limit - Waiting period of 36 months"
+      }
+    },
+    "prohealth-prime-active": {
+      "tierKey": "prohealth-prime-active",
+      "rows": {
+        "Room Rent": "SI =₹ 3Lacs: 1% of Base SI SI>=₹ 5Lacs: Single Private AC Room ICU: Up to SI",
+        "Pre hospitalization": "30 days; Up to SI",
+        "Post Hospitalisation": "60 days; Up to SI",
+        "AYUSH Cover": "Up to SI",
+        "Day Care Treatments": "Up to SI",
+        "Domiciliary": "10% of SI",
+        "Ambulance Cover": "Up to SI",
+        "Organ Donor Cover": "Up to SI",
+        "Annual Health Check-Up": "Available only if Wellness Program is removed from the base plan. Applicable once every 3rd policy year. Available as optional cover.",
+        "Recharge Of Sum Insured": "Unlimited times for unrelated illnesses",
+        "Modern Treatments": null,
+        "Co-pay": null,
+        "ICU Charges": null,
+        "Zone wise Co-pay": null,
+        "Waiting Period for PED": "90 days for Asthma, Diabetes, Hypertension, Dyslipidaemia, Obesity related conditions For all other conditions - 24 months",
+        "Add ons": null
+      }
+    },
+    "super-top-up-plus": {
+      "tierKey": "super-top-up-plus",
+      "rows": {
+        "Room Rent": "Covers Hospital expenses for admission longer than 24 hours.",
+        "Pre hospitalization": "Pre & Post Hospitalization of 60 And 90 days respectively",
+        "Post Hospitalisation": null,
+        "AYUSH Cover": "Up to Sum Insured",
+        "Day Care Treatments": "Covered up to limit of Sum Insured opted",
+        "Domiciliary": null,
+        "Ambulance Cover": "Actual expenses incurred paid per hospitalization event",
+        "Organ Donor Cover": "Up to Sum Insured",
+        "Annual Health Check-Up": null,
+        "Recharge Of Sum Insured": "A guaranteed 5% increase in Sum insured per policy year, maximum up to 50% of Sum Insured",
+        "Modern Treatments": null,
+        "Co-pay": null,
+        "ICU Charges": null,
+        "Zone wise Co-pay": null,
+        "Waiting Period for PED": null,
+        "Add ons": null
+      }
+    },
+    "super-top-up-select": {
+      "tierKey": "super-top-up-select",
+      "rows": {
+        "Room Rent": "Covers Hospital expenses for admission longer than 24 hours.",
+        "Pre hospitalization": "Pre & Post Hospitalization of 60 And 90 days respectively",
+        "Post Hospitalisation": null,
+        "AYUSH Cover": "Up to Sum Insured",
+        "Day Care Treatments": "Covered up to limit of Sum Insured opted",
+        "Domiciliary": null,
+        "Ambulance Cover": "Actual expenses incurred paid per hospitalization event",
+        "Organ Donor Cover": "Up to Sum Insured",
+        "Annual Health Check-Up": null,
+        "Recharge Of Sum Insured": "A guaranteed 5% increase in Sum insured per policy year, maximum up to 50% of Sum Insured",
+        "Modern Treatments": null,
+        "Co-pay": null,
+        "ICU Charges": null,
+        "Zone wise Co-pay": null,
+        "Waiting Period for PED": null,
+        "Add ons": null
+      }
+    },
+    "prime-senior-classic": {
+      "tierKey": "prime-senior-classic",
+      "rows": {
+        "Room Rent": "Single Private Room covered up to Sum Insured (With an option to select any room caterogy)",
+        "Pre hospitalization": "Expenses covered up to 30 and 60 days respectively",
+        "Post Hospitalisation": null,
+        "AYUSH Cover": "Covered up to Sum Insured",
+        "Day Care Treatments": null,
+        "Domiciliary": "Covered up to Sum Insured",
+        "Ambulance Cover": "Covered up to Sum Insured",
+        "Organ Donor Cover": null,
+        "Annual Health Check-Up": "Available every claim free policy year",
+        "Recharge Of Sum Insured": "Guaranteed Cumulative Bonus of 10% of Sum Insured every year, maximum up to 100% of Sum Insured",
+        "Modern Treatments": null,
+        "Co-pay": "20% co-pay applicable per claim, with an option to modify the co-pay to 0%, 10% or 30%",
+        "ICU Charges": null,
+        "Zone wise Co-pay": null,
+        "Waiting Period for PED": null,
+        "Add ons": null
+      }
+    },
+    "prime-senior-elite": {
+      "tierKey": "prime-senior-elite",
+      "rows": {
+        "Room Rent": "Single Private Room covered up to Sum Insured (With an option to select any room caterogy)",
+        "Pre hospitalization": "Expenses covered up to 30 and 60 days respectively",
+        "Post Hospitalisation": null,
+        "AYUSH Cover": "Covered up to Sum Insured",
+        "Day Care Treatments": null,
+        "Domiciliary": "Covered up to Sum Insured",
+        "Ambulance Cover": "Covered up to Sum Insured",
+        "Organ Donor Cover": "Covers complications arising during hospitalization of donor up to 25% of Sum Insured",
+        "Annual Health Check-Up": "Available every claim free policy year",
+        "Recharge Of Sum Insured": "Guaranteed Cumulative Bonus of 10% of Sum Insured every year, maximum up to 100% of Sum Insured",
+        "Modern Treatments": null,
+        "Co-pay": "20% co-pay applicable per claim, with an option to modify the co-pay to 0%, 10% or 30%",
+        "ICU Charges": null,
+        "Zone wise Co-pay": null,
+        "Waiting Period for PED": null,
+        "Add ons": null
+      }
+    }
+  }
+}

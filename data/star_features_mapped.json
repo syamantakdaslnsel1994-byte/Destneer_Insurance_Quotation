@@ -1,0 +1,470 @@
+{
+  "_comment": "Built from data/star_features_live.json — see scripts/build_star_feature_mapping.js. Keyed by product slug (matches starhealth.in/health-insurance/<slug>/).",
+  "_builtAt": "2026-08-27T09:04:03.431Z",
+  "_mappedCount": 22,
+  "_avgRowsFoundPerMappedPlan": 7.7727272727272725,
+  "plans": {
+    "arogya-sanjeevani": {
+      "slug": "arogya-sanjeevani",
+      "rows": {
+        "Room Rent": "Hospitalisation expenses incurred for a period of more than 24 hours on account of illness, injury or accidents are covered.",
+        "Pre hospitalization": "In addition to in-patient hospitalisation, the medical expenses incurred up to 30 days before the date of admission to the hospital are also covered.",
+        "Post Hospitalisation": "Post-hospitalisation medical expenses up to 60 days from the date of discharge are covered.",
+        "AYUSH Cover": "Expenses incurred for the treatment under Ayurveda, Yoga and Naturopathy, Unani, Siddha and Homeopathy systems of medicines in AYUSH hospitals are covered up to the limits of the Sum Insured.",
+        "Day Care Treatments": "Medical treatments and surgical procedures that require less than 24 hours of hospitalisation due to technological advancements are covered.",
+        "Domiciliary": null,
+        "Ambulance Cover": "Ambulance charges are covered up to Rs. 2000/- per hospitalisation.",
+        "Organ Donor Cover": null,
+        "Annual Health Check-Up": null,
+        "Recharge Of Sum Insured": null,
+        "Modern Treatments": null,
+        "Co-pay": "Each and every claim under the Policy shall be subject to a Copayment of 5% applicable to claim amount admissible and payable as per the terms and conditions of the Policy.",
+        "ICU Charges": "ICU charges up to 5% of the Sum Insured are covered subject to the maximum of Rs. 10,000/- per day.",
+        "Zone wise Co-pay": null,
+        "Waiting Period for PED": null,
+        "Add ons": null
+      }
+    },
+    "autism-care": {
+      "slug": "autism-care",
+      "rows": {
+        "Room Rent": "Hospitalisation expenses incurred for a period of more than 24 hours are covered.",
+        "Pre hospitalization": null,
+        "Post Hospitalisation": "Post-hospitalisation medical expenses incurred up to 60 days from the date of discharge from the hospital are covered up to 7% of the hospitalisation expenses or actuals.",
+        "AYUSH Cover": "Medical expenses for Inpatient Hospitalization incurred on treatment under Ayurveda, Unani, Sidha and Homeopathy systems of medicines in a AYUSH Hospital is payable up to the sum insured.",
+        "Day Care Treatments": "Medical treatments and surgical procedures that require less than 24 hours of hospitalisation due to technological advancements are covered.",
+        "Domiciliary": null,
+        "Ambulance Cover": null,
+        "Organ Donor Cover": null,
+        "Annual Health Check-Up": null,
+        "Recharge Of Sum Insured": null,
+        "Modern Treatments": "Expenses incurred for Modern treatments such as Robotic Surgeries, Oral Chemotherapy, etc., are payable to the extent of the limits mentioned in the policy clause.",
+        "Co-pay": "This policy is subjected to co-payment of 20% of each and every claim amount for fresh as well as renewal policies.",
+        "ICU Charges": null,
+        "Zone wise Co-pay": null,
+        "Waiting Period for PED": null,
+        "Add ons": null
+      }
+    },
+    "cancer-care-platinum": {
+      "slug": "cancer-care-platinum",
+      "rows": {
+        "Room Rent": "Hospitalisation expenses incurred for a period of more than 24 hours on account of illness, injury or accidents are covered.",
+        "Pre hospitalization": "In addition to in-patient hospitalisation, the medical expenses incurred up to 30 days before the date of admission to the hospital are also covered.",
+        "Post Hospitalisation": "Post-hospitalisation medical expenses up to 60 days from the date of discharge from the hospital are covered up to 2% of the basic Sum Insured per hospitalisation.",
+        "AYUSH Cover": "Medical expenses for Inpatient Hospitalization incurred on treatment under Ayurveda, Unani, Sidha and Homeopathy systems of medicines in a AYUSH Hospital is payable up to the sum insured",
+        "Day Care Treatments": "Medical treatments and surgical procedures that require less than 24 hours of hospitalisation due to technological advancements are covered.",
+        "Domiciliary": null,
+        "Ambulance Cover": "Ambulance charges incurred for transporting the insured person to the hospital are covered by private ambulance services are covered.",
+        "Organ Donor Cover": null,
+        "Annual Health Check-Up": "Expenses incurred for health check-up are covered up to Rs. 2500/- for every claim-free year.",
+        "Recharge Of Sum Insured": null,
+        "Modern Treatments": "Modern treatment expenses are covered up to the limits mentioned in the policy clause.",
+        "Co-pay": "If the insured person purchases or renews the policy at 61 years of age or above, then he/she is subjected to the co-payment of 10% for each and every claim amount.",
+        "ICU Charges": "ICU charges at actuals are covered under this policy.",
+        "Zone wise Co-pay": null,
+        "Waiting Period for PED": null,
+        "Add ons": "A Lump sum amount is provided for the recurrence of cancer, metastasis, and/or a second malignancy unrelated to the first cancer. This benefit is provided in addition to the Sum Insured of Indemnity cover under Section I. The Sum Insured under this Section is 50% of the Section I Sum Insured."
+      }
+    },
+    "cardiac-care": {
+      "slug": "cardiac-care",
+      "rows": {
+        "Room Rent": "Hospitalisation expenses incurred for a period of more than 24 hours on account of illness, injury or accidents are covered.",
+        "Pre hospitalization": "In addition to in-patient hospitalisation, the medical expenses incurred up to 30 days before the date of admission to the hospital are also covered.",
+        "Post Hospitalisation": "Post-hospitalisation medical expenses incurred up to 60 days from the date of discharge from the hospital are covered up to 7% of the hospitalisation expenses subject to the maximum of Rs. 5000/- per hospitalisation.",
+        "AYUSH Cover": "Medical expenses for Inpatient Hospitalization incurred on treatment under Ayurveda, Unani, Sidha and Homeopathy systems of medicines in a AYUSH Hospital is payable up to the sum insured.",
+        "Day Care Treatments": "Medical treatments and surgical procedures that require less than 24 hours of hospitalisation due to technological advancements are covered.",
+        "Domiciliary": null,
+        "Ambulance Cover": "Ambulance charges are covered up to Rs. 750/- per hospitalisation and Rs. 1500/- per policy period for transportation of the insured person to the hospital by private ambulance service.",
+        "Organ Donor Cover": null,
+        "Annual Health Check-Up": null,
+        "Recharge Of Sum Insured": null,
+        "Modern Treatments": "Expenses incurred for modern treatments such as Oral Chemotherapy, Intra Vitreal injections, Robotic Surgeries, etc. are covered up to the limits mentioned in the policy clause.",
+        "Co-pay": "If the insured person purchases or renews the policy at 61 years of age or above, then he/she is subjected to the co-payment of 10% for each and every claim amount.",
+        "ICU Charges": null,
+        "Zone wise Co-pay": null,
+        "Waiting Period for PED": null,
+        "Add ons": null
+      }
+    },
+    "cardiac-care-platinum": {
+      "slug": "cardiac-care-platinum",
+      "rows": {
+        "Room Rent": "Hospitalisation expenses incurred for a period of more than 24 hours on account of illness, injury or accidents are covered.",
+        "Pre hospitalization": "In addition to in-patient hospitalisation, the medical expenses incurred up to 30 days before the date of admission to the hospital are also covered.",
+        "Post Hospitalisation": "Post-hospitalisation medical expenses up to 60 days from the date of discharge from the hospital are covered.",
+        "AYUSH Cover": "Medical expenses for Inpatient Hospitalization incurred on treatment under Ayurveda, Unani, Sidha and Homeopathy systems of medicines in a AYUSH Hospital is payable up to the sum insured.",
+        "Day Care Treatments": "Medical treatments and surgical procedures that require less than 24 hours of hospitalisation due to technological advancements are covered.",
+        "Domiciliary": null,
+        "Ambulance Cover": "Ambulance charges incurred for transporting the insured person to the hospital are covered by private ambulance services are covered.",
+        "Organ Donor Cover": null,
+        "Annual Health Check-Up": "After completing each policy year, health check-up expenses are covered up to the specified limits irrespective of the claim.",
+        "Recharge Of Sum Insured": null,
+        "Modern Treatments": "Expenses incurred for modern treatments such as Oral Chemotherapy, Intra Vitreal injections, Robotic Surgeries, etc. are covered up to the limits mentioned in the policy clause.",
+        "Co-pay": null,
+        "ICU Charges": null,
+        "Zone wise Co-pay": null,
+        "Waiting Period for PED": null,
+        "Add ons": null
+      }
+    },
+    "critical-illness-insurance": {
+      "slug": "critical-illness-insurance",
+      "rows": {
+        "Room Rent": null,
+        "Pre hospitalization": null,
+        "Post Hospitalisation": null,
+        "AYUSH Cover": null,
+        "Day Care Treatments": null,
+        "Domiciliary": null,
+        "Ambulance Cover": null,
+        "Organ Donor Cover": null,
+        "Annual Health Check-Up": null,
+        "Recharge Of Sum Insured": null,
+        "Modern Treatments": null,
+        "Co-pay": null,
+        "ICU Charges": null,
+        "Zone wise Co-pay": null,
+        "Waiting Period for PED": null,
+        "Add ons": null
+      }
+    },
+    "diabetes-health-insurance": {
+      "slug": "diabetes-health-insurance",
+      "rows": {
+        "Room Rent": "Hospitalisation expenses incurred for a period of more than 24 hours on account of illness, injury or accidents are covered.",
+        "Pre hospitalization": "In addition to in-patient hospitalisation, the medical expenses incurred up to 30 days before the date of admission to the hospital are also covered.",
+        "Post Hospitalisation": "Post-hospitalisation medical expenses up to 60 days from the date of discharge from the hospital are covered as per the limits mentioned in the policy clause.",
+        "AYUSH Cover": "Medical expenses for Inpatient Hospitalization incurred on treatment under Ayurveda, Unani, Sidha and Homeopathy systems of medicines in a AYUSH Hospital is payable up to the sum insured.",
+        "Day Care Treatments": "Medical treatments and surgical procedures that require less than 24 hours of hospitalisation due to technological advancements are covered.",
+        "Domiciliary": null,
+        "Ambulance Cover": null,
+        "Organ Donor Cover": null,
+        "Annual Health Check-Up": null,
+        "Recharge Of Sum Insured": null,
+        "Modern Treatments": "Expenses incurred for modern treatments such as Balloon Sinuplasty, Intra Vitreal injections, Robotic Surgeries, etc. are covered up to the limits mentioned in the policy clause.",
+        "Co-pay": null,
+        "ICU Charges": "ICU charges at actuals are covered under this policy.",
+        "Zone wise Co-pay": null,
+        "Waiting Period for PED": null,
+        "Add ons": null
+      }
+    },
+    "extra-protect": {
+      "slug": "extra-protect",
+      "rows": {
+        "Room Rent": "This cover enhances the room, boarding and nursing expenses as per the limits mentioned in the policy clause.",
+        "Pre hospitalization": null,
+        "Post Hospitalisation": null,
+        "AYUSH Cover": "The in-patient hospitalisation expenses incurred for the treatment under Ayurveda, Unani, Siddha and Homeopathy systems of medicines in AYUSH hospitals are covered up to the Sum Insured of the base policy.",
+        "Day Care Treatments": null,
+        "Domiciliary": null,
+        "Ambulance Cover": null,
+        "Organ Donor Cover": null,
+        "Annual Health Check-Up": null,
+        "Recharge Of Sum Insured": null,
+        "Modern Treatments": "If the modern treatments that are listed in the policy clause are covered in the base policy, then such treatments are covered up to the Sum Insured of the basic policy.",
+        "Co-pay": null,
+        "ICU Charges": null,
+        "Zone wise Co-pay": null,
+        "Waiting Period for PED": null,
+        "Add ons": null
+      }
+    },
+    "family-health-optima": {
+      "slug": "family-health-optima",
+      "rows": {
+        "Room Rent": "Hospitalisation expenses incurred for a period of more than 24 hours on account of illness, injury or accidents are covered.",
+        "Pre hospitalization": "In addition to in-patient hospitalisation, the medical expenses incurred up to 60 days before the date of admission to the hospital are also covered.",
+        "Post Hospitalisation": "Post-hospitalisation medical expenses up to 90 days from the date of discharge from the hospital are covered.",
+        "AYUSH Cover": "Expenses incurred for the treatment under Ayurveda, Unani, Siddha and Homeopathy systems of medicines in AYUSH hospitals are covered upto the Sum Insured.",
+        "Day Care Treatments": "Medical treatments and surgical procedures that require less than 24 hours of hospitalisation due to technological advancements are covered.",
+        "Domiciliary": "Expenses incurred for domiciliary hospitalisation, including AYUSH on the advice of a medical practitioner for a period exceeding three days are covered.",
+        "Ambulance Cover": "Ambulance charges for the transportation of insured person by private ambulance are covered up to Rs. 750/- per hospitalisation and Rs. 1500/- per policy period.",
+        "Organ Donor Cover": "Expenses incurred for organ transplantation are covered up to a limit of 10% of the Sum Insured subject to the maximum of Rs. 1,00,000/- whichever is less.",
+        "Annual Health Check-Up": "We will arrange for a Preventive Health Check-up at Our Network Providers for the applicable package as per opted Sum Insured. For the updated and applicable list of tests available under such package,Insured Persons are required to check our website www.starhealth.in.",
+        "Recharge Of Sum Insured": "Upon exhaustion of the limit of coverage during the policy period, 100% of the Sum Insured will be restored 3 times in the same policy year.",
+        "Modern Treatments": "Modern treatment expenses are payable up to the limits mentioned in the policy clause.",
+        "Co-pay": "This policy is subjected to co-payment of 20% of each and every claim amount for fresh as well as renewal policies for insured persons whose age at the time of entry is 61 year and above.",
+        "ICU Charges": null,
+        "Zone wise Co-pay": null,
+        "Waiting Period for PED": null,
+        "Add ons": null
+      }
+    },
+    "health-gain": {
+      "slug": "health-gain",
+      "rows": {
+        "Room Rent": "Hospitalisation expenses incurred for a period of more than 24 hours on account of illness, injury or accidents are covered.",
+        "Pre hospitalization": "In addition to in-patient hospitalisation, the medical expenses incurred up to 30 days before the date of admission to the hospital are also covered.",
+        "Post Hospitalisation": "Post-hospitalisation medical expenses up to 60 days from the date of discharge from the hospital are covered.",
+        "AYUSH Cover": "Medical expenses for Inpatient Hospitalization incurred on treatment under Ayurveda, Unani, Sidha and Homeopathy systems of medicines in a AYUSH Hospital is payable up to the sum insured.",
+        "Day Care Treatments": "Medical treatments and surgical procedures that require less than 24 hours of hospitalisation due to technological advancements are covered.",
+        "Domiciliary": null,
+        "Ambulance Cover": "Ambulance charges are covered up to Rs. 750/- per hospitalisation and Rs. 1500/- per policy period for transportation of the insured person to the hospital by private ambulance service.",
+        "Organ Donor Cover": null,
+        "Annual Health Check-Up": null,
+        "Recharge Of Sum Insured": null,
+        "Modern Treatments": "Expenses incurred for modern treatments such as Oral Chemotherapy, Intra Vitreal injections, Robotic Surgeries, etc. are covered up to the limits mentioned in the policy clause.",
+        "Co-pay": "This policy is subjected to a Co-payment of 20% of each and every admissible claim amount, for fresh as well as for the policies subsequently renewed for insured persons whose age at the time of entry into this policy is 61 years and above.",
+        "ICU Charges": null,
+        "Zone wise Co-pay": null,
+        "Waiting Period for PED": null,
+        "Add ons": null
+      }
+    },
+    "health-premier": {
+      "slug": "health-premier",
+      "rows": {
+        "Room Rent": "Hospitalisation expenses incurred for a period of more than 24 hours on account of illness, injury or accidents are covered.",
+        "Pre hospitalization": "In addition to in-patient hospitalisation, the medical expenses incurred up to 60 days before the date of admission to the hospital are also covered.",
+        "Post Hospitalisation": "Post-hospitalisation medical expenses incurred up to 90 days from the date of discharge from the hospital are covered.",
+        "AYUSH Cover": "In-patient hospitalisation expenses incurred for the treatment under Ayurveda, Unani, Sidha and Homeopathy systems of medicines in AYUSH hospitals are covered up to the Sum Insured.",
+        "Day Care Treatments": "Medical treatments and surgical procedures that require less than 24 hours of hospitalisation due to technological advancements are covered.",
+        "Domiciliary": "Expenses incurred for domiciliary hospitalisation, including AYUSH on the advice of a medical practitioner for a period exceeding three days are covered.",
+        "Ambulance Cover": "This policy covers ambulance charges for admission in hospital, for shifting from one hospitals to another for better medical treatment and from hospital to residence.",
+        "Organ Donor Cover": "In-patient hospitalization expenses incurred for organ transplantation from the Donor to the recipient insured person are payable provided the claim for transplantation is payable. In addition, the expenses incurred by the Donor, (if any) for the complications that necessitate a Redo Surgery / ICU admission will be covered.",
+        "Annual Health Check-Up": "Health check-up expenses are covered up to the specified limits for every claim-free year.",
+        "Recharge Of Sum Insured": null,
+        "Modern Treatments": "Expenses incurred for modern treatments such as Oral Chemotherapy, Intra Vitreal injections, Robotic Surgeries, etc. are covered up to 50% of the Sum Insured specified in the policy schedule.",
+        "Co-pay": "Applicable for Insured persons whose age at the time of entry is above 65 years. Each and every claim under the Policy shall be subject to a Co-payment of 20% applicable to claim amount admissible and payable as per the terms and conditions of the Policy.",
+        "ICU Charges": null,
+        "Zone wise Co-pay": null,
+        "Waiting Period for PED": null,
+        "Add ons": null
+      }
+    },
+    "mediclassic": {
+      "slug": "mediclassic",
+      "rows": {
+        "Room Rent": "Hospitalisation expenses incurred for a period of more than 24 hours on account of illness, injury or accidents are covered.",
+        "Pre hospitalization": "In addition to in-patient hospitalisation, the medical expenses incurred up to 30 days before the date of admission to the hospital are also covered.",
+        "Post Hospitalisation": "Post-hospitalisation medical expenses up to 60 days from the date of discharge are covered as per the limits mentioned in the policy clause.",
+        "AYUSH Cover": "Medical expenses for Inpatient Hospitalization incurred on treatment under Ayurveda, Unani, Siddha and Homeopathy systems of medicines in a AYUSH Hospital is payable up to the Basic Sum Insured.",
+        "Day Care Treatments": "Medical treatments and surgical procedures that require less than 24 hours of hospitalisation due to technological advancements are covered.",
+        "Domiciliary": "Expenses incurred for domiciliary hospitalisation, including AYUSH on the advice of a medical practitioner for a period exceeding three days are covered.",
+        "Ambulance Cover": "Ambulance charges up to Rs. 750/- per hospitalisation and over all limit of Rs. 1,500/- per policy period for transportation of the insured person by private ambulance service are covered.",
+        "Organ Donor Cover": "If the insured person is the recipient, then the hospitalisation expenses incurred for organ transplantation are covered.",
+        "Annual Health Check-Up": "We will arrange for a Preventive Health Check-up at Our Network Providers for the applicable package as per opted Sum Insured. For the updated and applicable list of tests available under such package, Insured Persons are required to check our website www.starhealth.in.",
+        "Recharge Of Sum Insured": null,
+        "Modern Treatments": "Expenses incurred for modern treatments such as Oral Chemotherapy, Intra Vitreal injections, Robotic Surgeries, etc. are covered up to the limits mentioned in the policy clause.",
+        "Co-pay": "This policy is subjected to a Co-payment of 10% of each and every admissible claim amount, for fresh as well as for the policies subsequently renewed for insured persons whose age at the time of entry into this policy is 61 years and above.",
+        "ICU Charges": null,
+        "Zone wise Co-pay": null,
+        "Waiting Period for PED": null,
+        "Add ons": null
+      }
+    },
+    "micro-rural-and-farmers-care": {
+      "slug": "micro-rural-and-farmers-care",
+      "rows": {
+        "Room Rent": "Hospitalisation expenses incurred for a period of more than 24 hours on account of illness, injury or accidents are covered.",
+        "Pre hospitalization": null,
+        "Post Hospitalisation": null,
+        "AYUSH Cover": "Medical expenses for Inpatient Hospitalization incurred on treatment under Ayurveda, Unani, Sidha and Homeopathy systems of medicines in a AYUSH Hospital is payable up to the sum insured.",
+        "Day Care Treatments": "Medical treatments and surgical procedures that require less than 24 hours of hospitalisation due to technological advancements are covered.",
+        "Domiciliary": null,
+        "Ambulance Cover": null,
+        "Organ Donor Cover": null,
+        "Annual Health Check-Up": null,
+        "Recharge Of Sum Insured": null,
+        "Modern Treatments": "Modern treatment expenses are payable up to the limits mentioned in the policy clause.",
+        "Co-pay": "This policy is subjected to a Co-payment of 20% of each and every admissible claim amount, for fresh as well as for the policies subsequently renewed for insured persons whose age at the time of entry into this policy is 61 years and above.",
+        "ICU Charges": "ICU charges at actuals are covered under this policy.",
+        "Zone wise Co-pay": null,
+        "Waiting Period for PED": null,
+        "Add ons": null
+      }
+    },
+    "opd-health-insurance": {
+      "slug": "opd-health-insurance",
+      "rows": {
+        "Room Rent": null,
+        "Pre hospitalization": null,
+        "Post Hospitalisation": null,
+        "AYUSH Cover": "Outpatient medical consultation and treatment expenses incurred under Ayurveda, Yoga and Naturopathy, Unani, Siddha and Homeopathy systems of medicine are covered.",
+        "Day Care Treatments": null,
+        "Domiciliary": null,
+        "Ambulance Cover": null,
+        "Organ Donor Cover": null,
+        "Annual Health Check-Up": null,
+        "Recharge Of Sum Insured": null,
+        "Modern Treatments": null,
+        "Co-pay": null,
+        "ICU Charges": null,
+        "Zone wise Co-pay": null,
+        "Waiting Period for PED": null,
+        "Add ons": null
+      }
+    },
+    "smart-health-pro": {
+      "slug": "smart-health-pro",
+      "rows": {
+        "Room Rent": "Hospitalisation expenses incurred for a period of more than 24 hours on account of illness, injury or accidents are covered.",
+        "Pre hospitalization": "In addition to in-patient hospitalisation, the medical expenses incurred up to 60 days before the date of admission to the hospital are also covered.",
+        "Post Hospitalisation": "Post-hospitalisation medical expenses incurred up to 180 days from the date of discharge from the hospital are covered.",
+        "AYUSH Cover": "Expenses incurred for the treatment under Ayurveda, Unani, Siddha and Homeopathy systems of medicines in AYUSH hospitals are covered.",
+        "Day Care Treatments": "Medical treatments and surgical procedures that require less than 24 hours of hospitalisation due to technological advancements are covered.",
+        "Domiciliary": "Expenses incurred for domiciliary hospitalisation, including AYUSH on the advice of a medical practitioner for a period exceeding three days are covered.",
+        "Ambulance Cover": "This policy covers ambulance charges for admission to a hospital, for shifting from one hospital to another hospital and from the hospital to the insured’s residence (if it is in the same city).",
+        "Organ Donor Cover": null,
+        "Annual Health Check-Up": null,
+        "Recharge Of Sum Insured": "On partial or full utilisation of the Sum Insured during the policy period, 100% of the Sum Insured will be restored once during the policy year and it can be utilised for all the claims.",
+        "Modern Treatments": "Expenses incurred for modern treatments such as Deep Brain Stimulation, Intra Vitreal injections, Robotic Surgeries, etc. are covered up to the Sum Insured.",
+        "Co-pay": null,
+        "ICU Charges": null,
+        "Zone wise Co-pay": null,
+        "Waiting Period for PED": null,
+        "Add ons": null
+      }
+    },
+    "special-care-gold": {
+      "slug": "special-care-gold",
+      "rows": {
+        "Room Rent": "Hospitalisation expenses incurred for more than 24 hours of hospitalisation are covered.",
+        "Pre hospitalization": "In addition to in-patient hospitalisation, the medical expenses incurred up to 30 days before the date of admission to the hospital are also covered.",
+        "Post Hospitalisation": "Post-hospitalisation medical expenses including consultation fees, diagnostic charges, medicines and drugs as recommended by the Hospital / Medical Practitioner are covered up to 60 days from the date of discharge from the hospital.",
+        "AYUSH Cover": null,
+        "Day Care Treatments": "Medical treatments and / or surgical procedures that require less than 24 hours of hospitalisation due to technological advancements are covered.",
+        "Domiciliary": null,
+        "Ambulance Cover": "Ambulance charges are covered up to the maximum of Rs. 2000/- per hospitalisation.",
+        "Organ Donor Cover": null,
+        "Annual Health Check-Up": null,
+        "Recharge Of Sum Insured": null,
+        "Modern Treatments": null,
+        "Co-pay": "Each and every claim under this policy shall be subject to a Co-payment of 20% applicable to the claim amount admissible and payable as per the terms and conditions of the policy.",
+        "ICU Charges": "Intensive Care Unit (ICU) charges/Intensive Cardiac Care Unit (ICCU) charges all inclusive as provided by the Hospital/Nursing home are covered up to a maximum of 2% of the Sum Insured per day.",
+        "Zone wise Co-pay": null,
+        "Waiting Period for PED": null,
+        "Add ons": null
+      }
+    },
+    "star-assure": {
+      "slug": "star-assure",
+      "rows": {
+        "Room Rent": "Hospitalisation expenses incurred for a period of more than 24 hours on account of illness, injury or accidents are covered.",
+        "Pre hospitalization": "In addition to in-patient hospitalisation, the medical expenses incurred up to 60 days before the date of admission to the hospital are also covered.",
+        "Post Hospitalisation": "Post-hospitalisation medical expenses incurred up to 180 days from the date of discharge from the hospital are covered.",
+        "AYUSH Cover": "Expenses incurred for the treatment under Ayurveda, Unani, Sidha and Homeopathy systems of medicines in AYUSH hospitals are covered up to the Sum Insured.",
+        "Day Care Treatments": "Medical treatments and surgical procedures that require less than 24 hours of hospitalisation due to technological advancements are covered.",
+        "Domiciliary": "Expenses incurred for domiciliary hospitalisation, including AYUSH on the advice of a medical practitioner for a period exceeding three days are covered.",
+        "Ambulance Cover": "This policy covers ambulance charges for admission in hospital, for shifting from one hospitals to another for better medical treatment and from hospital to residence (if it is in the same city).",
+        "Organ Donor Cover": "In-patient hospitalisation expenses incurred for organ transplantation from the Donor to the recipient insured person are payable provided the claim for transplantation is payable. In addition, the expenses incurred by the Donor, (if any) for the complications that necessitate a Redo Surgery / ICU admission will be covered.",
+        "Annual Health Check-Up": "We will arrange for a Preventive Health Check-up at Our Network Providers for the applicable limits as per opted Sum Insured.",
+        "Recharge Of Sum Insured": null,
+        "Modern Treatments": "Expenses incurred for modern treatments such as Oral Chemotherapy, Intra Vitreal injections, Robotic Surgeries, etc. are covered up to the Sum Insured.",
+        "Co-pay": "If the insured person purchases or renews the policy at 61 years of age or above, then he/she is subjected to the co-payment of 10% for each and every claim amount.",
+        "ICU Charges": null,
+        "Zone wise Co-pay": null,
+        "Waiting Period for PED": null,
+        "Add ons": "Insured person can avail premium discount if he/she choose any of the deductibles as mentioned in this policy."
+      }
+    },
+    "super-star": {
+      "slug": "super-star",
+      "rows": {
+        "Room Rent": "Hospitalisation expenses incurred for a period of more than 24 hours on account of illness, injury or accidents are covered up to the Sum Insured.",
+        "Pre hospitalization": null,
+        "Post Hospitalisation": "Hospitalisation expenses incurred up to 180 days after discharge from hospital.",
+        "AYUSH Cover": "Inpatient hospitalisation expenses incurred for treatments under the Ayurveda, Yoga and Naturopathy, Unani, Sidha and Homeopathy systems of medicine in AYUSH hospitals are covered up to the Sum Insured.",
+        "Day Care Treatments": "All Day Care Procedures are covered.",
+        "Domiciliary": "Coverage for medical treatment at home for a duration exceeding three days when hospitalisation is not possible or available.",
+        "Ambulance Cover": "This policy covers ambulance charges for admission to the hospital, for shifting from one hospital to another and from hospital to residence.",
+        "Organ Donor Cover": "Coverage for organ transplantation and related costs, including the donor's post-donation complications.",
+        "Annual Health Check-Up": "Covers up to 1% of the sum insured for tests or vaccinations, available from day one on a cashless basis. Tests must be booked via digital platforms (e.g., Mobile App) and are subject to a ₹25,000 cap per year.",
+        "Recharge Of Sum Insured": null,
+        "Modern Treatments": "Expenses incurred for modern treatments such as Stem cell therapy for bone marrow transplant, Uterine artery embolisation, Balloon Sinuplasty, Deep Brain Stimulation, Oral Chemotherapy, Immunotherapy, Intravitreal injections, Robotic surgeries, Stereotactic radiosurgery, Bronchial Thermoplasty Holmium laser treatment, IONM (Intra Operative Neuro Monitoring) are covered up to the Sum Insured.",
+        "Co-pay": "Not Applicable",
+        "ICU Charges": null,
+        "Zone wise Co-pay": null,
+        "Waiting Period for PED": null,
+        "Add ons": null
+      }
+    },
+    "value-plus": {
+      "slug": "value-plus",
+      "rows": {
+        "Room Rent": "Hospitalisation expenses incurred for a period of more than 24 hours on account of illness, injury or accidents are covered up to the Sum Insured.",
+        "Pre hospitalization": "Medical expenses incurred up to 30 days before hospitalisation are covered.",
+        "Post Hospitalisation": "Medical expenses incurred up to 60 days after discharge are covered.",
+        "AYUSH Cover": "Coverage for in-patient treatment under Ayurveda, Yoga, Naturopathy, Unani, Siddha and Homeopathy systems.",
+        "Day Care Treatments": "All day care treatments requiring less than 24 hours of hospitalisation are covered.",
+        "Domiciliary": "Medical treatment taken at home for more than 3 days when hospitalisation is not possible is covered.",
+        "Ambulance Cover": "Coverage for ambulance expenses incurred for hospital admission, transfer between hospitals and transportation to residence.",
+        "Organ Donor Cover": "Coverage for organ transplantation expenses, including donor-related Post Donation Complications.",
+        "Annual Health Check-Up": null,
+        "Recharge Of Sum Insured": "100% of the Sum Insured gets automatically restored unlimited times during the policy year upon partial or full utilization of the Sum Insured.",
+        "Modern Treatments": "Coverage for advanced medical procedures including robotic surgeries, oral chemotherapy, immunotherapy, stem cell therapy and more.",
+        "Co-pay": null,
+        "ICU Charges": null,
+        "Zone wise Co-pay": null,
+        "Waiting Period for PED": null,
+        "Add ons": "Customise your policy with optional benefits such as: Single Private AC Room upgrade, Stay Fit, Mamta (Women Wellness Care), Param Seva (Senior Citizen Wellness Care), In-Clinic Consultation, Voluntary Deductible, Voluntary Co-pay"
+      }
+    },
+    "women-care": {
+      "slug": "women-care",
+      "rows": {
+        "Room Rent": "Hospitalisation expenses incurred for a period of more than 24 hours on account of illness, injury or accidents are covered.",
+        "Pre hospitalization": "In addition to in-patient hospitalisation, the medical expenses incurred up to 60 days before the date of admission to the hospital are also covered.",
+        "Post Hospitalisation": "Post-hospitalisation medical expenses up to 90 days from the date of discharge from the hospital are covered.",
+        "AYUSH Cover": "In patient hospitalisation expenses incurred for the treatment under Ayurveda, Unani, Sidha and Homeopathy systems of medicines in AYUSH hospitals are covered up to the Sum Insured.",
+        "Day Care Treatments": "Medical treatments and surgical procedures that require less than 24 hours of hospitalisation due to technological advancements are covered.",
+        "Domiciliary": null,
+        "Ambulance Cover": "This policy covers ambulance charges for admission in hospital, for shifting from one hospitals to another for better medical treatment and from hospital to residence.",
+        "Organ Donor Cover": "In-patient hospitalisation expenses incurred for organ transplantation from the Donor to the recipient insured person are payable provided the claim for transplantation is payable. In addition, the expenses incurred by the Donor, (if any) for the complications that necessitate a Redo Surgery / ICU admission will be covered.",
+        "Annual Health Check-Up": "Health check-up expenses incurred for the tests mentioned in the policy document are covered for every policy year up to the specified limits.",
+        "Recharge Of Sum Insured": "On partial or full utilisation of the Sum Insured during the policy period, 100% of the Sum Insured will be restored once in the same policy year that can be utilised for all claims and subsequent hospitalisation.",
+        "Modern Treatments": "Expenses incurred for modern treatments such as Oral Chemotherapy, Intra Vitreal injections, Robotic Surgeries, etc. are covered up to the limits mentioned in the policy clause.",
+        "Co-pay": null,
+        "ICU Charges": null,
+        "Zone wise Co-pay": null,
+        "Waiting Period for PED": null,
+        "Add ons": null
+      }
+    },
+    "young-star-add-on": {
+      "slug": "young-star-add-on",
+      "rows": {
+        "Room Rent": "This cover enhances the room, boarding and nursing expenses as per the limits mentioned in the policy clause.",
+        "Pre hospitalization": null,
+        "Post Hospitalisation": null,
+        "AYUSH Cover": "Medical expenses for In-patient Hospitalization incurred on treatment under Ayurveda, Unani, Siddha and Homeopathy systems of medicines in a AYUSH Hospital is payable up to sum insured (including Cumulative bonus if available) under the Base Policy.",
+        "Day Care Treatments": null,
+        "Domiciliary": null,
+        "Ambulance Cover": null,
+        "Organ Donor Cover": null,
+        "Annual Health Check-Up": null,
+        "Recharge Of Sum Insured": null,
+        "Modern Treatments": "The listed modern treatments that are covered in the base policy will become payable up to the Sum Insured of the base policy.",
+        "Co-pay": null,
+        "ICU Charges": null,
+        "Zone wise Co-pay": null,
+        "Waiting Period for PED": null,
+        "Add ons": null
+      }
+    },
+    "youngstar": {
+      "slug": "youngstar",
+      "rows": {
+        "Room Rent": "Hospitalisation expenses incurred for a period of more than 24 hours on account of illness, injury or accidents are covered.",
+        "Pre hospitalization": "In addition to in-patient hospitalisation, the medical expenses incurred up to 60 days before the date of admission to the hospital are also covered.",
+        "Post Hospitalisation": "Post-hospitalisation medical expenses up to 90 days from the date of discharge from the hospital are covered as per the limits mentioned in the policy clause.",
+        "AYUSH Cover": "Medical expenses for Inpatient Hospitalization incurred on treatment under Ayurveda, Unani, Sidha and Homeopathy systems of medicines in a AYUSH Hospital is payable up to the sum insured.",
+        "Day Care Treatments": "Medical treatments and surgical procedures that require less than 24 hours of hospitalisation due to technological advancements are covered.",
+        "Domiciliary": null,
+        "Ambulance Cover": "This policy covers ambulance charges for admission to the hospital, for shifting from one hospital to another and from hospital to residence.",
+        "Organ Donor Cover": null,
+        "Annual Health Check-Up": "We will arrange for a Preventive Health Check-up at Our Network Providers for the applicable package as per opted Sum Insured. For the updated and applicable list of tests available under such package, Insured Persons are required to check our website www.starhealth.in",
+        "Recharge Of Sum Insured": "On partial or full utilisation of the Sum Insured during the policy period, 100% of the Sum Insured will be restored once in the same policy period.",
+        "Modern Treatments": "Expenses incurred for modern treatments such as Oral Chemotherapy, Intra Vitreal injections, Robotic Surgeries, etc. are covered up to the limits mentioned in the policy clause.",
+        "Co-pay": null,
+        "ICU Charges": null,
+        "Zone wise Co-pay": null,
+        "Waiting Period for PED": null,
+        "Add ons": null
+      }
+    }
+  }
+}

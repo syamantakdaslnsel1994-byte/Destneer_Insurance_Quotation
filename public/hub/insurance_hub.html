@@ -2780,7 +2780,7 @@ function xlBuildQuoteSheet(wb, sheetName, membersSubset, rows, singleBlock, left
     const rowKeys = rowOrder.filter(k => siData[k]);
 
     // Title row — merged A:D (and I:L on a dual sheet)
-    const leftTitle = (singleBlock ? 'Individual' : (leftLabel === 'Multi Individual' ? 'Family Floater' : leftLabel))
+    const leftTitle = (singleBlock ? (leftLabel || 'Individual') : (leftLabel === 'Multi Individual' ? 'Family Floater' : leftLabel))
                     + ' Quotation For ' + xlSiLabel(si.key, false);
     xlSet(ws, r, 1, leftTitle, { bold: true, underline: true, fill: XL.titleFill,
                                  border: false, leftEdge: true });
@@ -2852,6 +2852,72 @@ let FEATURE_DATA = null;
   } catch (e) { /* sheet is skipped when unavailable */ }
 })();
 
+// Care Health's column, live: scraped from careinsurance.com's own product
+// pages (scripts/scrape_care_features.js) and mapped from the 48 real
+// portal plans to whichever of those pages applies (scripts/
+// build_care_feature_mapping.js) — a refreshable cache, re-run those
+// scripts on demand to pick up site changes; NOT fetched at report time.
+// Replaces the single static "Care Supreme" column from feature_comparison.json
+// with the ACTUAL quoted Care plan's real terms, whichever of the 48 it is —
+// see CARE_LIVE_SOURCE_INDEX below for how this slots into the existing
+// positional column system without changing xlBuildFeatureSheet/the PDF
+// section at all.
+let CARE_LIVE_FEATURES = null;
+(async function loadCareLiveFeatures(){
+  try {
+    const r = await fetch('care_features_mapped.json');
+    if (r.ok) CARE_LIVE_FEATURES = await r.json();
+  } catch (e) { /* Care's column falls back to the static entry when unavailable */ }
+})();
+
+// Niva Bupa's column, live: scraped from each product's own downloadable
+// brochure PDF at nivabupa.com (scripts/scrape_niva_features.js — the
+// product pages themselves have no table markup, unlike Care's; the
+// brochure PDFs are the real structured source) and mapped to the sheet's
+// 15 rows (scripts/build_niva_feature_mapping.js). Same refreshable-cache
+// principle as Care's — see NIVA_LIVE_SOURCE_INDEX below.
+let NIVA_LIVE_FEATURES = null;
+(async function loadNivaLiveFeatures(){
+  try {
+    const r = await fetch('niva_features_mapped.json');
+    if (r.ok) NIVA_LIVE_FEATURES = await r.json();
+  } catch (e) { /* Niva's column falls back to the static entry when unavailable */ }
+})();
+
+// ManipalCigna's column, live: scraped from manipalcigna.com's own public
+// product pages (scripts/scrape_mc_features.js — NOT the online.
+// manipalcigna.com quotation portal server/mc_server.js already talks to,
+// confirmed early this session that API only returns pricing + add-on
+// NAMES, never descriptive feature text) and mapped per real tier
+// (scripts/build_mc_feature_mapping.js — Lifetime India/Global, ProHealth
+// Prime Protect/Advantage/Active, Super Top-up Plus/Select, Prime Senior
+// Classic/Elite). Sarvah has no public product page and stays on the
+// static entry. Same refreshable-cache principle as Care/Niva's.
+let MC_LIVE_FEATURES = null;
+(async function loadMcLiveFeatures(){
+  try {
+    const r = await fetch('mc_features_mapped.json');
+    if (r.ok) MC_LIVE_FEATURES = await r.json();
+  } catch (e) { /* MC's columns fall back to the static entries when unavailable */ }
+})();
+
+// Star Health's column, live: scraped from starhealth.in's own public
+// product pages (scripts/scrape_star_features.js — server/sh_server.js is
+// just a thin proxy to Star's live API with no hardcoded product
+// catalogue, unlike Care/MC, so there's no static entry for Star at all
+// today — see the FEATURE_PROVIDER_LABEL/"missing" fallback below, which
+// this replaces the same way Care/Niva/MC's live data replaces their
+// static entries). Mapped per product slug
+// (scripts/build_star_feature_mapping.js). Same refreshable-cache
+// principle as the other three.
+let STAR_LIVE_FEATURES = null;
+(async function loadStarLiveFeatures(){
+  try {
+    const r = await fetch('star_features_mapped.json');
+    if (r.ok) STAR_LIVE_FEATURES = await r.json();
+  } catch (e) { /* Star's column falls back to the "no data held" placeholder when unavailable */ }
+})();
+
 // ── Which feature columns belong in this report ─────────────────────────────
 // The five columns were transcribed from one client's quotation, so they are a
 // fixed set of specific products: two ManipalCigna plans, one Niva, one Care
@@ -2865,6 +2931,220 @@ let FEATURE_DATA = null;
 // all, so it gets a column that says so rather than being silently absent —
 // an insurer missing from a comparison table reads as "nothing to compare".
 const FEATURE_PROVIDER_LABEL = { care:'Care Health', niva:'Niva Bupa', mc:'ManipalCigna', star:'Star Health' };
+
+// Reserved slot one past the original 5 static columns — xlBuildFeatureSheet
+// and the PDF section both read row.values[col.sourceIndex] positionally
+// (see the "sourceIndex is load-bearing" comment below), so a live Care
+// column just needs its OWN index into that same array; neither renderer
+// needs to change at all. Always reset to null first (see
+// applyCareLiveOverlay) so a live match from an earlier report never leaks
+// into a later one that doesn't have one — FEATURE_DATA is loaded once and
+// reused for every report generated in the session.
+const CARE_LIVE_SOURCE_INDEX = 5;
+
+// Projects one live-mapped Care plan's scraped rows (see
+// scripts/build_care_feature_mapping.js's canonical row names — they match
+// FEATURE_DATA.features[].feature exactly) into values[CARE_LIVE_SOURCE_INDEX]
+// across every feature row, including every sub-row (Room Rent's Shared/
+// Single AC/Suite all get the same value — the live source doesn't
+// distinguish by room type either, confirmed live against Care's own
+// product pages, which show one flat "Up to SI" for the whole feature).
+function applyCareLiveOverlay(liveRows){
+  (FEATURE_DATA.features || []).forEach(f => {
+    // 'N/A' (not null) when a plan IS live-mapped but this particular row
+    // wasn't found on its page — confirmed with the user this is expected
+    // for some rows (Co-pay, Add ons, etc. aren't published in a matching
+    // format on every plan's page) and should read as "checked, not
+    // there", not a blank cell that could be misread as "nothing captured
+    // at all". Plain null (blank) only when no live plan is shown in this
+    // report to begin with.
+    const value = liveRows ? (liveRows[f.feature] || 'N/A') : null;
+    f.rows.forEach(row => {
+      row.values = row.values || [];
+      row.values[CARE_LIVE_SOURCE_INDEX] = value;
+    });
+  });
+}
+
+// Resolves whichever Care plan was actually quoted to its live-scraped data
+// — matched by exact name against data/care_plans.json's own naming (the
+// same catalogue CARE_PLAN_META and this file both already key off), not a
+// fuzzy guess. Returns null if CARE_LIVE_FEATURES isn't loaded, no Care
+// plan was quoted, or the quoted plan has no confident live mapping (see
+// build_care_feature_mapping.js's SKU_TO_SLUG — some of the 48 are left
+// deliberately unmapped rather than guessed).
+function resolveLiveCarePlan(quotedCareNames){
+  if (!CARE_LIVE_FEATURES || !Array.isArray(quotedCareNames)) return null;
+  const entries = Object.values(CARE_LIVE_FEATURES.plans || {});
+  for (const name of quotedCareNames) {
+    const hit = entries.find(p => p.name === name && p.rows);
+    if (hit) return hit;
+  }
+  return null;
+}
+
+// One slot past Care's — see CARE_LIVE_SOURCE_INDEX above for why this
+// pattern needs no changes to xlBuildFeatureSheet/the PDF section.
+const NIVA_LIVE_SOURCE_INDEX = 6;
+
+function applyNivaLiveOverlay(liveRows){
+  (FEATURE_DATA.features || []).forEach(f => {
+    const value = liveRows ? (liveRows[f.feature] || 'N/A') : null;
+    f.rows.forEach(row => {
+      row.values = row.values || [];
+      row.values[NIVA_LIVE_SOURCE_INDEX] = value;
+    });
+  });
+}
+
+// Unlike Care, there's no existing 48-plan catalogue keying Niva's real
+// captured plan names to a product slug — the exact string Niva's real
+// quote flow captures has not been confirmed live this pass (Niva was
+// never brought into this session's real-page-capture work). Matched by
+// keyword fragment instead of exact name, same principle as the pre-
+// exactMatch FEATURE_DATA.plans columns: ordered so more specific
+// fragments (reassure2/reassure3) are checked before the bare "reassure"
+// fallback, so a versioned quote can't be swallowed by the unversioned
+// entry. Treat any match here as unverified until a real captured Niva
+// plan name is seen and checked against this list.
+const NIVA_SLUG_KEYWORDS = [
+  { slug: 'reassurev2-insurance', any: ['reassure2', 'reassure 2.0', 'reassurev2'] },
+  { slug: 'reassurev3-insurance', any: ['reassure3', 'reassure 3.0', 'reassurev3'] },
+  { slug: 'reassure', any: ['reassure'] },
+  { slug: 'aspire-max', any: ['aspire max', 'aspiremax'] },
+  { slug: 'aspire', any: ['aspire'] },
+  { slug: 'health-companion-family-floater', any: ['health companion'] },
+  { slug: 'health-pulse', any: ['health pulse'] },
+  { slug: 'health-recharge-family-floater', any: ['health recharge'] },
+  { slug: 'heart-beat', any: ['heart beat', 'heartbeat'] },
+  { slug: 'senior-citizen-family-floater', any: ['senior citizen', 'senior first'] },
+  { slug: 'goactive', any: ['go active', 'goactive'] },
+  { slug: 'corona-kavach', any: ['corona kavach'] },
+  { slug: 'criti-care', any: ['criti care', 'criticare'] },
+  { slug: 'accident-care', any: ['accident care'] },
+  { slug: 'rise', any: ['rise'] },
+];
+
+function resolveLiveNivaPlan(quotedNivaNames){
+  if (!NIVA_LIVE_FEATURES || !Array.isArray(quotedNivaNames)) return null;
+  const norm = s => String(s || '').toLowerCase();
+  for (const name of quotedNivaNames) {
+    const n = norm(name);
+    for (const { slug, any } of NIVA_SLUG_KEYWORDS) {
+      if (!any.some(kw => n.includes(kw))) continue;
+      const entry = NIVA_LIVE_FEATURES.plans[slug];
+      if (entry && entry.rows) return { name, slug, rows: entry.rows };
+    }
+  }
+  return null;
+}
+
+// Third live slot — after Care (5) and Niva (6).
+const MC_LIVE_SOURCE_INDEX = 7;
+
+function applyMcLiveOverlay(liveRows){
+  (FEATURE_DATA.features || []).forEach(f => {
+    const value = liveRows ? (liveRows[f.feature] || 'N/A') : null;
+    f.rows.forEach(row => {
+      row.values = row.values || [];
+      row.values[MC_LIVE_SOURCE_INDEX] = value;
+    });
+  });
+}
+
+// MC's captured plan names are noisy free text (see the exactMatch comment
+// on the static Sarvah/Lifetime columns above) — matched here by requiring
+// ALL keyword fragments for a tier to be present (not just one), so e.g. a
+// Sarvah quote can never accidentally satisfy a ProHealth Prime tier.
+// Punctuation-insensitive (collapses non-alphanumerics to spaces) so
+// "Super Top-Up"/"Super Top Up"/"SuperTopUp" all match the same way.
+// Sarvah has no live entry at all — no public product page found for it
+// (confirmed live: zero results in manipalcigna.com's own sitemap) — stays
+// on its existing static, exactMatch-guarded column untouched.
+const MC_TIER_KEYWORDS = [
+  { tierKey: 'lifetime-india',            all: ['lifetime', 'india'] },
+  { tierKey: 'lifetime-global',           all: ['lifetime', 'global'] },
+  { tierKey: 'prohealth-prime-protect',   all: ['prohealth', 'protect'] },
+  { tierKey: 'prohealth-prime-advantage', all: ['prohealth', 'advantage'] },
+  { tierKey: 'prohealth-prime-active',    all: ['prohealth', 'active'] },
+  { tierKey: 'super-top-up-plus',         all: ['top up', 'plus'] },
+  { tierKey: 'super-top-up-select',       all: ['top up', 'select'] },
+  { tierKey: 'prime-senior-classic',      all: ['senior', 'classic'] },
+  { tierKey: 'prime-senior-elite',        all: ['senior', 'elite'] },
+];
+
+function resolveLiveMcPlan(quotedMcNames){
+  if (!MC_LIVE_FEATURES || !Array.isArray(quotedMcNames)) return null;
+  const norm = s => String(s || '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').replace(/\s+/g, ' ').trim();
+  for (const name of quotedMcNames) {
+    const n = norm(name);
+    for (const { tierKey, all } of MC_TIER_KEYWORDS) {
+      if (!all.every(kw => n.includes(norm(kw)))) continue;
+      const entry = MC_LIVE_FEATURES.plans[tierKey];
+      if (entry && entry.rows) return { name, tierKey, rows: entry.rows, isLifetime: tierKey.startsWith('lifetime-') };
+    }
+  }
+  return null;
+}
+
+// Fourth live slot — after Care (5), Niva (6), MC (7).
+const STAR_LIVE_SOURCE_INDEX = 8;
+
+function applyStarLiveOverlay(liveRows){
+  (FEATURE_DATA.features || []).forEach(f => {
+    const value = liveRows ? (liveRows[f.feature] || 'N/A') : null;
+    f.rows.forEach(row => {
+      row.values = row.values || [];
+      row.values[STAR_LIVE_SOURCE_INDEX] = value;
+    });
+  });
+}
+
+// Star has no captured-plan-name precedent in this codebase at all (no
+// BrowserView/real-page capture, no existing static column) — matched by
+// keyword like Niva/MC. More specific slugs (e.g. 'cardiac-care-platinum')
+// are listed before their shorter substrings ('cardiac-care') so a
+// Platinum quote can't be swallowed by the base-tier entry. 'assure' alone
+// is included for star-assure since that's the literal example already
+// used elsewhere in this codebase's own test fixtures.
+const STAR_SLUG_KEYWORDS = [
+  { slug: 'cancer-care-platinum', any: ['cancer care platinum'] },
+  { slug: 'cardiac-care-platinum', any: ['cardiac care platinum'] },
+  { slug: 'cardiac-care', any: ['cardiac care'] },
+  { slug: 'special-care-gold', any: ['special care gold'] },
+  { slug: 'young-star-add-on', any: ['young star add', 'youngstar add'] },
+  { slug: 'youngstar', any: ['young star', 'youngstar'] },
+  { slug: 'arogya-sanjeevani', any: ['arogya sanjeevani'] },
+  { slug: 'autism-care', any: ['autism care'] },
+  { slug: 'critical-illness-insurance', any: ['critical illness'] },
+  { slug: 'diabetes-health-insurance', any: ['diabetes'] },
+  { slug: 'extra-protect', any: ['extra protect'] },
+  { slug: 'family-health-optima', any: ['family health optima'] },
+  { slug: 'health-gain', any: ['health gain'] },
+  { slug: 'health-premier', any: ['health premier'] },
+  { slug: 'mediclassic', any: ['mediclassic', 'medi classic'] },
+  { slug: 'micro-rural-and-farmers-care', any: ['micro rural', 'farmers care'] },
+  { slug: 'opd-health-insurance', any: ['opd health', 'opd insurance'] },
+  { slug: 'smart-health-pro', any: ['smart health pro'] },
+  { slug: 'star-assure', any: ['star assure', 'assure'] },
+  { slug: 'super-star', any: ['super star', 'superstar'] },
+  { slug: 'value-plus', any: ['value plus'] },
+  { slug: 'women-care', any: ['women care', 'woman care'] },
+];
+
+function resolveLiveStarPlan(quotedStarNames){
+  if (!STAR_LIVE_FEATURES || !Array.isArray(quotedStarNames)) return null;
+  const norm = s => String(s || '').toLowerCase();
+  for (const name of quotedStarNames) {
+    const n = norm(name);
+    for (const { slug, any } of STAR_SLUG_KEYWORDS) {
+      if (!any.some(kw => n.includes(kw))) continue;
+      const entry = STAR_LIVE_FEATURES.plans[slug];
+      if (entry && entry.rows) return { name, slug, rows: entry.rows };
+    }
+  }
+  return null;
+}
 
 function featureColumns(rows){
   if (!FEATURE_DATA || !Array.isArray(FEATURE_DATA.plans)) return [];
@@ -2882,12 +3162,24 @@ function featureColumns(rows){
     (quoted[k] = quoted[k] || []).push(String(r.planName || ''));
   });
 
+  const norm = s => String(s || '').toLowerCase().replace(/\s+/g, ' ').trim();
+
   const out = [];
   FEATURE_DATA.plans.forEach((col, srcIdx) => {
     const names = quoted[col.provider];
     if (!names) return;                            // insurer not in this quotation
-    const match = (col.planMatch || []).some(frag =>
-      names.some(n => n.toLowerCase().indexOf(String(frag).toLowerCase()) !== -1));
+    // exactMatch columns require the quoted name to equal `plan` exactly —
+    // confirmed live that Care's real catalogue has several distinct plans
+    // whose names contain "Care Supreme" as a plain substring (e.g. "POS
+    // Care Supreme Shine"), so a loose planMatch fragment reported a false
+    // match for those and silently attributed this plan's features to the
+    // wrong quote with no caveat. Non-flagged columns (MC's two entries,
+    // whose captured names are noisy free text but never collide with a
+    // sibling product) keep the original fragment behavior they rely on.
+    const match = col.exactMatch
+      ? names.some(n => norm(n) === norm(col.plan))
+      : (col.planMatch || []).some(frag =>
+          names.some(n => n.toLowerCase().indexOf(String(frag).toLowerCase()) !== -1));
     // sourceIndex is load-bearing: every feature row's `values` array is
     // positional against the ORIGINAL five columns, so a column that survives
     // filtering must still read the slot it was transcribed into. Using the
@@ -2906,6 +3198,90 @@ function featureColumns(rows){
                provider:k, plan:null, matches:false, missing:true,
                quotedPlans:[...new Set(quoted[k])] });
   });
+
+  // Live Care Health data replaces the static "Care Supreme" column
+  // whenever the ACTUAL quoted plan (whichever of the 48 it is) has a
+  // confident live mapping — see resolveLiveCarePlan()/
+  // build_care_feature_mapping.js. Falls back to the static column
+  // (already correctly caveated by its own exactMatch guard) when there's
+  // no live match, rather than showing nothing for Care.
+  const liveCare = resolveLiveCarePlan(quoted.care);
+  applyCareLiveOverlay(liveCare && liveCare.rows);   // always reset first — see CARE_LIVE_SOURCE_INDEX
+  if (liveCare) {
+    const staticIdx = out.findIndex(c => c.provider === 'care' && !c.missing);
+    const staticCol = staticIdx >= 0 ? out[staticIdx] : null;
+    const liveCol = {
+      label: liveCare.name, width: (staticCol && staticCol.width) || 19,
+      fill: (staticCol && staticCol.fill) || null,
+      provider: 'care', plan: liveCare.name, matches: true, live: true,
+      sourceIndex: CARE_LIVE_SOURCE_INDEX, quotedPlans: [...new Set(quoted.care)],
+    };
+    if (staticIdx >= 0) out.splice(staticIdx, 1, liveCol);
+    else out.push(liveCol);
+  }
+
+  // Same idea for Niva — see resolveLiveNivaPlan()/
+  // build_niva_feature_mapping.js. Matched by keyword, not exact name
+  // (Niva's real captured plan-name format hasn't been confirmed live
+  // this pass), so this is a step better than the static caveat but not
+  // as certain as Care's exact-name match.
+  const liveNiva = resolveLiveNivaPlan(quoted.niva);
+  applyNivaLiveOverlay(liveNiva && liveNiva.rows);   // always reset first — see NIVA_LIVE_SOURCE_INDEX
+  if (liveNiva) {
+    const staticIdx = out.findIndex(c => c.provider === 'niva' && !c.missing);
+    const staticCol = staticIdx >= 0 ? out[staticIdx] : null;
+    const liveCol = {
+      label: liveNiva.name, width: (staticCol && staticCol.width) || 19,
+      fill: (staticCol && staticCol.fill) || null,
+      provider: 'niva', plan: liveNiva.name, matches: true, live: true,
+      sourceIndex: NIVA_LIVE_SOURCE_INDEX, quotedPlans: [...new Set(quoted.niva)],
+    };
+    if (staticIdx >= 0) out.splice(staticIdx, 1, liveCol);
+    else out.push(liveCol);
+  }
+
+  // MC — see resolveLiveMcPlan()/build_mc_feature_mapping.js. Different
+  // from Care/Niva in one way: only Lifetime Health had an existing static
+  // column to replace (Sarvah's stays untouched, no live data for it —
+  // see resolveLiveMcPlan's comment). ProHealth Prime/Super Top-up/Prime
+  // Senior have no existing static column at all, so a live match for
+  // those is ADDED as a new column rather than replacing anything.
+  const liveMc = resolveLiveMcPlan(quoted.mc);
+  applyMcLiveOverlay(liveMc && liveMc.rows);   // always reset first — see MC_LIVE_SOURCE_INDEX
+  if (liveMc) {
+    const staticIdx = liveMc.isLifetime
+      ? out.findIndex(c => c.provider === 'mc' && c.plan === 'Lifetime Health' && !c.missing)
+      : -1;
+    const staticCol = staticIdx >= 0 ? out[staticIdx] : null;
+    const liveCol = {
+      label: liveMc.name, width: (staticCol && staticCol.width) || 19,
+      fill: (staticCol && staticCol.fill) || null,
+      provider: 'mc', plan: liveMc.name, matches: true, live: true,
+      sourceIndex: MC_LIVE_SOURCE_INDEX, quotedPlans: [...new Set(quoted.mc)],
+    };
+    if (staticIdx >= 0) out.splice(staticIdx, 1, liveCol);
+    else out.push(liveCol);
+  }
+
+  // Star — see resolveLiveStarPlan()/build_star_feature_mapping.js. Star
+  // has no static entry in FEATURE_DATA.plans at all, so when it's quoted
+  // the loop above always produces a "missing" placeholder column (the
+  // "No feature data held for Star Health" note) — a live match replaces
+  // THAT placeholder, same splice pattern as Care/Niva replacing their
+  // static entries.
+  const liveStar = resolveLiveStarPlan(quoted.star);
+  applyStarLiveOverlay(liveStar && liveStar.rows);   // always reset first — see STAR_LIVE_SOURCE_INDEX
+  if (liveStar) {
+    const missingIdx = out.findIndex(c => c.provider === 'star' && c.missing);
+    const liveCol = {
+      label: liveStar.name, width: 19, fill: null,
+      provider: 'star', plan: liveStar.name, matches: true, live: true,
+      sourceIndex: STAR_LIVE_SOURCE_INDEX, quotedPlans: [...new Set(quoted.star)],
+    };
+    if (missingIdx >= 0) out.splice(missingIdx, 1, liveCol);
+    else out.push(liveCol);
+  }
+
   return out;
 }
 
@@ -3313,7 +3689,7 @@ function pdfBuildQuoteSection(P, sec, isFirst){
     };
 
     if (sec.singleBlock) {
-      drawBlock('Individual Quotation For ' + xlSiLabel(si.key, false), d => ({
+      drawBlock((sec.leftLabel || 'Individual') + ' Quotation For ' + xlSiLabel(si.key, false), d => ({
         p: d.ff.some(x => x > 0) ? d.ff : d.mi,
         addon: pick(d.ff.some(x => x > 0) ? d.addonFF : d.addonMI,
                     d.ff.some(x => x > 0) ? d.addonMI : d.addonFF),
@@ -3447,6 +3823,23 @@ async function generatePdfReport(){
 }
 
 // ── One description of the report, for both writers ─────────────────────────
+// Which cover type(s) a section's rows actually carry — mirrors the same
+// binary split _buildDataMap() uses to place premiums (planType === 'Multi
+// Individual' vs everything else). Deciding the block layout from member
+// count alone (the previous approach) forced a Family-Floater-only group of
+// 2+ members into the dual-block layout, drawing a Multi Individual section
+// that had no rows tagged for it — real company/plan names with "NA"
+// premiums, which read as "filled in" when nothing was quoted that way.
+function coverMixOf(rows){
+  const hasMI  = rows.some(r => r.planType === 'Multi Individual');
+  const hasFF  = rows.some(r => r.planType === 'Family Floater');
+  const hasInd = rows.some(r => r.planType === 'Individual' || !r.planType);
+  if (hasMI && (hasFF || hasInd)) return { singleBlock: false, leftLabel: 'Family Floater' };
+  if (hasMI) return { singleBlock: true, leftLabel: 'Multi Individual' };
+  if (hasFF) return { singleBlock: true, leftLabel: 'Family Floater' };
+  return { singleBlock: true, leftLabel: 'Individual' };
+}
+
 // The Excel and the PDF must never disagree about what is in the report, so the
 // list of sections and who is on each one is decided once, here, and both
 // writers walk the same list. Anything that reads rpRows directly in only one of
@@ -3482,8 +3875,7 @@ function buildReportSections(){
             || (n > 1 ? `${WORD[n] || n} Member Quote` : (members[0]?.name || clientNm)),
       membersSubset: members,
       rows: familySource,
-      singleBlock: smartType === 'Individual',
-      leftLabel: smartType,
+      ...coverMixOf(familySource),
     });
   }
 
@@ -3493,8 +3885,7 @@ function buildReportSections(){
     if (!g) return;
     const subset = members.filter(m => g.memberIds.map(String).includes(String(m.id)));
     sections.push({ kind:'quote', name: g.name || 'Group', membersSubset: subset, rows: groupRows[gid],
-                    singleBlock: subset.length === 1,
-                    leftLabel: subset.length > 1 ? 'Family Floater' : 'Individual' });
+                    ...coverMixOf(groupRows[gid]) });
   });
 
   // 3. One sheet per individually tagged member

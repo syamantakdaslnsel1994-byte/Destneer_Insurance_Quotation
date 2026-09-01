@@ -8,6 +8,8 @@
       "planMatch": [
         "sarvah"
       ],
+      "exactMatch": true,
+      "_exactMatchNote": "Sarvah has 3 named sub-plan tiers (Pratham/Uttam/Param, confirmed live via a user screenshot of the real results page) with materially different pricing/features — a plain \"sarvah\" substring match can't tell them apart, the same false-positive class fixed for Care Supreme. Now that electron/mc_result_script.js captures the real selected tier (e.g. \"Sarvah Uttam\"), exactMatch requires it to equal \"plan\" exactly instead.",
       "fill": {
         "theme": 7,
         "tint": 0.8
@@ -21,6 +23,8 @@
       "planMatch": [
         "lifetime"
       ],
+      "exactMatch": true,
+      "_exactMatchNote": "Lifetime Health has two real variants with materially different pricing (confirmed live: India base premium ~40,085.8 vs Global ~54,070.88 for the same SI/tenure) captured as \"Lifetime India\"/\"Lifetime Global\" (see electron/mc_result_script.js) — a plain \"lifetime\" substring matched both indiscriminately, the same false-positive class fixed for Care Supreme/Sarvah. Neither real captured name equals \"Lifetime Health\" exactly, so this column now always shows the \"features shown are for X, you quoted Y\" caveat rather than silently picking one. This is intentional, not a bug: nobody currently knows which variant this column's feature data was transcribed from (even the original source quotation just called it \"Lifetime\" with no variant noted — see scripts/verify/verify_excel_fixture.js's MC_ADD/50L-1Cr rows). Once someone confirms the variant, set \"plan\" to the exact real name (\"Lifetime India\" or \"Lifetime Global\") to re-enable a real match.",
       "fill": {
         "theme": 7,
         "tint": 0.8
@@ -35,6 +39,7 @@
         "reassure2.0",
         "reassure 2.0"
       ],
+      "_knownRisk": "Not hardened with exactMatch this pass, unlike the other columns — investigated but left alone deliberately. Niva was never brought into this session's real-page-capture work, so there's no live evidence of what public/calculators/niva_index.html's #resultProduct actually displays for a real ReAssure 2.0 Bronze quote today. Worse, the one real data point available — scripts/verify/verify_excel_fixture.js's own reference transcription (the actual source quotation this file was seeded from) — writes the plan name as \"Reassure2.0 Bronze\" (no space before \"2.0\"), which would NOT equality-match this column's \"ReAssure 2.0 Bronze\" (with a space) under featureColumns()'s norm(). Naively adding exactMatch here could break a currently-working match instead of fixing anything. If ReAssure 2.0 turns out to have sibling tiers (Silver/Gold/Platinum etc.) that collide the same way Care Supreme/Sarvah/Lifetime did, this needs a live-verified capture format first, not a guess.",
       "fill": {
         "theme": 6,
         "tint": 0.6
@@ -48,6 +53,8 @@
       "planMatch": [
         "care supreme"
       ],
+      "exactMatch": true,
+      "_exactMatchNote": "Care's real 48-plan catalogue has several other real plans whose names also contain \"Care Supreme\" as a substring (e.g. \"POS Care Supreme Shine\", the \"Care Supreme - VFM/VFM2/VFM3\" family) with materially different SI ladders/add-ons — a plain substring match on planMatch reported a false match for those and silently showed this plan's features under the wrong quote, with no caveat. exactMatch requires the quoted name to equal \"plan\" exactly (case/whitespace-insensitive) instead.",
       "fill": {
         "theme": 8,
         "tint": 0.6

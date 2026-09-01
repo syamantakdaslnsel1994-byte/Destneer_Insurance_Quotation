@@ -1,0 +1,939 @@
+{
+  "_comment": "Scraped live from manipalcigna.com's own public product pages (NOT the online.manipalcigna.com quotation portal, which never returns descriptive feature text) — see scripts/scrape_mc_features.js. Sarvah has no public page and is not covered. Refreshable cache, not fetched at report time.",
+  "_scrapedAt": "2026-08-27T08:21:14.559Z",
+  "_pageCount": 6,
+  "_okCount": 6,
+  "plans": {
+    "lifetime-health": {
+      "url": "https://www.manipalcigna.com/hospitalization-cover/lifetime-health/lifetime-health-india",
+      "key": "lifetime-health",
+      "ok": true,
+      "status": 200,
+      "columnHeaders": [
+        "Compare Plans Of",
+        "Lifetime HealthIndia₹14,855*/annum",
+        "Lifetime HealthGlobal₹23,428*/annum"
+      ],
+      "rows": [
+        {
+          "label": "Sum Insured1 (INR)",
+          "values": [
+            "50 Lacs/ 75 Lacs/ 100 Lacs/ 150 Lacs/ 200 Lacs/ 300 Lacs",
+            "50 Lacs/ 75 Lacs/ 100 Lacs/ 150 Lacs/ 200 Lacs/ 300 Lacs"
+          ]
+        },
+        {
+          "label": "Sum Insured2 (INR)",
+          "values": [
+            "Not Available",
+            "50 Lacs/ 75 Lacs/ 100 Lacs/ 150 Lacs/ 200 Lacs/ 300 Lacs"
+          ]
+        },
+        {
+          "label": "Major Illness (For coverages outside India)",
+          "values": [
+            "Not Available",
+            "Option to select the Major Illness/es for which coverage is required under Covers 16 to 25. 1. Only ...Read More"
+          ]
+        },
+        {
+          "label": "Area of Cover (For coverages outside India)",
+          "values": [
+            "Not Available",
+            "Option to select any one of the following as Area of Cover (AOC), applicable to Covers 16 to 25: (i ...Read More"
+          ]
+        },
+        {
+          "label": "Hospitalization Expenses",
+          "values": [
+            "Available",
+            "Available"
+          ]
+        },
+        {
+          "label": "Day Care Treatment",
+          "values": [
+            "Available",
+            "Available"
+          ]
+        },
+        {
+          "label": "Pre – hospitalization",
+          "values": [
+            "Available",
+            "Available"
+          ]
+        },
+        {
+          "label": "Post – hospitalization",
+          "values": [
+            "Available",
+            "Available"
+          ]
+        },
+        {
+          "label": "Ayush Cover",
+          "values": [
+            "Available",
+            "Available"
+          ]
+        },
+        {
+          "label": "Road Ambulance Cover",
+          "values": [
+            "Covered up to Sum Insured",
+            "Covered up to Sum Insured"
+          ]
+        },
+        {
+          "label": "Donor Expenses",
+          "values": [
+            "Available",
+            "Available"
+          ]
+        },
+        {
+          "label": "Domiciliary Expenses",
+          "values": [
+            "Available",
+            "Available"
+          ]
+        },
+        {
+          "label": "Adult Health Check-up",
+          "values": [
+            "Available",
+            "Available"
+          ]
+        },
+        {
+          "label": "Robotic and Cyber Knife Surgery",
+          "values": [
+            "Available",
+            "Available"
+          ]
+        },
+        {
+          "label": "Modern and Advanced Treatments",
+          "values": [
+            "Available",
+            "Available"
+          ]
+        },
+        {
+          "label": "HIV/AIDS and STD Cover",
+          "values": [
+            "Available",
+            "Available"
+          ]
+        },
+        {
+          "label": "Mental Care Cover",
+          "values": [
+            "Available",
+            "Available"
+          ]
+        },
+        {
+          "label": "Restoration of Sum Insured",
+          "values": [
+            "Multiple Restorations of base Sum Insured in a policy year for unrelated illnesses",
+            "Multiple Restorations of base Sum Insured in a policy year for unrelated illnesses"
+          ]
+        },
+        {
+          "label": "Premium Waiver Benefit",
+          "values": [
+            "Waives off one year’ renewal premium upon diagnosis of listed critical illnesses, permanent partial ...Read More",
+            "Waives off one year’ renewal premium upon diagnosis of listed critical illnesses, permanent partial ...Read More"
+          ]
+        },
+        {
+          "label": "Global Hospitalization for Major Illness",
+          "values": [
+            "Not Available",
+            "Global coverage for listed major illnesses as per opted Area of Cover."
+          ]
+        },
+        {
+          "label": "Global Pre- hospitalization",
+          "values": [
+            "Not Available",
+            "Available"
+          ]
+        },
+        {
+          "label": "Global Post- hospitalization",
+          "values": [
+            "Not Available",
+            "Available"
+          ]
+        },
+        {
+          "label": "Global Ambulance Cover",
+          "values": [
+            "Not Available",
+            "Available"
+          ]
+        },
+        {
+          "label": "Medical Evacuation",
+          "values": [
+            "Not Available",
+            "Available"
+          ]
+        },
+        {
+          "label": "Medical Repatriation",
+          "values": [
+            "Not Available",
+            "Available"
+          ]
+        },
+        {
+          "label": "Repatriation of Mortal Remains",
+          "values": [
+            "Not Available",
+            "Available"
+          ]
+        },
+        {
+          "label": "Global Travel Vaccination",
+          "values": [
+            "Not Available",
+            "Available"
+          ]
+        },
+        {
+          "label": "Global Robotic and Cyber Knife Surgery",
+          "values": [
+            "Not Available",
+            "Available"
+          ]
+        },
+        {
+          "label": "Global Modern and Advanced Treatments",
+          "values": [
+            "Not Available",
+            "Available"
+          ]
+        },
+        {
+          "label": "Health+",
+          "values": [
+            "Elevate your health protection with Health+, offering comprehensive coverage from Air Ambulance and ...Read More",
+            "Elevate your health protection with Health+, offering comprehensive coverage from Air Ambulance and ...Read More"
+          ]
+        },
+        {
+          "label": "Women+",
+          "values": [
+            "With Women+, prioritize your well-being with comprehensive coverage for essential screenings includi ...Read More",
+            "With Women+, prioritize your well-being with comprehensive coverage for essential screenings includi ...Read More"
+          ]
+        },
+        {
+          "label": "Global+",
+          "values": [
+            "Not Available",
+            "Designed for international healthcare needs, Global+ offers worldwide assistance with Global Hospi C ...Read More"
+          ]
+        },
+        {
+          "label": "Personal Accident Plus",
+          "values": [
+            "Opt for personal accident coverage for Accidental Death, Permanent Disablement Cover (including Perm ...Read More",
+            "Opt for personal accident coverage for Accidental Death, Permanent Disablement Cover (including Perm ...Read More"
+          ]
+        },
+        {
+          "label": "Pre-existing Disease waiting Period",
+          "values": [
+            "24 Months",
+            "24 Months"
+          ]
+        },
+        {
+          "label": "30 days waiting period",
+          "values": [
+            "Applicable",
+            "Applicable"
+          ]
+        },
+        {
+          "label": "Specified disease/procedure waiting periods",
+          "values": [
+            "24 Months",
+            "24 Months"
+          ]
+        },
+        {
+          "label": "Critical Illness Add On Cover",
+          "values": [
+            "Lump sum payment of Sum Insured, upon diagnosis of a Critical Illness available through ManipalCigna ...Read More",
+            "Lump sum payment of Sum Insured, upon diagnosis of a Critical Illness available through ManipalCigna ...Read More"
+          ]
+        },
+        {
+          "label": "Hospitalization Expenses",
+          "values": [
+            "Up to Sum Insured"
+          ]
+        },
+        {
+          "label": "Day Care Treatment",
+          "values": [
+            "Up to Sum Insured"
+          ]
+        },
+        {
+          "label": "Pre – hospitalization",
+          "values": [
+            "(up to Sum Insured)"
+          ]
+        },
+        {
+          "label": "Post – hospitalization",
+          "values": [
+            "up to Sum Insured"
+          ]
+        },
+        {
+          "label": "Donor expenses",
+          "values": [
+            "up to Sum Insured"
+          ]
+        },
+        {
+          "label": "AYUSH treatment",
+          "values": [
+            "up to Sum Insured"
+          ]
+        },
+        {
+          "label": "Road Ambulance Cover",
+          "values": [
+            "Covered up to Sum Insured"
+          ]
+        },
+        {
+          "label": "Domiciliary Expenses",
+          "values": [
+            "Covered up to 10% of Sum Insured, pre & post hospitalization covered up to 60 and 180 days each"
+          ]
+        },
+        {
+          "label": "Adult Health Check-up",
+          "values": [
+            "Adult Health Check-up once in a Policy Year to all Insured Persons who have completed 18 years of Ag ...Read More"
+          ]
+        },
+        {
+          "label": "Robotic and Cyber Knife Surgery",
+          "values": [
+            "up to Sum Insured"
+          ]
+        },
+        {
+          "label": "Modern and Advanced Treatments",
+          "values": [
+            "up to Sum Insured"
+          ]
+        },
+        {
+          "label": "HIV/AIDS and STD Cover",
+          "values": [
+            "up to Sum Insured"
+          ]
+        },
+        {
+          "label": "Mental Care Cover",
+          "values": [
+            "up to Sum Insured"
+          ]
+        },
+        {
+          "label": "Restoration of Sum Insured",
+          "values": [
+            "Multiple Restorations of base Sum Insured in a policy year for unrelated illnesses"
+          ]
+        },
+        {
+          "label": "Premium Waiver Benefit",
+          "values": [
+            "Waives off one year’ renewal premium upon diagnosis of listed critical illnesses, permanent partial ...Read More"
+          ]
+        }
+      ]
+    },
+    "prohealth-prime": {
+      "url": "https://www.manipalcigna.com/hospitalization-cover/prohealth-insurance/prohealthprime-protect",
+      "key": "prohealth-prime",
+      "ok": true,
+      "status": 200,
+      "columnHeaders": [
+        "PLAN NAME",
+        "ProHealth Prime Protect",
+        "ProHealth Prime Advantage",
+        "ProHealth Prime Active"
+      ],
+      "rows": [
+        {
+          "label": "Sum Insured",
+          "values": [
+            "3 Lacs - ₹ 100 Lacs",
+            "5 Lacs- ₹ 100 Lacs",
+            "3 Lacs- ₹ 15 Lacs"
+          ]
+        },
+        {
+          "label": "Room Accommodation",
+          "values": [
+            "Single Private AC Room ICU: Up to SI",
+            "Single Private AC Room ICU: Up to SI",
+            "SI =₹ 3Lacs: 1% of Base SI SI>=₹ 5Lacs: Single Private AC Room ICU: Up to SI"
+          ]
+        },
+        {
+          "label": "Pre - Hospitalization",
+          "values": [
+            "60 days; Up to SI",
+            "60 days; Up to SI",
+            "30 days; Up to SI"
+          ]
+        },
+        {
+          "label": "Post - Hospitalization",
+          "values": [
+            "180 days; Up to SI",
+            "180 days; Up to SI",
+            "60 days; Up to SI"
+          ]
+        },
+        {
+          "label": "Day Care Treatment",
+          "values": [
+            "Up to SI",
+            "Up to SI",
+            "Up to SI"
+          ]
+        },
+        {
+          "label": "Domiciliary Hospitalization",
+          "values": [
+            "10% of SI",
+            "10% of SI",
+            "10% of SI"
+          ]
+        },
+        {
+          "label": "Road Ambulance",
+          "values": [
+            "Up to SI",
+            "Up to SI",
+            "Up to SI"
+          ]
+        },
+        {
+          "label": "Donor Expenses",
+          "values": [
+            "Covered up to the Sum Insured • Pre & Post Hospitalization expenses (Up to 30 days each) of the donor. • Cost towards donor screening once in a Policy year for successful transplant. • Complications arising during hospitalization or up to 30 days from date of discharge - Covered up to 25% of SI subject to maximum of ₹2 Lacs, Over and above SI. We will not cover expenses towards the Donor in respect of cost associated to the acquisition of the organ.",
+            "Covered up to the Sum Insured • Pre & Post Hospitalization expenses (Up to 30 days each) of the donor. • Cost towards donor screening once in a Policy year for successful transplant. • Complications arising during hospitalization or up to 30 days from date of discharge - Covered up to 25% of SI subject to maximum of ₹2 Lacs, Over and above SI. We will not cover expenses towards the Donor in respect of cost associated to the acquisition of the organ.",
+            "Up to SI"
+          ]
+        },
+        {
+          "label": "Restoration of Sum Insured",
+          "values": [
+            "Unlimited times for related/unrelated illnesses",
+            "Unlimited times for related/unrelated illnesses",
+            "Unlimited times for unrelated illnesses"
+          ]
+        },
+        {
+          "label": "AYUSH Treatment",
+          "values": [
+            "Up to SI",
+            "Up to SI",
+            "Up to SI"
+          ]
+        },
+        {
+          "label": "Air Ambulance Cover",
+          "values": [
+            "Up to SI, subject to a maximum of ₹ 10Lacs",
+            "Up to SI, subject to a maximum of ₹ 10Lacs",
+            "Not Applicable"
+          ]
+        },
+        {
+          "label": "Bariatric Surgery Cover",
+          "values": [
+            "Up to SI, subject to a maximum of ₹ 5Lacs Waiting Period: 36 months",
+            "Up to SI, subject to a maximum of ₹ 5Lacs Waiting Period: 36 months",
+            "Not Applicable"
+          ]
+        },
+        {
+          "label": "Outpatient Expenses",
+          "values": [
+            "Not Applicable",
+            "Covered up to maximum of ₹ 20,000/30,000/50,000 per policy year, through cashless basis - Consultations, Prescribed diagnostics & pharmacy. A limit of up to 20% of the OPD limit shall apply on Pharmacy expenses. -",
+            "Not Applicable"
+          ]
+        },
+        {
+          "label": "Convalescence Benefit",
+          "values": [
+            "Not Applicable",
+            "Not Applicable",
+            "For SI>=₹ 5 lacs: ₹ 30,000 for hospitalization >=10 days, to be paid as lump sum"
+          ]
+        },
+        {
+          "label": "Daily Cash for Shared Accommodation",
+          "values": [
+            "Per Hospitalization: For SI up to ₹ 10 Lacs: ₹ 800 p.d. max ₹ 5600 For SI above ₹ 10 Lacs: ₹ 1000 p.d. max ₹ 7000 Cover triggers post 48 hours of hospitalization and payable from 1st day",
+            "Per Hospitalization: For SI up to ₹ 10 Lacs: ₹ 800 p.d. max ₹ 5600 For SI above ₹ 10 Lacs: ₹ 1000 p.d. max ₹ 7000 Cover triggers post 48 hours of hospitalization and payable from 1st day",
+            "Per Hospitalization: For SI from ₹ 5 Lacs to ₹ 10 Lacs: ₹ 800 p.d. max ₹ 5600 For SI above ₹ 10 Lacs: ₹ 1000 p.d. max ₹ 7000 Cover triggers post 48 hours of hospitalization and payable from 1st day"
+          ]
+        },
+        {
+          "label": "Health Check Up",
+          "values": [
+            "Annually from 1st year onwards, for all adults insured. Limits / Test basis opted SI, offered through Network only.",
+            "Annually from 1st year onwards, for all adults insured. Limits / Test basis opted SI, offered through Network only.",
+            "Available only if Wellness Program is removed from the base plan. Applicable once every 3rd policy year. Available as optional cover."
+          ]
+        },
+        {
+          "label": "Domestic Second Opinion",
+          "values": [
+            "Available for 36 listed Critical Illnesses",
+            "Available for 36 listed Critical Illnesses",
+            "Available for 36 listed Critical Illnesses"
+          ]
+        },
+        {
+          "label": "Tele- Consultation",
+          "values": [
+            "Unlimited",
+            "Unlimited",
+            "Unlimited"
+          ]
+        },
+        {
+          "label": "Cumulative Bonus",
+          "values": [
+            "Guaranteed Cumulative Bonus of 25% of Base SI each year subject to a max of 200% of the Base SI, irrespective of claims",
+            "Guaranteed Cumulative Bonus of 25% of Base SI each year subject to a max of 200% of the Base SI, irrespective of claims",
+            "Cumulative Bonus of 10% per year subject to a maximum upto 100% of Sum Insured"
+          ]
+        },
+        {
+          "label": "Switch Off Benefit",
+          "values": [
+            "Switch off the cover after 1 year for a maximum period of 30 days and get discount in premium during subsequent renewal.",
+            "Switch off the cover after 1 year for a maximum period of 30 days and get discount in premium during subsequent renewal.",
+            "Not Applicable"
+          ]
+        },
+        {
+          "label": "Wellness Program",
+          "values": [
+            "Earn rewards up to 20% of base premium through completing Healthy Life Management Program",
+            "Earn rewards up to 20% of base premium through completing Healthy Life Management Program",
+            "Earn rewards up to 15% of base premium through completing Condition Management Program"
+          ]
+        },
+        {
+          "label": "Premium Waiver benefit",
+          "values": [
+            "Waives off next one year renewal policy premium upon occurrence of any of the listed contingencies",
+            "Waives off next one year renewal policy premium upon occurrence of any of the listed contingencies",
+            "Waives off next one year renewal policy premium upon occurrence of any of the listed contingencies"
+          ]
+        },
+        {
+          "label": "Enhance Plus",
+          "values": [
+            "1. Room Accommodation - upgrade to \"Any Room\" 2. Health Maintenance Benefit of up to ₹ 3000 per Policy Year 3. Maternity & New Born (Including 1st year vaccination expenses) - 10% of SI per delivery subject to a maximum of ₹ 1Lac",
+            "Not Applicable",
+            "Not Applicable"
+          ]
+        },
+        {
+          "label": "Enhance",
+          "values": [
+            "Not Applicable",
+            "1. Room Accommodation - upgrade to \"Any Room\" 2. Maternity & New Born (Including 1st year vaccination expenses) - 10% of SI per delivery subject to a maximum of ₹ 1Lac",
+            "Not Applicable"
+          ]
+        },
+        {
+          "label": "Freedom (Only for Indian Residents)",
+          "values": [
+            "1. Room Accommodation - upgrade to \"Any Room\" 2. Worldwide Emergency Hospitalization with Outpatient Cover (including Accidental Hospitalization) Up to SI; Over and above the Base SI",
+            "1. Room Accommodation - upgrade to \"Any Room\" 2. Worldwide Emergency Hospitalization with Outpatient Cover (including Accidental Hospitalization) Up to SI; Over and above the Base SI",
+            "Not Applicable"
+          ]
+        },
+        {
+          "label": "Assure (Applicable for ₹ 3Lacs/₹ 4Lacs & ₹ 5Lacs Sum Insured)",
+          "values": [
+            "1. Room rent - Up to 1% of Sum Insured per day; ICU - Up to 2% of Sum Insured per day 2. Modern and Advanced Treatments - Covered up to 10% of Sum Insured 3. Disease specific sub-limits applicable",
+            "Not Applicable",
+            "Not Applicable"
+          ]
+        },
+        {
+          "label": "Non Medical Items (Non Payables)",
+          "values": [
+            "Up to SI as a part of Base SI offering",
+            "Up to SI as a part of Base SI offering",
+            "Up to SI as a part of Base SI offering"
+          ]
+        },
+        {
+          "label": "Deductible",
+          "values": [
+            "₹ 10K or ₹ 25K",
+            "Not Applicable",
+            "Not Applicable"
+          ]
+        },
+        {
+          "label": "Infertility Treatment (Option available with Enhance / Enhance Plus - Optional Packages, Applicable if base SI>= ₹ 7.5lacs)",
+          "values": [
+            "Infertility treatment limited to IUI and/or IVF - Coverage up to ₹ 2.5Lacs, over and above the Maternity limit - Waiting period of 36 months",
+            "Infertility treatment limited to IUI and/or IVF - Coverage up to ₹ 2.5Lacs, over and above the Maternity limit - Waiting period of 36 months"
+          ]
+        },
+        {
+          "label": "Personal Accident Cover (Fixed Benefit)",
+          "values": [
+            "2 times of SI subject to a maximum of ₹ 50Lacs",
+            "2 times of SI subject to a maximum of ₹ 50Lacs",
+            "Not Applicable"
+          ]
+        },
+        {
+          "label": "Cumulative Bonus Booster (For SI ₹ 5Lacs and above)",
+          "values": [
+            "50% of SI per policy year, subject to a maximum of 200% of SI",
+            "50% of SI per policy year, subject to a maximum of 200% of SI",
+            "Not Applicable"
+          ]
+        },
+        {
+          "label": "Worldwide Accidental Emergency Hospitalization Cover",
+          "values": [
+            "Not Applicable",
+            "Not Applicable",
+            "Up to SI; Over and above the Base SI"
+          ]
+        },
+        {
+          "label": "ManipalCigna Critical Illness Add On Cover (Critical Illness Benefit Rider)",
+          "values": [
+            "Any available SI options under Critical Illness Benefit Rider subject to the maximum of the Base SI",
+            "Any available SI options under Critical Illness Benefit Rider subject to the maximum of the Base SI",
+            "Not Applicable"
+          ]
+        },
+        {
+          "label": "PED Waiting Period",
+          "values": [
+            "Up to SI ₹ 5Lacs - 36 months For SI >= ₹ 7.5Lacs - 24 months",
+            "Up to SI ₹ 5Lacs - 36 months For SI >= ₹ 7.5Lacs - 24 months",
+            "90 days for Asthma, Diabetes, Hypertension, Dyslipidaemia, Obesity related conditions For all other conditions - 24 months"
+          ]
+        },
+        {
+          "label": "Policy type",
+          "values": [
+            "Individual / Multi Individual /Family Floater",
+            "Individual / Multi Individual /Family Floater",
+            "Individual / Multi Individual"
+          ]
+        }
+      ]
+    },
+    "super-top-up-plus": {
+      "url": "https://www.manipalcigna.com/hospitalization-cover/super-topup/super-topup-plus",
+      "key": "super-top-up-plus",
+      "ok": true,
+      "status": 200,
+      "columnHeaders": [
+        "KEY FEATURES",
+        "INFORMATION"
+      ],
+      "rows": [
+        {
+          "label": "Inpatient Hospitalization Expenses",
+          "values": [
+            "Covers Hospital expenses for admission longer than 24 hours."
+          ]
+        },
+        {
+          "label": "Pre & Post Hospitalization",
+          "values": [
+            "Pre & Post Hospitalization of 60 And 90 days respectively"
+          ]
+        },
+        {
+          "label": "Road Ambulance",
+          "values": [
+            "Actual expenses incurred paid per hospitalization event"
+          ]
+        },
+        {
+          "label": "Donor expenses",
+          "values": [
+            "Up to Sum Insured"
+          ]
+        },
+        {
+          "label": "AYUSH treatment",
+          "values": [
+            "Up to Sum Insured"
+          ]
+        },
+        {
+          "label": "Non-medical expenses cover",
+          "values": [
+            "Actual expenses incurred towards non-medical items listed under policy wordings under Annexure III"
+          ]
+        },
+        {
+          "label": "Day care Treatment",
+          "values": [
+            "Covered up to limit of Sum Insured opted"
+          ]
+        },
+        {
+          "label": "Guaranteed Cumulative Bonus",
+          "values": [
+            "A guaranteed 5% increase in Sum insured per policy year, maximum up to 50% of Sum Insured"
+          ]
+        }
+      ]
+    },
+    "super-top-up-select": {
+      "url": "https://www.manipalcigna.com/hospitalization-cover/super-topup/super-topup-select",
+      "key": "super-top-up-select",
+      "ok": true,
+      "status": 200,
+      "columnHeaders": [
+        "KEY FEATURES",
+        "INFORMATION"
+      ],
+      "rows": [
+        {
+          "label": "Inpatient Hospitalization Expenses",
+          "values": [
+            "Covers Hospital expenses for admission longer than 24 hours."
+          ]
+        },
+        {
+          "label": "Pre & Post Hospitalization",
+          "values": [
+            "Pre & Post Hospitalization of 60 And 90 days respectively"
+          ]
+        },
+        {
+          "label": "Road Ambulance",
+          "values": [
+            "Actual expenses incurred paid per hospitalization event"
+          ]
+        },
+        {
+          "label": "Donor expenses",
+          "values": [
+            "Up to Sum Insured"
+          ]
+        },
+        {
+          "label": "AYUSH treatment",
+          "values": [
+            "Up to Sum Insured"
+          ]
+        },
+        {
+          "label": "Non-medical expenses cover",
+          "values": [
+            "Actual expenses incurred towards non-medical items listed under policy wordings under Annexure III"
+          ]
+        },
+        {
+          "label": "Day care Treatment",
+          "values": [
+            "Covered up to limit of Sum Insured opted"
+          ]
+        },
+        {
+          "label": "Guaranteed Cumulative Bonus",
+          "values": [
+            "A guaranteed 5% increase in Sum insured per policy year, maximum up to 50% of Sum Insured"
+          ]
+        }
+      ]
+    },
+    "prime-senior-classic": {
+      "url": "https://www.manipalcigna.com/hospitalization-cover/senior-citizen-health-insurance/senior-classic",
+      "key": "prime-senior-classic",
+      "ok": true,
+      "status": 200,
+      "columnHeaders": [
+        "KEY FEATURES",
+        "INFORMATION"
+      ],
+      "rows": [
+        {
+          "label": "Hospitalization expenses",
+          "values": [
+            "Single Private Room covered up to Sum Insured (With an option to select any room caterogy)"
+          ]
+        },
+        {
+          "label": "Pre & Post Hospitalization Expenses",
+          "values": [
+            "Expenses covered up to 30 and 60 days respectively"
+          ]
+        },
+        {
+          "label": "Domiciliary Hospitalization",
+          "values": [
+            "Covered up to Sum Insured"
+          ]
+        },
+        {
+          "label": "Road Ambulance",
+          "values": [
+            "Covered up to Sum Insured"
+          ]
+        },
+        {
+          "label": "AYUSH treatment",
+          "values": [
+            "Covered up to Sum Insured"
+          ]
+        },
+        {
+          "label": "Enhanced coverage",
+          "values": [
+            "Covers complications arising during hospitalization of donor up to 25% of Sum Insured"
+          ]
+        },
+        {
+          "label": "Unlimited Tele-Consultation",
+          "values": [
+            "Available"
+          ]
+        },
+        {
+          "label": "Health Check-up",
+          "values": [
+            "Available every claim free policy year"
+          ]
+        },
+        {
+          "label": "Cumulative Bonus",
+          "values": [
+            "Guaranteed Cumulative Bonus of 10% of Sum Insured every year, maximum up to 100% of Sum Insured"
+          ]
+        },
+        {
+          "label": "Mandatory Co-Payment",
+          "values": [
+            "20% co-pay applicable per claim, with an option to modify the co-pay to 0%, 10% or 30%"
+          ]
+        }
+      ]
+    },
+    "prime-senior-elite": {
+      "url": "https://www.manipalcigna.com/hospitalization-cover/senior-citizen-health-insurance/senior-elite",
+      "key": "prime-senior-elite",
+      "ok": true,
+      "status": 200,
+      "columnHeaders": [
+        "KEY FEATURES",
+        "INFORMATION"
+      ],
+      "rows": [
+        {
+          "label": "Hospitalization expenses",
+          "values": [
+            "Single Private Room covered up to Sum Insured (With an option to select any room caterogy)"
+          ]
+        },
+        {
+          "label": "Pre & Post Hospitalization Expenses",
+          "values": [
+            "Expenses covered up to 30 and 60 days respectively"
+          ]
+        },
+        {
+          "label": "Domiciliary Hospitalization",
+          "values": [
+            "Covered up to Sum Insured"
+          ]
+        },
+        {
+          "label": "Road Ambulance",
+          "values": [
+            "Covered up to Sum Insured"
+          ]
+        },
+        {
+          "label": "Unlimited Restoration",
+          "values": [
+            "Restoration of Sum Insured for both related & unrelated illnesses"
+          ]
+        },
+        {
+          "label": "AYUSH treatment",
+          "values": [
+            "Covered up to Sum Insured"
+          ]
+        },
+        {
+          "label": "Enhanced Coverage for Donor Expenses",
+          "values": [
+            "Covers complications arising during hospitalization of donor up to 25% of Sum Insured"
+          ]
+        },
+        {
+          "label": "Air Ambulance",
+          "values": [
+            "cover up to Sum Insured, subject to a max of ₹ 10Lacs"
+          ]
+        },
+        {
+          "label": "Unlimited Tele-Consultation",
+          "values": [
+            "Available"
+          ]
+        },
+        {
+          "label": "Health Check-up",
+          "values": [
+            "Available every claim free policy year"
+          ]
+        },
+        {
+          "label": "Cumulative Bonus",
+          "values": [
+            "Guaranteed Cumulative Bonus of 10% of Sum Insured every year, maximum up to 100% of Sum Insured"
+          ]
+        },
+        {
+          "label": "Mandatory Co-Payment",
+          "values": [
+            "20% co-pay applicable per claim, with an option to modify the co-pay to 0%, 10% or 30%"
+          ]
+        }
+      ]
+    }
+  }
+}

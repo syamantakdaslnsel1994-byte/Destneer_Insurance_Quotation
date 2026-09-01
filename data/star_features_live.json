@@ -1,0 +1,2142 @@
+{
+  "_comment": "Scraped live from starhealth.in's own public product pages — see scripts/scrape_star_features.js. Refreshable cache, not fetched at report time.",
+  "_scrapedAt": "2026-08-27T09:03:37.723Z",
+  "_slugCount": 22,
+  "_okCount": 22,
+  "plans": {
+    "arogya-sanjeevani": {
+      "slug": "arogya-sanjeevani",
+      "ok": true,
+      "status": 200,
+      "rows": [
+        {
+          "label": "Policy Term",
+          "value": "This policy can be availed for a term of one year."
+        },
+        {
+          "label": "Sum Insured",
+          "value": "The policy provides the Sum Insured options ranging from Rs. 50,000/- to Rs. 10,00,000/- (in the multiples of Rs. 50,000/-)."
+        },
+        {
+          "label": "In-Patient Hospitalisation",
+          "value": "Hospitalisation expenses incurred for a period of more than 24 hours on account of illness, injury or accidents are covered."
+        },
+        {
+          "label": "Pre-Hospitalisation",
+          "value": "In addition to in-patient hospitalisation, the medical expenses incurred up to 30 days before the date of admission to the hospital are also covered."
+        },
+        {
+          "label": "Post-Hospitalisation",
+          "value": "Post-hospitalisation medical expenses up to 60 days from the date of discharge are covered."
+        },
+        {
+          "label": "Room Rent",
+          "value": "Room, boarding and nursing expenses incurred during in-patient hospitalisation are covered up to 2% of the Sum Insured subject to the maximum of Rs. 5000/- per day."
+        },
+        {
+          "label": "ICU Charges",
+          "value": "ICU charges up to 5% of the Sum Insured are covered subject to the maximum of Rs. 10,000/- per day."
+        },
+        {
+          "label": "Road Ambulance",
+          "value": "Ambulance charges are covered up to Rs. 2000/- per hospitalisation."
+        },
+        {
+          "label": "Day Care Procedures",
+          "value": "Medical treatments and surgical procedures that require less than 24 hours of hospitalisation due to technological advancements are covered."
+        },
+        {
+          "label": "AYUSH Treatment",
+          "value": "Expenses incurred for the treatment under Ayurveda, Yoga and Naturopathy, Unani, Siddha and Homeopathy systems of medicines in AYUSH hospitals are covered up to the limits of the Sum Insured."
+        },
+        {
+          "label": "Rural Discount",
+          "value": "A discount of 10% of the premium is applicable for Insured Persons aged up to 59 years whereas discount of 20% is applicable for Insured Persons aged 60 years and above."
+        },
+        {
+          "label": "Lifelong Renewal",
+          "value": "The policy provides lifelong renewal option."
+        },
+        {
+          "label": "Cumulative Bonus",
+          "value": "Cumulative bonus is provided at 5% of the Sum Insured for each claim-free year subject to a maximum of 50% of the Sum Insured."
+        },
+        {
+          "label": "Co-payment",
+          "value": "Each and every claim under the Policy shall be subject to a Copayment of 5% applicable to claim amount admissible and payable as per the terms and conditions of the Policy."
+        },
+        {
+          "label": "Cataract Treatment",
+          "value": "Expenses incurred for Cataract treatment are covered up to 25% of the Sum Insured or Rs. 40,000/- whichever is less per eye in one policy year."
+        },
+        {
+          "label": "Instalment Options",
+          "value": "This policy premium can be paid on a quarterly or half-yearly basis. It can also be paid annually."
+        }
+      ]
+    },
+    "autism-care": {
+      "slug": "autism-care",
+      "ok": true,
+      "status": 200,
+      "rows": [
+        {
+          "label": "Policy Type",
+          "value": "This policy provides benefits only on an Individual basis."
+        },
+        {
+          "label": "Policy Term",
+          "value": "This policy can be availed for a term of one year."
+        },
+        {
+          "label": "In-Patient Hospitalisation",
+          "value": "Hospitalisation expenses incurred for a period of more than 24 hours are covered."
+        },
+        {
+          "label": "Post-Hospitalisation",
+          "value": "Post-hospitalisation medical expenses incurred up to 60 days from the date of discharge from the hospital are covered up to 7% of the hospitalisation expenses or actuals."
+        },
+        {
+          "label": "Room Rent",
+          "value": "Room, boarding and nursing expenses incurred during in-patient hospitalisation are covered up to Rs. 5,000/- per day."
+        },
+        {
+          "label": "Shared Accommodation",
+          "value": "Expenses incurred on occupying a shared accommodation by the insured person are covered up to Rs.500/- per day subject to a maximum of Rs.2,000/- per hospitalisation and Rs.10,000/- per policy period."
+        },
+        {
+          "label": "Emergency Ambulance",
+          "value": "Ambulance charges for the transportation of an insured person by private ambulance are covered up to Rs. 750/- per hospitalisation and Rs. 1500/- per policy period."
+        },
+        {
+          "label": "Day Care Procedures",
+          "value": "Medical treatments and surgical procedures that require less than 24 hours of hospitalisation due to technological advancements are covered."
+        },
+        {
+          "label": "Co-Payment",
+          "value": "This policy is subjected to co-payment of 20% of each and every claim amount for fresh as well as renewal policies."
+        },
+        {
+          "label": "Modern Treatment",
+          "value": "Expenses incurred for Modern treatments such as Robotic Surgeries, Oral Chemotherapy, etc., are payable to the extent of the limits mentioned in the policy clause."
+        },
+        {
+          "label": "AYUSH Treatment",
+          "value": "Medical expenses for Inpatient Hospitalization incurred on treatment under Ayurveda, Unani, Sidha and Homeopathy systems of medicines in a AYUSH Hospital is payable up to the sum insured."
+        },
+        {
+          "label": "Sub-Limits",
+          "value": "The policy is subjected to sub-limits for certain procedures and treatments as mentioned in the policy clause."
+        }
+      ]
+    },
+    "cancer-care-platinum": {
+      "slug": "cancer-care-platinum",
+      "ok": true,
+      "status": 200,
+      "rows": [
+        {
+          "label": "Policy Term",
+          "value": "This policy can be availed for a term of one year."
+        },
+        {
+          "label": "Entry Age",
+          "value": "Any person aged between 5 months and 65 years can avail this policy."
+        },
+        {
+          "label": "Sum Insured",
+          "value": "The Sum Insured options under this policy are Rs. 5,00,000/-, Rs. 7,50,000/- and Rs. 10,00,000/-."
+        },
+        {
+          "label": "In-Patient Hospitalisation",
+          "value": "Hospitalisation expenses incurred for a period of more than 24 hours on account of illness, injury or accidents are covered."
+        },
+        {
+          "label": "Pre-Hospitalisation",
+          "value": "In addition to in-patient hospitalisation, the medical expenses incurred up to 30 days before the date of admission to the hospital are also covered."
+        },
+        {
+          "label": "Post-Hospitalisation",
+          "value": "Post-hospitalisation medical expenses up to 60 days from the date of discharge from the hospital are covered up to 2% of the basic Sum Insured per hospitalisation."
+        },
+        {
+          "label": "Road Ambulance",
+          "value": "Ambulance charges incurred for transporting the insured person to the hospital are covered by private ambulance services are covered."
+        },
+        {
+          "label": "Room Rent",
+          "value": "Room (Single Standard A/C Room), boarding and nursing expenses incurred during in-patient hospitalisation are covered."
+        },
+        {
+          "label": "ICU Charges",
+          "value": "ICU charges at actuals are covered under this policy."
+        },
+        {
+          "label": "Cataract Treatment",
+          "value": "Expenses incurred for Cataract treatment are covered up to the limits mentioned in the policy clause."
+        },
+        {
+          "label": "Modern Treatment",
+          "value": "Modern treatment expenses are covered up to the limits mentioned in the policy clause."
+        },
+        {
+          "label": "Day Care Procedures",
+          "value": "Medical treatments and surgical procedures that require less than 24 hours of hospitalisation due to technological advancements are covered."
+        },
+        {
+          "label": "Rehabilitation & Pain Management",
+          "value": "Expenses incurred for Rehabilitation and Pain Management are covered up to the specified sub-limit or the maximum up to 10% of the basic Sum Insured, whichever is less, per policy period."
+        },
+        {
+          "label": "Hospice Care",
+          "value": "For cancer patients with advanced life-limiting cancer, 20% of the Sum Insured is payable for compassionate care at Network Hospitals after the completion of 12 month waiting period."
+        },
+        {
+          "label": "Co-payment",
+          "value": "If the insured person purchases or renews the policy at 61 years of age or above, then he/she is subjected to the co-payment of 10% for each and every claim amount."
+        },
+        {
+          "label": "Cumulative Bonus",
+          "value": "Cumulative bonus is provided at 5% of the Sum Insured for each claim-free year subject to a maximum of 50% of the Sum Insured."
+        },
+        {
+          "label": "Second Medical Opinion",
+          "value": "The Insured person can avail a Second Medical Opinion from a Doctor in the Company's network of Medical Practitioners."
+        },
+        {
+          "label": "Health Check-Up",
+          "value": "Expenses incurred for health check-up are covered up to Rs. 2500/- for every claim-free year."
+        },
+        {
+          "label": "Wellness Services",
+          "value": "This program intends to promote, incentivize and to reward the Insured Persons' healthy life style through various wellness activities."
+        },
+        {
+          "label": "Instalment Options",
+          "value": "This policy premium can be paid on a quarterly or half-yearly basis."
+        },
+        {
+          "label": "AYUSH Treatments",
+          "value": "Medical expenses for Inpatient Hospitalization incurred on treatment under Ayurveda, Unani, Sidha and Homeopathy systems of medicines in a AYUSH Hospital is payable up to the sum insured"
+        },
+        {
+          "label": "Lump Sum Cover for Cancer - Optional Cover",
+          "value": "A Lump sum amount is provided for the recurrence of cancer, metastasis, and/or a second malignancy unrelated to the first cancer. This benefit is provided in addition to the Sum Insured of Indemnity cover under Section I. The Sum Insured under this Section is 50% of the Section I Sum Insured."
+        }
+      ]
+    },
+    "cardiac-care": {
+      "slug": "cardiac-care",
+      "ok": true,
+      "status": 200,
+      "rows": [
+        {
+          "label": "In-patient Hospitalisation",
+          "value": "Hospitalisation expenses incurred for a period of more than 24 hours on account of illness, injury or accidents are covered."
+        },
+        {
+          "label": "Pre-Hospitalisation",
+          "value": "In addition to in-patient hospitalisation, the medical expenses incurred up to 30 days before the date of admission to the hospital are also covered."
+        },
+        {
+          "label": "Post-Hospitalisation",
+          "value": "Post-hospitalisation medical expenses incurred up to 60 days from the date of discharge from the hospital are covered up to 7% of the hospitalisation expenses subject to the maximum of Rs. 5000/- per hospitalisation."
+        },
+        {
+          "label": "Room Rent",
+          "value": "Room, boarding and nursing expenses incurred during in-patient hospitalisation are covered up to 2% of the Sum Insured subject to the maximum of Rs. 5000/- per day."
+        },
+        {
+          "label": "Road Ambulance",
+          "value": "Ambulance charges are covered up to Rs. 750/- per hospitalisation and Rs. 1500/- per policy period for transportation of the insured person to the hospital by private ambulance service."
+        },
+        {
+          "label": "Day Care Procedures",
+          "value": "Medical treatments and surgical procedures that require less than 24 hours of hospitalisation due to technological advancements are covered."
+        },
+        {
+          "label": "Modern Treatment",
+          "value": "Expenses incurred for modern treatments such as Oral Chemotherapy, Intra Vitreal injections, Robotic Surgeries, etc. are covered up to the limits mentioned in the policy clause."
+        },
+        {
+          "label": "Cataract Treatment",
+          "value": "Expenses incurred for Cataract treatment are payable up to the limits mentioned in the policy clause."
+        },
+        {
+          "label": "Co-Payment",
+          "value": "If the insured person purchases or renews the policy at 61 years of age or above, then he/she is subjected to the co-payment of 10% for each and every claim amount."
+        },
+        {
+          "label": "AYUSH Treatment",
+          "value": "Medical expenses for Inpatient Hospitalization incurred on treatment under Ayurveda, Unani, Sidha and Homeopathy systems of medicines in a AYUSH Hospital is payable up to the sum insured."
+        },
+        {
+          "label": "Cardiac Ailments (Surgical /Interventional Management, Medical Management)",
+          "value": "All the features mentioned in Section I will be covered along with cardiac related complications that requires in-patient hospitalisation in Gold Plan under this policy."
+        },
+        {
+          "label": "Cardiac Ailments (Only Surgical /Interventional Management)",
+          "value": "All the features mentioned in Section I will be covered along with cardiac related complications that requires surgery or intervention in Silver Plan under this policy."
+        },
+        {
+          "label": "AYUSH Treatment",
+          "value": "Medical expenses for Inpatient Hospitalization incurred on treatment under Ayurveda, Unani, Sidha and Homeopathy systems of medicines in a AYUSH Hospital is payable up to the sum insured."
+        },
+        {
+          "label": "Out Patient Expenses",
+          "value": "Reasonably and necessarily incurred outpatient expenses at Network Hospitals in India are covered up to Rs. 500/- per event subject to a maximum of Rs. 1500/- per policy period."
+        },
+        {
+          "label": "Personal Accident Cover",
+          "value": "Worldwide personal accident cover is provided in the event of unfortunate death of the insured person due to accidents during the policy period."
+        }
+      ]
+    },
+    "cardiac-care-platinum": {
+      "slug": "cardiac-care-platinum",
+      "ok": true,
+      "status": 200,
+      "rows": [
+        {
+          "label": "In-patient Hospitalisation",
+          "value": "Hospitalisation expenses incurred for a period of more than 24 hours on account of illness, injury or accidents are covered."
+        },
+        {
+          "label": "Pre-Hospitalisation",
+          "value": "In addition to in-patient hospitalisation, the medical expenses incurred up to 30 days before the date of admission to the hospital are also covered."
+        },
+        {
+          "label": "Post-Hospitalisation",
+          "value": "Post-hospitalisation medical expenses up to 60 days from the date of discharge from the hospital are covered."
+        },
+        {
+          "label": "Room Rent",
+          "value": "Room (Single Private A/C Room), boarding and nursing expenses incurred during in-patient hospitalisation are covered."
+        },
+        {
+          "label": "Road Ambulance",
+          "value": "Ambulance charges incurred for transporting the insured person to the hospital are covered by private ambulance services are covered."
+        },
+        {
+          "label": "Day Care Procedures",
+          "value": "Medical treatments and surgical procedures that require less than 24 hours of hospitalisation due to technological advancements are covered."
+        },
+        {
+          "label": "Cataract Treatment",
+          "value": "Expenses incurred for Cataract treatment are payable up to the limits mentioned in the policy clause."
+        },
+        {
+          "label": "Modern Treatment",
+          "value": "Expenses incurred for modern treatments such as Oral Chemotherapy, Intra Vitreal injections, Robotic Surgeries, etc. are covered up to the limits mentioned in the policy clause."
+        },
+        {
+          "label": "E-Medical Opinion",
+          "value": "E-Medical Opinion facility from the Company’s expert panel is available on the request initiated by the insured person."
+        },
+        {
+          "label": "Rehabilitation & Pain Management",
+          "value": "Expenses incurred for Rehabilitation and Pain Management are covered up to the specified sub-limit or maximum up to 10% of the basic Sum Insured, whichever is less, per policy year."
+        },
+        {
+          "label": "Automatic Restoration",
+          "value": "On exhaustion of the limit of coverage,100% of the basic Sum Insured will be restored once in the policy period which can be utilized only for illness unrelated to the illness for which claim was already made. This benefit is not available for modern treatment and cardiac ailment."
+        },
+        {
+          "label": "Cumulative Bonus",
+          "value": "Cumulative bonus is provided at 10% of the basic Sum Insured for each claim-free year subject to a maximum of 100% of the opted Sum Insured."
+        },
+        {
+          "label": "Health Check-Up",
+          "value": "After completing each policy year, health check-up expenses are covered up to the specified limits irrespective of the claim."
+        },
+        {
+          "label": "Wellness Services",
+          "value": "This program intends to promote, incentivize and to reward the Insured Persons' healthy lifestyle through various wellness activities."
+        },
+        {
+          "label": "AYUSH Treatment",
+          "value": "Medical expenses for Inpatient Hospitalization incurred on treatment under Ayurveda, Unani, Sidha and Homeopathy systems of medicines in a AYUSH Hospital is payable up to the sum insured."
+        },
+        {
+          "label": "In-patient Hospitalisation",
+          "value": "Hospitalisation expenses incurred for a period of more than 24 hours on account of illness, injury or accidents are covered."
+        },
+        {
+          "label": "Pre-Hospitalisation",
+          "value": "In addition to in-patient hospitalisation, the medical expenses incurred up to 30 days before the date of admission to the hospital are also covered."
+        },
+        {
+          "label": "Post-Hospitalisation",
+          "value": "Post-hospitalisation medical expenses up to 60 days from the date of discharge from the hospital are covered."
+        },
+        {
+          "label": "Room Rent",
+          "value": "Room (Single Private A/C Room), boarding and nursing expenses incurred during in-patient hospitalisation are covered."
+        },
+        {
+          "label": "Road Ambulance",
+          "value": "Ambulance charges incurred for transporting the insured person to the hospital are covered by private ambulance services are covered."
+        },
+        {
+          "label": "Modern Treatment",
+          "value": "Expenses incurred for modern treatments such as Oral Chemotherapy, Intra Vitreal injections, Robotic Surgeries, etc. are covered up to the limits mentioned in the policy clause."
+        },
+        {
+          "label": "E-Medical Opinion",
+          "value": "E-Medical Opinion facility from the Company’s expert panel is available on the request initiated by the insured person."
+        },
+        {
+          "label": "Cardiac Devices",
+          "value": "Expenses incurred on cardiac devices like Pacemaker, CRT-D and AICD are covered up to 50% of the Sum Insured."
+        },
+        {
+          "label": "Heart Transplantation",
+          "value": "Expenses incurred towards harvesting and transportation of heart by road or air are covered up to 200% of the basic Sum Insured."
+        },
+        {
+          "label": "Conventional Coronary Angiogram Test",
+          "value": "Expenses incurred for Coronary Angiogram test are covered up to the limits mentioned in this policy."
+        },
+        {
+          "label": "Rehabilitation & Pain Management",
+          "value": "Expenses incurred for Rehabilitation and Pain Management are covered up to the specified sub-limit or maximum up to 10% of the basic Sum Insured, whichever is less, per policy year."
+        },
+        {
+          "label": "Cumulative Bonus",
+          "value": "Cumulative bonus is provided at 10% of the basic Sum Insured for each claim-free year subject to a maximum of 100% of the opted Sum Insured."
+        },
+        {
+          "label": "Health Check-Up",
+          "value": "After completing each policy year, health check-up expenses are covered up to the specified limits irrespective of the claim."
+        },
+        {
+          "label": "Wellness Services",
+          "value": "This program intends to promote, incentivize and to reward the Insured Persons' healthy lifestyle through various wellness activities."
+        },
+        {
+          "label": "AYUSH Treatments",
+          "value": "Medical expenses for Inpatient Hospitalization incurred on treatment under Ayurveda, Unani, Sidha and Homeopathy systems of medicines in a AYUSH Hospital is payable up to the sum insured"
+        },
+        {
+          "label": "Outpatient Expenses (Including Vaccination)",
+          "value": "Outpatient Expenses (including vaccination) incurred at Networked Facility are payable up to the limits mentioned in the policy clause."
+        }
+      ]
+    },
+    "critical-illness-insurance": {
+      "slug": "critical-illness-insurance",
+      "ok": true,
+      "status": 200,
+      "rows": [
+        {
+          "label": "Policy Term",
+          "value": "This policy can be availed for a term of one, two or three years."
+        },
+        {
+          "label": "Pre-Medical Examination",
+          "value": "Pre-acceptance medical screening is not required to avail this policy by those who are aged below 50 years. However, those who are aged above 50 years and those who have adverse medical history need to undergo pre-medical screening."
+        },
+        {
+          "label": "Sum Insured",
+          "value": "The minimum Sum Insured of this policy is Rs. 5,00,000/- and the maximum is Rs. 25,00,000/- (in the multiples of Rs. 1,00,000/-). 1) For Earning persons -12 times of yearly income for 18 – 35 yrs age and 10 times of yearly income for above 35 yrs age. The maximum Sum Insured cannot exceed Rs.25 lakhs. 2) For Non-Earning persons – Maximum up to 15 lakhs. Non-earning Sum Insured cannot be more than the Sum Insured for the primary member."
+        },
+        {
+          "label": "Wide Critical Illness Cover",
+          "value": "This wide critical illness cover is used for major critical illnesses grouped into four categories."
+        },
+        {
+          "label": "Cancer Cover",
+          "value": "This policy provides lump sum cover for Cancer related major diseases."
+        },
+        {
+          "label": "Heart Disease Cover",
+          "value": "This policy provides lump sum cover for major heart related conditions."
+        },
+        {
+          "label": "Brain & Nervous System",
+          "value": "This policy provides lump sum cover for critical illnesses related to brain and nervous system."
+        },
+        {
+          "label": "Major Organ & Other Conditions",
+          "value": "This policy provides lump sum cover for critical illnesses related to major organs and other conditions."
+        },
+        {
+          "label": "Instalment Options",
+          "value": "The policy premium can be paid on a quarterly or half-yearly basis. It can also be paid on an annual, biennial (once in 2 years) and triennial (once in 3 years) basis."
+        }
+      ]
+    },
+    "diabetes-health-insurance": {
+      "slug": "diabetes-health-insurance",
+      "ok": true,
+      "status": 200,
+      "rows": [
+        {
+          "label": "In-patient Hospitalisation",
+          "value": "Hospitalisation expenses incurred for a period of more than 24 hours on account of illness, injury or accidents are covered."
+        },
+        {
+          "label": "Pre-Hospitalisation",
+          "value": "In addition to in-patient hospitalisation, the medical expenses incurred up to 30 days before the date of admission to the hospital are also covered."
+        },
+        {
+          "label": "Post-Hospitalisation",
+          "value": "Post-hospitalisation medical expenses up to 60 days from the date of discharge from the hospital are covered as per the limits mentioned in the policy clause."
+        },
+        {
+          "label": "Room Rent",
+          "value": "Room (Single Standard A/C Room), boarding and nursing expenses incurred during in-patient hospitalisation are covered."
+        },
+        {
+          "label": "ICU Charges",
+          "value": "ICU charges at actuals are covered under this policy."
+        },
+        {
+          "label": "Emergency Ambulance",
+          "value": "Ambulance charges for transporting the insured person to the hospital by private ambulance service are covered up to Rs. 2000/- per policy period."
+        },
+        {
+          "label": "Day Care Procedures",
+          "value": "Medical treatments and surgical procedures that require less than 24 hours of hospitalisation due to technological advancements are covered."
+        },
+        {
+          "label": "Kidney Transplantation",
+          "value": "Donor expenses for kidney transplantation are payable if the insured person is the recipient provided the claim for transplantation is payable subject to the availability of the Sum Insured."
+        },
+        {
+          "label": "Dialysis Expenses",
+          "value": "Expenses incurred for dialysis (including AV fistula / graft creation changes) is covered up to Rs. 1000/- per siting. If the insured person diagnosed with Chronic Kidney Diseases then the same are covered for 24 consecutive months."
+        },
+        {
+          "label": "Cost of Artificial Limbs",
+          "value": "Expenses incurred for the cost of artificial limbs following the amputation are covered up to 10% of the Sum Insured."
+        },
+        {
+          "label": "In-patient Hospitalisation",
+          "value": "Hospitalisation expenses incurred for a period of more than 24 hours on account of illness, injury or accidents are covered."
+        },
+        {
+          "label": "Pre-Hospitalisation",
+          "value": "In addition to in-patient hospitalisation, the medical expenses incurred up to 30 days before the date of admission to the hospital are also covered."
+        },
+        {
+          "label": "Post-Hospitalisation",
+          "value": "Post-hospitalisation medical expenses up to 60 days from the date of discharge from the hospital are covered as per the limits mentioned in the policy clause."
+        },
+        {
+          "label": "Room Rent",
+          "value": "Room (Single Standard A/C Room), boarding and nursing expenses incurred during in-patient hospitalisation are covered."
+        },
+        {
+          "label": "ICU Charges",
+          "value": "ICU charges at actuals are covered under this policy."
+        },
+        {
+          "label": "Emergency Ambulance",
+          "value": "Ambulance charges for transporting the insured person to the hospital by private ambulance service are covered up to Rs. 2000/- per policy period."
+        },
+        {
+          "label": "Day Care Procedures",
+          "value": "Medical treatments and surgical procedures that require less than 24 hours of hospitalisation due to technological advancements are covered."
+        },
+        {
+          "label": "AYUSH Treatment",
+          "value": "Medical expenses for Inpatient Hospitalization incurred on treatment under Ayurveda, Unani, Sidha and Homeopathy systems of medicines in a AYUSH Hospital is payable up to the sum insured."
+        },
+        {
+          "label": "Cataract Treatment",
+          "value": "Expenses incurred for Cataract treatment are covered up to the limits mentioned in the policy clause."
+        },
+        {
+          "label": "Outpatient Expenses",
+          "value": "Outpatient expenses incurred at Network Hospitals or Diagnostic Centres are covered up to the limits mentioned in the policy clause."
+        },
+        {
+          "label": "Modern Treatment",
+          "value": "Expenses incurred for modern treatments such as Balloon Sinuplasty, Intra Vitreal injections, Robotic Surgeries, etc. are covered up to the limits mentioned in the policy clause."
+        },
+        {
+          "label": "Personal Accident Cover",
+          "value": "One person is eligible to avail worldwide personal accident cover at no additional cost in case of accidental death."
+        }
+      ]
+    },
+    "extra-protect": {
+      "slug": "extra-protect",
+      "ok": true,
+      "status": 200,
+      "rows": [
+        {
+          "label": "Enhanced Room Rent",
+          "value": "This cover enhances the room, boarding and nursing expenses as per the limits mentioned in the policy clause."
+        },
+        {
+          "label": "Claim Guard (Coverage for Non-medical Items)",
+          "value": "If there is an admissible claim under the base policy, then the expenses for non-medical items specified in this Add on Cover will become payable."
+        },
+        {
+          "label": "Enhanced Limit for Modern Treatments",
+          "value": "If the modern treatments that are listed in the policy clause are covered in the base policy, then such treatments are covered up to the Sum Insured of the basic policy."
+        },
+        {
+          "label": "Enhanced Limit for AYUSH Treatment",
+          "value": "The in-patient hospitalisation expenses incurred for the treatment under Ayurveda, Unani, Siddha and Homeopathy systems of medicines in AYUSH hospitals are covered up to the Sum Insured of the base policy."
+        },
+        {
+          "label": "Home Care Treatment",
+          "value": "Expenses incurred on home care treatment for the specified conditions as mentioned in the policy clause are covered up to 10% of the Sum Insured of the base policy subject to the maximum of Rs. 5,00,000/- in a policy year."
+        },
+        {
+          "label": "Bonus Guard",
+          "value": "1) The Cumulative Bonus granted under the base policy will not be reduced at the time of renewal unless the bonus is utilised. 2) On full utilisation of the Sum Insured and nil utilisation of the Cumulative bonus, the Cumulative Bonus granted under the base policy at the time of renewal will not be reduced. 3) On full utilisation of the Sum Insured and partial utilisation of the Cumulative Bonus, the Cumulative Bonus granted under the base policy at the time of renewal will be the balance Cumulative Bonus available. 4) On full utilisation of the Sum Insured and Cumulative Bonus, the Cumulative Bonus granted under the base policy on renewal will be nil."
+        },
+        {
+          "label": "Option to Choose Aggregate Deductible",
+          "value": "Discount on premium is available if the insured person chooses any of the deductible listed in the policy clause."
+        }
+      ]
+    },
+    "family-health-optima": {
+      "slug": "family-health-optima",
+      "ok": true,
+      "status": 200,
+      "rows": [
+        {
+          "label": "Policy Type",
+          "value": "This policy provides benefits only on a Floater basis."
+        },
+        {
+          "label": "Entry Age",
+          "value": "Any person aged between 18 and 65 years can avail this policy. Dependent children are covered from the 16th day onwards up to 25 years."
+        },
+        {
+          "label": "Family Size",
+          "value": "This policy provides wide coverage to family members including self, spouse, dependent children (maximum 3), parents and parents-in-law."
+        },
+        {
+          "label": "In-Patient Hospitalisation",
+          "value": "Hospitalisation expenses incurred for a period of more than 24 hours on account of illness, injury or accidents are covered."
+        },
+        {
+          "label": "Pre-Hospitalisation",
+          "value": "In addition to in-patient hospitalisation, the medical expenses incurred up to 60 days before the date of admission to the hospital are also covered."
+        },
+        {
+          "label": "Post-Hospitalisation",
+          "value": "Post-hospitalisation medical expenses up to 90 days from the date of discharge from the hospital are covered."
+        },
+        {
+          "label": "Shared Accommodation",
+          "value": "Expenses incurred on occupying a shared accommodation by the insured person are covered up to the limits mentioned in the policy clause."
+        },
+        {
+          "label": "Road Ambulance",
+          "value": "Ambulance charges for the transportation of insured person by private ambulance are covered up to Rs. 750/- per hospitalisation and Rs. 1500/- per policy period."
+        },
+        {
+          "label": "Air Ambulance",
+          "value": "Air ambulance expenses are covered up to 10% of the Sum Insured for the entire policy period."
+        },
+        {
+          "label": "Automatic Restoration of Sum Insured",
+          "value": "Upon exhaustion of the limit of coverage during the policy period, 100% of the Sum Insured will be restored 3 times in the same policy year."
+        },
+        {
+          "label": "Loyalty Bonus",
+          "value": "For the Sum Insured options Rs.3,00,000/- and above, the insured would be entitled to benefit of Loyalty Bonus of 10% of the expiring Sum Insured subject to a maximum Loyalty Bonus of 100% of the sum insured. The Loyalty Bonus will be calculated on the expiring sum insured or on the renewed sum insured whichever is less. If the insured opts to reduce the sum insured at the subsequent renewal, the limit of indemnity by way of such Loyalty Bonus shall not exceed such reduced sum insured. Loyalty Bonus shall be available irrespective of a claim and only upon timely renewal without break or upon renewal within the grace period allowed."
+        },
+        {
+          "label": "Additional Sum Insured for Road Traffic Accident (RTA)",
+          "value": "If the insured person meets with a Road Traffic Accident resulting in an in-patient hospitalisation, then the Sum Insured shall be increased by 25% subject to a maximum of Rs.5,00,000/-."
+        },
+        {
+          "label": "Assisted Reproduction Treatment",
+          "value": "The Company will reimburse medical expenses incurred on Assisted Reproduction Treatment, where indicated, for sub-fertility 1. Waiting period of 36 months from the date of first inception of this policy is applicable. 2. Maximum liability of the Company for such treatment shall be limited to Rs.1 lakh for sum insured of Rs.5 lakh and Rs.2 lakhs for sum insured of Rs.10 lakhs and above for every block of 36 months."
+        },
+        {
+          "label": "Hospitalisation Expenses for Treatment of New Born Baby",
+          "value": "Cover starts from 16th day after birth and subject to a limit of 10% of the Sum Insured or Rupees Fifty Thousand, whichever is less, provided the mother is insured under the policy for a continuous period of 12 months without break. Note : Exclusions No.1(Code Excl 01), Exclusion No.2(Code Excl 02), Exclusion No.3(Code Excl 03) and the above sublimit will not apply for treatment related to Congenital Internal disease/defects for the new born."
+        },
+        {
+          "label": "AYUSH Treatment",
+          "value": "Expenses incurred for the treatment under Ayurveda, Unani, Siddha and Homeopathy systems of medicines in AYUSH hospitals are covered upto the Sum Insured."
+        },
+        {
+          "label": "Emergency Domestic Medical Evacuation",
+          "value": "Expenses incurred towards the transportation of the insured person from the treating hospital to another hospital for treatment are covered as per the limits mentioned in the policy clause."
+        },
+        {
+          "label": "Compassionate Travel",
+          "value": "The air transportation expenses incurred up to Rs. 5000/- are payable for an immediate family member to travel to the hospital in case of hospitalisation of the insured person for life-threatening emergency times, at the place away from insured’s usual place of residence."
+        },
+        {
+          "label": "Second Medical Opinion",
+          "value": "The Insured person can avail a Second Medical Opinion from a Doctor in the Company's network of medical practitioners."
+        },
+        {
+          "label": "Modern Treatment",
+          "value": "Modern treatment expenses are payable up to the limits mentioned in the policy clause."
+        },
+        {
+          "label": "Recharge Benefit",
+          "value": "Available up to the limits."
+        },
+        {
+          "label": "Day Care Procedures",
+          "value": "Medical treatments and surgical procedures that require less than 24 hours of hospitalisation due to technological advancements are covered."
+        },
+        {
+          "label": "Domiciliary Hospitalisation",
+          "value": "Expenses incurred for domiciliary hospitalisation, including AYUSH on the advice of a medical practitioner for a period exceeding three days are covered."
+        },
+        {
+          "label": "Organ Donor Expenses",
+          "value": "Expenses incurred for organ transplantation are covered up to a limit of 10% of the Sum Insured subject to the maximum of Rs. 1,00,000/- whichever is less."
+        },
+        {
+          "label": "Repatriation of Mortal Remains",
+          "value": "The expenses incurred for the repatriation of mortal remains of the insured person are covered up to Rs. 5,000/- per policy period."
+        },
+        {
+          "label": "Cataract Treatment",
+          "value": "Expenses incurred for Cataract treatment are covered up to the limits mentioned in the policy clause."
+        },
+        {
+          "label": "Treatment in Valuable Service Providers",
+          "value": "If the treatment is undergone in a hospital suggested by the Company, then a lump-sum of 1% of the Sum Insured subject to a maximum of Rs. 5,000/- per policy period is payable."
+        },
+        {
+          "label": "Preventive Health Check-up",
+          "value": "We will arrange for a Preventive Health Check-up at Our Network Providers for the applicable package as per opted Sum Insured. For the updated and applicable list of tests available under such package,Insured Persons are required to check our website www.starhealth.in."
+        },
+        {
+          "label": "Mandatory Co-payment",
+          "value": "This policy is subjected to co-payment of 20% of each and every claim amount for fresh as well as renewal policies for insured persons whose age at the time of entry is 61 year and above."
+        },
+        {
+          "label": "Instalment Options",
+          "value": "Premium can be paid Monthly, Quarterly and Half Yearly. Note: If Instalment Facility is opted for 2 year term policies, the full premium applicable for 2 year terms should be paid in monthly, quarterly or half yearly within the expiry of the first year."
+        },
+        {
+          "label": "Option to choose Voluntary Co-payment",
+          "value": "If the insured person chooses voluntary co-payment, the Company will provide a discount on premium as specified in the Policy Clause"
+        },
+        {
+          "label": "Unlimited Tele-Consultation",
+          "value": "Insured can avail unlimited number of Tele-consultations on Star Health mobile application or digital platforms."
+        },
+        {
+          "label": "AI driven Face Scan",
+          "value": "The Insured Person can avail, AI-driven face scan facility by using STAR Health mobile app to know the vital parameters such as heart rate, oxygen saturation, respiration rate up to two times per month per Insured Person in a Policy Year."
+        },
+        {
+          "label": "E-Domestic Second Medical Opinion",
+          "value": "The Insured person can avail a Second Medical Opinion from a Doctor in the Company's network of medical practitioners."
+        }
+      ]
+    },
+    "health-gain": {
+      "slug": "health-gain",
+      "ok": true,
+      "status": 200,
+      "rows": [
+        {
+          "label": "In-patient Hospitalisation",
+          "value": "Hospitalisation expenses incurred for a period of more than 24 hours on account of illness, injury or accidents are covered."
+        },
+        {
+          "label": "Pre-Hospitalisation",
+          "value": "In addition to in-patient hospitalisation, the medical expenses incurred up to 30 days before the date of admission to the hospital are also covered."
+        },
+        {
+          "label": "Post-Hospitalisation",
+          "value": "Post-hospitalisation medical expenses up to 60 days from the date of discharge from the hospital are covered."
+        },
+        {
+          "label": "Room Rent",
+          "value": "Room, boarding and nursing expenses incurred during in-patient hospitalisation are covered up to 1% of the basic Sum Insured per day."
+        },
+        {
+          "label": "Road Ambulance",
+          "value": "Ambulance charges are covered up to Rs. 750/- per hospitalisation and Rs. 1500/- per policy period for transportation of the insured person to the hospital by private ambulance service."
+        },
+        {
+          "label": "Day Care Procedures",
+          "value": "Medical treatments and surgical procedures that require less than 24 hours of hospitalisation due to technological advancements are covered."
+        },
+        {
+          "label": "Modern Treatment",
+          "value": "Expenses incurred for modern treatments such as Oral Chemotherapy, Intra Vitreal injections, Robotic Surgeries, etc. are covered up to the limits mentioned in the policy clause."
+        },
+        {
+          "label": "AYUSH Treatment",
+          "value": "Medical expenses for Inpatient Hospitalization incurred on treatment under Ayurveda, Unani, Sidha and Homeopathy systems of medicines in a AYUSH Hospital is payable up to the sum insured."
+        },
+        {
+          "label": "Cataract Treatment",
+          "value": "Expenses incurred for Cataract treatment are covered up to the limits mentioned in the policy clause."
+        },
+        {
+          "label": "Co-payment",
+          "value": "This policy is subjected to a Co-payment of 20% of each and every admissible claim amount, for fresh as well as for the policies subsequently renewed for insured persons whose age at the time of entry into this policy is 61 years and above."
+        },
+        {
+          "label": "Outpatient Benefit",
+          "value": "Necessary outpatient expenses incurred at any Networked Facility in India are covered up to the benefit limits in aggregate as stated in the policy schedule."
+        },
+        {
+          "label": "Carry Forward Benefits",
+          "value": "Unutilised benefits in a policy year can be carried forward to the immediately succeeding renewal year. No further carry-over is permitted."
+        }
+      ]
+    },
+    "health-premier": {
+      "slug": "health-premier",
+      "ok": true,
+      "status": 200,
+      "rows": [
+        {
+          "label": "Sum Insured",
+          "value": "The Sum Insured options under this policy are Rs.10,00,000/-, Rs.20,00,000/-, Rs.30,00,000/-, Rs.50,00,000/-, Rs75,00,000/- and Rs.1,00,00,000/-. However, the Sum Insured of Rs.75,00,000/- and Rs.1,00,00,000/- can be availed by people aged up to 65 years only. This is applicable only at the time of inception of this policy."
+        },
+        {
+          "label": "Policy Term",
+          "value": "This policy can be availed for a term of one, two or three years."
+        },
+        {
+          "label": "Pre-Acceptance Medical Screening",
+          "value": "Pre-acceptance medical screening is not required to avail this policy irrespective of the age and Sum Insured opted."
+        },
+        {
+          "label": "In-Patient Hospitalisation",
+          "value": "Hospitalisation expenses incurred for a period of more than 24 hours on account of illness, injury or accidents are covered."
+        },
+        {
+          "label": "Pre-Hospitalisation",
+          "value": "In addition to in-patient hospitalisation, the medical expenses incurred up to 60 days before the date of admission to the hospital are also covered."
+        },
+        {
+          "label": "Post-Hospitalisation",
+          "value": "Post-hospitalisation medical expenses incurred up to 90 days from the date of discharge from the hospital are covered."
+        },
+        {
+          "label": "Room Rent",
+          "value": "Room, boarding and nursing expenses incurred during in-patient hospitalisation are covered up to 1% of the Sum Insured or to the maximum of Rs. 20,000 per day."
+        },
+        {
+          "label": "Home Care Treatment",
+          "value": "Expenses incurred on home care treatment for specified conditions are covered up to 10% of the Sum Insured subject to maximum of Rs. 5 Lakh in a policy year. The insured person can avail this service either on a cashless or reimbursement basis."
+        },
+        {
+          "label": "Coverage for Non-medical Items",
+          "value": "If there is an admissible claim under the policy, then non-medical items specified in this policy will become payable."
+        },
+        {
+          "label": "Road Ambulance",
+          "value": "This policy covers ambulance charges for admission in hospital, for shifting from one hospitals to another for better medical treatment and from hospital to residence."
+        },
+        {
+          "label": "Air Ambulance",
+          "value": "Air ambulance expenses are covered up to Rs. 2.5 lakh per hospitalisation to the maximum of up to Rs. 5 lakh per policy period."
+        },
+        {
+          "label": "Domiciliary Hospitalisation",
+          "value": "Expenses incurred for domiciliary hospitalisation, including AYUSH on the advice of a medical practitioner for a period exceeding three days are covered."
+        },
+        {
+          "label": "Day Care Procedures",
+          "value": "Medical treatments and surgical procedures that require less than 24 hours of hospitalisation due to technological advancements are covered."
+        },
+        {
+          "label": "Organ Donor Expenses",
+          "value": "In-patient hospitalization expenses incurred for organ transplantation from the Donor to the recipient insured person are payable provided the claim for transplantation is payable. In addition, the expenses incurred by the Donor, (if any) for the complications that necessitate a Redo Surgery / ICU admission will be covered."
+        },
+        {
+          "label": "Hospice Care",
+          "value": "Payable up to 10% of the sum insured subject to a maximum of Rs.5 lakhs, if availed at our Networked facility. This cover is available after a waiting period of 24 months from the inception of the policy."
+        },
+        {
+          "label": "Rehabilitation & Pain Management",
+          "value": "Expenses incurred for Rehabilitation and Pain Management are covered up to the specified sub-limit or maximum up to 10% of the basic Sum Insured whichever is less, per policy period."
+        },
+        {
+          "label": "AYUSH Treatment",
+          "value": "In-patient hospitalisation expenses incurred for the treatment under Ayurveda, Unani, Sidha and Homeopathy systems of medicines in AYUSH hospitals are covered up to the Sum Insured."
+        },
+        {
+          "label": "Bariatric Surgery",
+          "value": "Expenses incurred on hospitalisation for Bariatric surgical procedures are covered up to the limits mentioned in the policy clause."
+        },
+        {
+          "label": "Modern Treatment",
+          "value": "Expenses incurred for modern treatments such as Oral Chemotherapy, Intra Vitreal injections, Robotic Surgeries, etc. are covered up to 50% of the Sum Insured specified in the policy schedule."
+        },
+        {
+          "label": "Cumulative Bonus",
+          "value": "Cumulative bonus is provided at 20% of the Sum Insured for each claim-free year subject to a maximum of 100% of the Sum Insured."
+        },
+        {
+          "label": "Co-payment",
+          "value": "Applicable for Insured persons whose age at the time of entry is above 65 years. Each and every claim under the Policy shall be subject to a Co-payment of 20% applicable to claim amount admissible and payable as per the terms and conditions of the Policy."
+        },
+        {
+          "label": "Health Check-Up",
+          "value": "Health check-up expenses are covered up to the specified limits for every claim-free year."
+        },
+        {
+          "label": "Instalment Options",
+          "value": "The policy premium can be paid on a quarterly or half-yearly basis. It can also be paid on an annual, biennial (once in 2 years) and triennial (once in 3 years) basis. This facility is not available for long-term (2 & 3 year term) options."
+        },
+        {
+          "label": "Star Wellness Program",
+          "value": "Wellness program designed to motivate and encourage the healthy lifestyle of the insured person through various wellness activities. In addition, the earned wellness bonus points can be utilised for availing renewal discounts up to a maximum of 10%."
+        },
+        {
+          "label": "Family Discount",
+          "value": "When two adults are covered under the policy on a Floater basis Sum Insured, then a 40% discount on the premium is available as a floater discount for the younger member."
+        },
+        {
+          "label": "Young Age Discount",
+          "value": "For adults aged 50 years and above, if the spouse is aged less than 50 years, then a family floater cover can be offered considering the premium of age 50 years discounted by 10% for the spouse."
+        }
+      ]
+    },
+    "mediclassic": {
+      "slug": "mediclassic",
+      "ok": true,
+      "status": 200,
+      "rows": [
+        {
+          "label": "Entry Age",
+          "value": "Any person between 5 months and 65 years can avail this policy."
+        },
+        {
+          "label": "In-Patient Hospitalisation",
+          "value": "Hospitalisation expenses incurred for a period of more than 24 hours on account of illness, injury or accidents are covered."
+        },
+        {
+          "label": "Pre-Hospitalisation",
+          "value": "In addition to in-patient hospitalisation, the medical expenses incurred up to 30 days before the date of admission to the hospital are also covered."
+        },
+        {
+          "label": "Post-Hospitalisation",
+          "value": "Post-hospitalisation medical expenses up to 60 days from the date of discharge are covered as per the limits mentioned in the policy clause."
+        },
+        {
+          "label": "Room Rent",
+          "value": "Room, boarding and nursing expenses incurred during in-patient hospitalisation are covered up to 2% of the basic Sum Insured of Rs. 5000/- per day."
+        },
+        {
+          "label": "Road Ambulance",
+          "value": "Ambulance charges up to Rs. 750/- per hospitalisation and over all limit of Rs. 1,500/- per policy period for transportation of the insured person by private ambulance service are covered."
+        },
+        {
+          "label": "Day Care Procedures",
+          "value": "Medical treatments and surgical procedures that require less than 24 hours of hospitalisation due to technological advancements are covered."
+        },
+        {
+          "label": "Modern Treatment",
+          "value": "Expenses incurred for modern treatments such as Oral Chemotherapy, Intra Vitreal injections, Robotic Surgeries, etc. are covered up to the limits mentioned in the policy clause."
+        },
+        {
+          "label": "AYUSH Treatment",
+          "value": "Medical expenses for Inpatient Hospitalization incurred on treatment under Ayurveda, Unani, Siddha and Homeopathy systems of medicines in a AYUSH Hospital is payable up to the Basic Sum Insured."
+        },
+        {
+          "label": "Cataract Treatment",
+          "value": "Expenses incurred for Cataract treatment are covered up to the limits mentioned in the policy clause."
+        },
+        {
+          "label": "Automatic Restoration of Basic Sum Insured",
+          "value": "On exhaustion of the limit of coverage during the policy period, 200% of the basic Sum Insured will be restored once during the policy year that can be utilised for illness or disease unrelated to illness or disease for which claims were made."
+        },
+        {
+          "label": "Family Package Plan",
+          "value": "Available for persons from 5 months to 45 years. The sum insured is apportioned equally among insured family members."
+        },
+        {
+          "label": "Cumulative Bonus",
+          "value": "The insured person will be eligible for Cumulative bonus calculated at 5% of the basic Sum Insured for every claim free year subject to a maximum of 25% of the basic Sum Insured."
+        },
+        {
+          "label": "Preventive Health Check-up",
+          "value": "We will arrange for a Preventive Health Check-up at Our Network Providers for the applicable package as per opted Sum Insured. For the updated and applicable list of tests available under such package, Insured Persons are required to check our website www.starhealth.in."
+        },
+        {
+          "label": "Co-payment",
+          "value": "This policy is subjected to a Co-payment of 10% of each and every admissible claim amount, for fresh as well as for the policies subsequently renewed for insured persons whose age at the time of entry into this policy is 61 years and above."
+        },
+        {
+          "label": "Home Care Treatment",
+          "value": "Payable up to 10% of the Basic Sum Insured in a Policy Year, for treatment availed by the Insured Person at home, only for the specified conditions."
+        },
+        {
+          "label": "Unlimited Tele-Consultation",
+          "value": "Insured can avail unlimited number of Tele-consultations on Star Health mobile application or digital platforms."
+        },
+        {
+          "label": "AI driven Face Scan",
+          "value": "The Insured Person can avail, AI-driven face scan facility by using Star Health mobile app to know the vital parameters such as heart rate, oxygen saturation, respiration rate up to two times per month per Insured Person in a Policy Year."
+        },
+        {
+          "label": "Entry Age",
+          "value": "Under Gold Plan, any person aged between 16 days and 65 years can avail this policy."
+        },
+        {
+          "label": "In-Patient Hospitalisation",
+          "value": "Hospitalisation expenses incurred for a period of more than 24 hours on account of illness, injury or accidents are covered."
+        },
+        {
+          "label": "Pre-Hospitalisation",
+          "value": "In addition to in-patient hospitalisation, the medical expenses incurred up to 30 days before the date of admission to the hospital are also covered."
+        },
+        {
+          "label": "Post-Hospitalisation",
+          "value": "Post-hospitalisation medical expenses up to 60 days from the date of discharge from the hospital are covered."
+        },
+        {
+          "label": "Room Rent",
+          "value": "Room, boarding and nursing expenses incurred during in-patient hospitalisation are covered up to the limits mentioned in the policy clause."
+        },
+        {
+          "label": "Road Ambulance",
+          "value": "Ambulance charges up to Rs. 2,000/- per hospitalisation for transportation of the insured person by private ambulance service are covered."
+        },
+        {
+          "label": "Day Care Procedures",
+          "value": "Medical treatments and surgical procedures that require less than 24 hours of hospitalisation due to technological advancements are covered."
+        },
+        {
+          "label": "Modern Treatment",
+          "value": "Expenses incurred for modern treatments such as Oral Chemotherapy, Intra Vitreal injections, Robotic Surgeries, etc. are covered up to the limits mentioned in the policy clause."
+        },
+        {
+          "label": "Cataract Treatment",
+          "value": "Expenses incurred for Cataract treatment are covered up to the limits mentioned in the policy clause."
+        },
+        {
+          "label": "Preventive Health Check-up",
+          "value": "We will arrange for a Preventive Health Check-up at Our Network Providers for the applicable package as per opted Sum Insured. For the updated and applicable list of tests available under such package, Insured Persons are required to check our website www.starhealth.in."
+        },
+        {
+          "label": "Cumulative Bonus",
+          "value": "For every claim free year the insured person will be eligible for Cumulative bonus calculated at 25% of the basic Sum Insured in the second year and an additional 20% of the basic Sum Insured for each subsequent years subject to the maximum of 100% overall."
+        },
+        {
+          "label": "Automatic Restoration of Basic Sum Insured",
+          "value": "On exhaustion of the limit of coverage during the policy period, 200% of the basic Sum Insured will be restored once during the policy year that can be utilised for illness or disease unrelated to illness or disease for which claims were made."
+        },
+        {
+          "label": "Super Restoration",
+          "value": "On exhaustion of the limit of coverage during the policy period, under the gold plan, 100% of the Sum Insured will be restored once for the remaining policy year that can be utilised for all claims."
+        },
+        {
+          "label": "Domiciliary Hospitalisation",
+          "value": "Expenses incurred for domiciliary hospitalisation, including AYUSH on the advice of a medical practitioner for a period exceeding three days are covered."
+        },
+        {
+          "label": "Shared Accommodation",
+          "value": "If the insured person opts for shared accommodation in a Networked Hospital, a cash benefit is provided for the opted Sum Insured as mentioned in the policy clause."
+        },
+        {
+          "label": "Organ Donor Expenses",
+          "value": "If the insured person is the recipient, then the hospitalisation expenses incurred for organ transplantation are covered."
+        },
+        {
+          "label": "Additional Basic Sum Insured for Road Traffic Accident (RTA)",
+          "value": "If the basic Sum Insured gets exhausted, then for hospitalisation due to Road Traffic Accidents, it will be increased by 50%."
+        },
+        {
+          "label": "Hospitalisation Expenses for Treatment of New Born Baby",
+          "value": "The coverage for the New Born Baby starts from the 16th day after its birth till the expiry date of the policy and is subject to a limit of 10% of the basic Sum Insured or Rupees Fifty thousand, whichever is less, subject to the availability of the basic Sum Insured, provided the mother has been insured under the policy for a continuous period of 12 months without break."
+        },
+        {
+          "label": "AYUSH Treatment",
+          "value": "Medical expenses for Inpatient Hospitalization incurred on treatment under Ayurveda, Unani, Siddha and Homeopathy systems of medicines in a AYUSH Hospital is payable up to the Basic Sum Insured."
+        },
+        {
+          "label": "Patient Care",
+          "value": "The expenses incurred for one attendant at the residence of the insured person immediately after discharge from the hospital provided this is recommended by the attending physician are covered. Such expenses are payable up to Rs. 400/- for each completed day up to 5 days per occurrence and 14 day per policy period."
+        },
+        {
+          "label": "Hospital Cash Benefit",
+          "value": "A cash benefit of Rs.1000/- for each completed day in the hospital is provided for a maximum of 7 days per hospitalisation and 14 days per policy period."
+        },
+        {
+          "label": "Co-payment",
+          "value": "This policy is subjected to a Co-payment of 10% of each and every admissible claim amount, for fresh as well as for the policies subsequently renewed for insured persons whose age at the time of entry into this policy is 61 years and above."
+        },
+        {
+          "label": "Family Discount",
+          "value": "5% discount on premium is available if 2 or more family members are covered under this policy."
+        },
+        {
+          "label": "Major Organ Donor Discount",
+          "value": "If the insured person submits proof that he/she has donated a major organ, a discount of 25% of the premium is available at the time of renewal. This discount is available even for subsequent renewals as well."
+        },
+        {
+          "label": "Home Care Treatment",
+          "value": "Payable up to 10% of the Basic Sum Insured in a Policy Year, for treatment availed by the Insured Person at home, only for the specified conditions."
+        },
+        {
+          "label": "Unlimited Tele-Consultation",
+          "value": "Insured can avail unlimited number of Tele-consultations on Star Health mobile application or digital platforms."
+        },
+        {
+          "label": "AI driven Face Scan",
+          "value": "The Insured Person can avail, AI-driven face scan facility by using Star Health mobile app to know the vital parameters such as heart rate, oxygen saturation,respiration rate up to two times per month per Insured Person in a Policy Year."
+        }
+      ]
+    },
+    "micro-rural-and-farmers-care": {
+      "slug": "micro-rural-and-farmers-care",
+      "ok": true,
+      "status": 200,
+      "rows": [
+        {
+          "label": "Policy Term",
+          "value": "This policy can be availed for a term of one year."
+        },
+        {
+          "label": "Entry Age",
+          "value": "Any person aged between 18 and 65 years can avail this policy. Under the Floater basis, up to 2 dependent children aged between 12 months and 25 years are covered."
+        },
+        {
+          "label": "In-patient Hospitalisation",
+          "value": "Hospitalisation expenses incurred for a period of more than 24 hours on account of illness, injury or accidents are covered."
+        },
+        {
+          "label": "Room Rent",
+          "value": "Room, boarding and nursing expenses are covered up to 1% of the Sum Insured per day."
+        },
+        {
+          "label": "ICU Charges",
+          "value": "ICU charges at actuals are covered under this policy."
+        },
+        {
+          "label": "Day Care Procedures",
+          "value": "Medical treatments and surgical procedures that require less than 24 hours of hospitalisation due to technological advancements are covered."
+        },
+        {
+          "label": "Modern Treatment",
+          "value": "Modern treatment expenses are payable up to the limits mentioned in the policy clause."
+        },
+        {
+          "label": "Co-payment",
+          "value": "This policy is subjected to a Co-payment of 20% of each and every admissible claim amount, for fresh as well as for the policies subsequently renewed for insured persons whose age at the time of entry into this policy is 61 years and above."
+        },
+        {
+          "label": "AYUSH Treatment",
+          "value": "Medical expenses for Inpatient Hospitalization incurred on treatment under Ayurveda, Unani, Sidha and Homeopathy systems of medicines in a AYUSH Hospital is payable up to the sum insured."
+        },
+        {
+          "label": "Cataract treatment",
+          "value": "Cataract treatments are covered up to Rs. 10,000/- per eye and up to Rs. 15,000/- per policy period."
+        },
+        {
+          "label": "Instalment Options",
+          "value": "Policyholders can pay their premiums either on a quarterly or half-yearly basis. It can also be paid annually."
+        },
+        {
+          "label": "Lifelong Renewal",
+          "value": "This policy offers a lifelong renewal option."
+        }
+      ]
+    },
+    "opd-health-insurance": {
+      "slug": "opd-health-insurance",
+      "ok": true,
+      "status": 200,
+      "rows": [
+        {
+          "label": "Policy Type",
+          "value": "This policy can be availed either on an Individual or Floater basis."
+        },
+        {
+          "label": "Policy Term",
+          "value": "This policy can be availed for a term of one year."
+        },
+        {
+          "label": "Entry Age",
+          "value": "Any person aged between 18 and 50 years can avail this policy. Dependent children are covered from the 31st day onwards up to 25 years."
+        },
+        {
+          "label": "Outpatient Consultation",
+          "value": "Expenses incurred for outpatient consultation at any Network Facility in India are covered."
+        },
+        {
+          "label": "AYUSH Cover",
+          "value": "Outpatient medical consultation and treatment expenses incurred under Ayurveda, Yoga and Naturopathy, Unani, Siddha and Homeopathy systems of medicine are covered."
+        },
+        {
+          "label": "Diagnostics, Physiotherapy and Pharmacy",
+          "value": "Expenses incurred towards Diagnostics, Physiotherapy and Pharmacy at Network Facility are covered."
+        },
+        {
+          "label": "Dental Treatment",
+          "value": "Dental treatment expenses for natural tooth or teeth arising out of accidents incurred at any Networked Facility are covered."
+        },
+        {
+          "label": "Ophthalmic Cover",
+          "value": "Expenses towards Ophthalmic treatment out of accidental injuries incurred at any Network Facility in India are covered."
+        },
+        {
+          "label": "Lifelong Renewal",
+          "value": "This policy offers a lifelong renewal option."
+        },
+        {
+          "label": "Renewal Discount",
+          "value": "The Insured Person is eligible for a discount of 25% on the premium at the time of renewal after every block of two continuous claim free years."
+        }
+      ]
+    },
+    "smart-health-pro": {
+      "slug": "smart-health-pro",
+      "ok": true,
+      "status": 200,
+      "rows": [
+        {
+          "label": "Individual Entry Age",
+          "value": "Any person aged between 18 and 50 years can avail this policy."
+        },
+        {
+          "label": "Floater Entry Age",
+          "value": "Any person aged between 18 and 50 years can avail this policy. Dependent children are covered from the 91st day onwards up to 25 years."
+        },
+        {
+          "label": "Policy Type",
+          "value": "This policy can be availed either on an Individual or Floater basis."
+        },
+        {
+          "label": "Policy Term",
+          "value": "This policy can be availed for a term of one, two or three years."
+        },
+        {
+          "label": "Sum Insured",
+          "value": "The Sum Insured options under this policy are Rs.5,00,000/-, Rs.10,00,000/-, Rs.15,00,000/-, Rs.20,00,000/-, Rs.25,00,000/-, Rs.50,00,000/-, Rs75,00,000/-, and Rs.1,00,00,000/- ."
+        },
+        {
+          "label": "Long-Term Discount",
+          "value": "A discount on premium is available if the policy term opted is more than one year."
+        },
+        {
+          "label": "Family Size",
+          "value": "Under floater Sum Insured you can add Self + Spouse/ Live-in Partner/ Same Sex Partner + Dependent Children. The policy covers maximum family size of 2 Adults + 3 Children under floater Sum Insured basis."
+        },
+        {
+          "label": "In-Patient Hospitalisation",
+          "value": "Hospitalisation expenses incurred for a period of more than 24 hours on account of illness, injury or accidents are covered."
+        },
+        {
+          "label": "Pre-Hospitalisation",
+          "value": "In addition to in-patient hospitalisation, the medical expenses incurred up to 60 days before the date of admission to the hospital are also covered."
+        },
+        {
+          "label": "Post-Hospitalisation",
+          "value": "Post-hospitalisation medical expenses incurred up to 180 days from the date of discharge from the hospital are covered."
+        },
+        {
+          "label": "Room Rent",
+          "value": "Room (Private Single A/c Room), boarding and nursing expenses as provided by the hospital are covered."
+        },
+        {
+          "label": "Road Ambulance",
+          "value": "This policy covers ambulance charges for admission to a hospital, for shifting from one hospital to another hospital and from the hospital to the insured’s residence (if it is in the same city)."
+        },
+        {
+          "label": "Air Ambulance",
+          "value": "Air ambulance expenses are covered up to 10% of the Sum Insured per policy year, provided the situation requires an immediate hospitalisation of the insured person."
+        },
+        {
+          "label": "Day Care Procedures",
+          "value": "Medical treatments and surgical procedures that require less than 24 hours of hospitalisation due to technological advancements are covered."
+        },
+        {
+          "label": "Domiciliary Hospitalisation",
+          "value": "Expenses incurred for domiciliary hospitalisation, including AYUSH on the advice of a medical practitioner for a period exceeding three days are covered."
+        },
+        {
+          "label": "Home Care Treatment",
+          "value": "Insured person’s expenses incurred for home care treatment for specified conditions are covered up to 10% of the Sum Insured subject to the maximum of Rs. 5 Lakh in a policy year."
+        },
+        {
+          "label": "Mid-Term Inclusion",
+          "value": "The newly married spouse, newborn baby and/or legally adopted child can be included in the policy by paying a proportionate premium."
+        },
+        {
+          "label": "Hospitalisation expenses for treatment of New Born Baby",
+          "value": "Treatment expenses of newborn are payable from Day 1 of birth and subject to a limit of 10% of the Sum Insured and maximum of up to Rs. 2 lakhs. This will not apply for treatment related to congenital internal disease / defects."
+        },
+        {
+          "label": "AYUSH Treatment",
+          "value": "Expenses incurred for the treatment under Ayurveda, Unani, Siddha and Homeopathy systems of medicines in AYUSH hospitals are covered."
+        },
+        {
+          "label": "Modern Treatment",
+          "value": "Expenses incurred for modern treatments such as Deep Brain Stimulation, Intra Vitreal injections, Robotic Surgeries, etc. are covered up to the Sum Insured."
+        },
+        {
+          "label": "Automatic Restoration of Sum Insured",
+          "value": "On partial or full utilisation of the Sum Insured during the policy period, 100% of the Sum Insured will be restored once during the policy year and it can be utilised for all the claims."
+        },
+        {
+          "label": "Cumulative Bonus",
+          "value": "Cumulative bonus is provided at 50% of the Sum Insured for each claim-free year subject to a maximum of 100% of the Sum Insured."
+        },
+        {
+          "label": "Value Added Services",
+          "value": "This policy offers value added services including Star Tele-health Services, Medical Concierge Services, Digital Health Vault, Wellness Content, Post Operative Care, Discounts from Network Providers."
+        },
+        {
+          "label": "Cumulative Bonus Booster",
+          "value": "This optional cover entitles the insured person to avail additional cumulative bonus calculated at 50% of the Sum Insured for each claim-free year subject to a maximum of 600% of the Sum Insured. This is applicable if the opted Sum Insured is Rs. 10 Lakh and above."
+        },
+        {
+          "label": "Modification of Room Category",
+          "value": "This cover entitles the insured person to enhance/reduce the room category from Private Single A/c Room to Any Room / Shared Accommodation."
+        },
+        {
+          "label": "Reduction of Pre-Existing Diseases Waiting Period",
+          "value": "Through this optional cover, the insured person can reduce the pre-existing diseases waiting period from 36 months to 24/12 months. This is applicable only for the first purchase of this policy."
+        },
+        {
+          "label": "Coverage for Non-Medical Items (Consumables)",
+          "value": "The coverage for non-medical items as specified in the List I of the policy schedule will be payable if the claim for in-patient / day care treatment is admissible under the policy."
+        },
+        {
+          "label": "Unlimited Automatic Restoration of Sum Insured",
+          "value": "On partial or full utilisation of the Sum Insured, 100% of the Sum Insured will be automatically restored for unlimited number of times which can be utilised for a subsequent hospitalisation."
+        }
+      ]
+    },
+    "special-care-gold": {
+      "slug": "special-care-gold",
+      "ok": true,
+      "status": 200,
+      "rows": [
+        {
+          "label": "Unique Plan",
+          "value": "Specially designed policy for the persons with a disabilities as per The Rights of Persons with Disabilities Act, 2016 Or / and for individuals with HIV/AIDS as defined under the Human Immunodeficiency Virus and Acquired Immune Deficiency Syndrome (Prevention and Control) Act, 2017."
+        },
+        {
+          "label": "Policy Type",
+          "value": "This policy provides benefits only on an individual basis."
+        },
+        {
+          "label": "Policy Term",
+          "value": "The policy can be taken for a term of 1 year."
+        },
+        {
+          "label": "Sum Insured",
+          "value": "The Sum Insured options under this policy are Rs.4,00,000/- and Rs. 5,00,000/-."
+        },
+        {
+          "label": "Disability Cover",
+          "value": "The coverage under this policy is available for persons with the following disability/disabilities as defined under the Act and any subsequent additions/modifications to the list in the Act. Disability for the purpose of this policy means a person with 40% or more of a specified disability as Certified by the Certifying authority as per the Disability Act 2016. 1. Blindness 2. Muscular Dystrophy 3. Low vision 4. Chronic Neurological conditions 5. Leprosy Cured persons 6. Specific Learning Disabilities 7. Hearing Impairment (deaf and hard of hearing) 8. Multiple Sclerosis 9. Locomotor Disability 10. Speech and Language disability 11. Dwarfism 12. Thalassemia 13. Intellectual Disability 14. Haemophilia 15. Mental Illness 16. Sickle Cell Disease 17. Autism spectrum disorder 18. Multiple Disabilities including deaf/ blindness 19. Cerebral Palsy 20. Acid Attack victim 21. Parkinson's disease"
+        },
+        {
+          "label": "HIV Cover",
+          "value": "This policy is available for individuals with HIV/AIDS as defined under the Human Immunodeficiency Virus and Acquired Immune Deficiency Syndrome (Prevention and Control) Act, 2017. Individuals diagnosed as HIV/AIDS by a duly qualified Medical Practitioner with a CD4 count above 350 will only be eligible for cover under this policy."
+        },
+        {
+          "label": "In-Patient Hospitalisation",
+          "value": "Hospitalisation expenses incurred for more than 24 hours of hospitalisation are covered."
+        },
+        {
+          "label": "Room Rent",
+          "value": "Room, boarding and nursing expenses all inclusive as provided by the Hospital/Nursing Home are covered up to 1% of the Sum Insured per day."
+        },
+        {
+          "label": "ICU Charges",
+          "value": "Intensive Care Unit (ICU) charges/Intensive Cardiac Care Unit (ICCU) charges all inclusive as provided by the Hospital/Nursing home are covered up to a maximum of 2% of the Sum Insured per day."
+        },
+        {
+          "label": "Pre-Hospitalisation",
+          "value": "In addition to in-patient hospitalisation, the medical expenses incurred up to 30 days before the date of admission to the hospital are also covered."
+        },
+        {
+          "label": "Post-Hospitalisation",
+          "value": "Post-hospitalisation medical expenses including consultation fees, diagnostic charges, medicines and drugs as recommended by the Hospital / Medical Practitioner are covered up to 60 days from the date of discharge from the hospital."
+        },
+        {
+          "label": "Emergency Road Ambulance",
+          "value": "Ambulance charges are covered up to the maximum of Rs. 2000/- per hospitalisation."
+        },
+        {
+          "label": "Day Care Procedures",
+          "value": "Medical treatments and / or surgical procedures that require less than 24 hours of hospitalisation due to technological advancements are covered."
+        },
+        {
+          "label": "Cataract Treatment",
+          "value": "Expenses incurred for Cataract treatment are covered up to Rs. 40,000/- per eye in one policy year."
+        },
+        {
+          "label": "Co-payment",
+          "value": "Each and every claim under this policy shall be subject to a Co-payment of 20% applicable to the claim amount admissible and payable as per the terms and conditions of the policy."
+        },
+        {
+          "label": "Waiver of Co-payment",
+          "value": "Waiver of co-payment is available on payment of additional premium as per terms & conditions."
+        },
+        {
+          "label": "Lumpsum Coverage for HIV/AIDS",
+          "value": "In case the CD4 count of the insured is/goes below 150, then the Company will pay 100% of the Sum Insured or the balance Sum Insured available under the policy, whichever is lower, as a lumpsum amount to the insured. This payment will trigger after a waiting period of 90 days from the commencement date of the policy. Note: The claim mentioned above shall be payable once in the lifetime of the insured person and shall not be necessarily linked to an in-patient hospitalisation claim made under the policy."
+        },
+        {
+          "label": "Pre-existing Diseases",
+          "value": "I) Applicable for Diseases other than Disability/HIV/AIDS: The expenses related to the treatment of pre-existing diseases and their direct complications are covered after a waiting period of 36 months of continuous coverage after the date of inception of the first policy with the insurer. II) Applicable for HIV/AIDS: The expenses related to the treatment of HIV/AIDS and its direct complications are covered after 90 days of continuous coverage from the date of inception of the first policy with the insurer. III) Applicable for Disability: The expenses related to the treatment of pre-existing disability and its direct complications are covered after 24 months of continuous coverage after the date of inception of the first policy with the insurer."
+        },
+        {
+          "label": "Specific Disease",
+          "value": "The expenses related to the treatment of listed conditions, surgeries and treatments are covered after a waiting period of 24 months of continuous coverage after the date of inception of the first policy with the insurer."
+        },
+        {
+          "label": "Initial Waiting Period",
+          "value": "The expenses related to the treatment of any illness within 30 days from the first policy commencement date are excluded except for claims arising due to an accident."
+        }
+      ]
+    },
+    "star-assure": {
+      "slug": "star-assure",
+      "ok": true,
+      "status": 200,
+      "rows": [
+        {
+          "label": "Policy Type",
+          "value": "This policy can be availed either on an Individual or Floater basis."
+        },
+        {
+          "label": "Individual Entry Age",
+          "value": "Any person aged between 91 days and 75 years can avail this policy on an Individual basis."
+        },
+        {
+          "label": "Floater Entry Age",
+          "value": "Any person aged between 18 and 75 years can avail this policy. Under the Floater basis, a maximum of up to three dependent children aged between 16 days and 25 years are covered."
+        },
+        {
+          "label": "In-Patient Hospitalisation",
+          "value": "Hospitalisation expenses incurred for a period of more than 24 hours on account of illness, injury or accidents are covered."
+        },
+        {
+          "label": "Pre-Hospitalisation",
+          "value": "In addition to in-patient hospitalisation, the medical expenses incurred up to 60 days before the date of admission to the hospital are also covered."
+        },
+        {
+          "label": "Post-Hospitalisation",
+          "value": "Post-hospitalisation medical expenses incurred up to 180 days from the date of discharge from the hospital are covered."
+        },
+        {
+          "label": "Room Rent",
+          "value": "Room, boarding and nursing expenses incurred during in-patient hospitalisation are covered up to 1% of the Sum Insured per day for Rs. 5/7.5 lakh Sum Insured options; Any room (except suite or above category) for Rs. 10/15/20/25 lakh Sum Insured options; and Any Room for Rs. 50/75/100/200 lakh Sum Insured options."
+        },
+        {
+          "label": "Shared Accommodation",
+          "value": "Expenses incurred on occupying a shared accommodation by the insured person are covered up to the limits mentioned in the policy clause."
+        },
+        {
+          "label": "Coverage for Non-medical Items",
+          "value": "If there is an admissible claim under the policy, then non-medical items specified in this policy will become payable."
+        },
+        {
+          "label": "Road Ambulance",
+          "value": "This policy covers ambulance charges for admission in hospital, for shifting from one hospitals to another for better medical treatment and from hospital to residence (if it is in the same city)."
+        },
+        {
+          "label": "Air Ambulance",
+          "value": "Air ambulance expenses are covered up to 10% of the Sum Insured per policy year, provided the situation requires an immediate hospitalisation of the insured person and ground transportation cannot be provided."
+        },
+        {
+          "label": "Domiciliary Hospitalisation",
+          "value": "Expenses incurred for domiciliary hospitalisation, including AYUSH on the advice of a medical practitioner for a period exceeding three days are covered."
+        },
+        {
+          "label": "Day Care Procedures",
+          "value": "Medical treatments and surgical procedures that require less than 24 hours of hospitalisation due to technological advancements are covered."
+        },
+        {
+          "label": "Modern Treatment",
+          "value": "Expenses incurred for modern treatments such as Oral Chemotherapy, Intra Vitreal injections, Robotic Surgeries, etc. are covered up to the Sum Insured."
+        },
+        {
+          "label": "Organ Donor Expenses",
+          "value": "In-patient hospitalisation expenses incurred for organ transplantation from the Donor to the recipient insured person are payable provided the claim for transplantation is payable. In addition, the expenses incurred by the Donor, (if any) for the complications that necessitate a Redo Surgery / ICU admission will be covered."
+        },
+        {
+          "label": "Rehabilitation & Pain Management",
+          "value": "Expenses incurred for Rehabilitation and Pain Management are covered up to the specified sub-limit or maximum up to 20% of the Sum Insured whichever is less, per policy year."
+        },
+        {
+          "label": "AYUSH Treatment",
+          "value": "Expenses incurred for the treatment under Ayurveda, Unani, Sidha and Homeopathy systems of medicines in AYUSH hospitals are covered up to the Sum Insured."
+        },
+        {
+          "label": "Compassionate Travel",
+          "value": "The air transportation expenses incurred up to Rs. 10,000/- are payable for an immediate family member to travel to the hospital in case of hospitalisation of the insured person for life-threatening emergency times, at the place away from insured’s usual place of residence."
+        },
+        {
+          "label": "Repatriation of Mortal Remains",
+          "value": "The expenses incurred for the repatriation of mortal remains of the insured person are covered up to Rs. 15,000/- in a policy year."
+        },
+        {
+          "label": "In Utero Fetal Surgery / Intervention",
+          "value": "Expenses incurred for In Utero Fetal surgeries and procedures mentioned in this policy are covered with a waiting period of 24 months. Note: The waiting period will not apply for the treatment related to congenital Internal disease/defects for the Unborn."
+        },
+        {
+          "label": "Treatment in Valuable Service Providers Network",
+          "value": "In the event of hospitalisation in Valuable Service Provider, then a lump-sum of 1% of the Sum Insured subject to a maximum of Rs. 5,000/- per policy period is provided."
+        },
+        {
+          "label": "Cumulative Bonus",
+          "value": "Cumulative bonus is provided at 25% of the Sum Insured for each claim-free year subject to a maximum of 100% of the Sum Insured."
+        },
+        {
+          "label": "Deductible - Optional Cover",
+          "value": "Insured person can avail premium discount if he/she choose any of the deductibles as mentioned in this policy."
+        },
+        {
+          "label": "Co-Payment",
+          "value": "If the insured person purchases or renews the policy at 61 years of age or above, then he/she is subjected to the co-payment of 10% for each and every claim amount."
+        },
+        {
+          "label": "Preventive Health Check-up",
+          "value": "We will arrange for a Preventive Health Check-up at Our Network Providers for the applicable limits as per opted Sum Insured."
+        },
+        {
+          "label": "E-Domestic Second Medical Opinion",
+          "value": "The Insured person can avail a Second Medical Opinion from a Doctor in the Company's network of medical practitioners."
+        },
+        {
+          "label": "Star Wellness Program",
+          "value": "Wellness program designed to motivate and encourage the healthy lifestyle of the insured person through various wellness activities. In addition, the earned wellness points can be utilised for availing renewal discounts up to a maximum of 20%."
+        },
+        {
+          "label": "Waiting Period",
+          "value": "1. For Pre-Existing Diseases (3 year term) - 30 months 2. For Pre-Existing Diseases (1 and 2 year term) - 36 months 3. For Specific Diseases/Procedures - 24 months Initial Waiting Period - 30 days"
+        },
+        {
+          "label": "Instalment Options",
+          "value": "The policy premium can be paid on a monthly, quarterly or half-yearly basis.This facility is not available for long-term (2 & 3 year term) options."
+        },
+        {
+          "label": "Unlimited Tele-Consultation",
+          "value": "Insured can avail unlimited number of Tele-consultations on Star Health mobile application or digital platforms."
+        },
+        {
+          "label": "AI-Driven Face Scan",
+          "value": "The Insured Person can avail, AI-driven face scan facility by using Star Health mobile app to know the vital parameters such as heart rate, oxygen saturation, respiration rate up to two times per month per Insured Person in a Policy Year."
+        }
+      ]
+    },
+    "super-star": {
+      "slug": "super-star",
+      "ok": true,
+      "status": 200,
+      "rows": [
+        {
+          "label": "Individual Entry Age",
+          "value": "Any person aged 18 years and above can avail this policy."
+        },
+        {
+          "label": "Floater Entry Age",
+          "value": "Any person aged 18 years and above can avail this policy. Dependent children are covered from the 91st day onwards up to 25 years."
+        },
+        {
+          "label": "Policy Type",
+          "value": "This policy can be availed on an individual, floater, or multi-individual basis."
+        },
+        {
+          "label": "Policy Term",
+          "value": "This policy can be availed for a term of one, two, three, four or five years."
+        },
+        {
+          "label": "Instalment Options",
+          "value": "The policy premium can be paid monthly, quarterly or half-yearly for policy terms of 1, 2 or 3 years."
+        },
+        {
+          "label": "Sum Insured",
+          "value": "The Sum Insured options under this policy are ₹5,00,000, ₹7,50,000, ₹10,00,000, ₹15,00,000, ₹20,00,000, ₹25,00,000, ₹50,00,000, ₹1,00,00,000, & Unlimited Sum Insured."
+        },
+        {
+          "label": "Family Size",
+          "value": "Under floater Sum Insured, you can add Self + Spouse/ Live-in Partner + Dependent Children. Maximum family size covered under floater policy: 2 Adults + 4 Children."
+        },
+        {
+          "label": "Waiting Period",
+          "value": "The initial waiting period is 30 days; for specified conditions, surgeries/ treatments are 24 months, and for pre-existing disease(s) (PED), it is 36 months."
+        },
+        {
+          "label": "In-Patient Hospitalisation",
+          "value": "Hospitalisation expenses incurred for a period of more than 24 hours on account of illness, injury or accidents are covered up to the Sum Insured."
+        },
+        {
+          "label": "Co-pay",
+          "value": "Not Applicable"
+        },
+        {
+          "label": "Pre- Hospitalisation",
+          "value": "Hospitalisation expenses incurred up to 90 days before hospitalisation."
+        },
+        {
+          "label": "Post-Hospitalisation",
+          "value": "Hospitalisation expenses incurred up to 180 days after discharge from hospital."
+        },
+        {
+          "label": "Room Rent Modification",
+          "value": "Option to modify room rent eligibility from Any Room to a Single Private AC Room/ Shared Room/ General Ward."
+        },
+        {
+          "label": "Road Ambulance",
+          "value": "This policy covers ambulance charges for admission to the hospital, for shifting from one hospital to another and from hospital to residence."
+        },
+        {
+          "label": "Air Ambulance",
+          "value": "This policy covers up to ₹5,00,000 in a policy year for air ambulance services if recommended by a medical practitioner."
+        },
+        {
+          "label": "Mid-term Inclusions",
+          "value": "This option is available for a Newly wedded Spouse, Newborn, and Legally Adopted Child, who can be added anytime during the policy year."
+        },
+        {
+          "label": "Modern Treatment",
+          "value": "Expenses incurred for modern treatments such as Stem cell therapy for bone marrow transplant, Uterine artery embolisation, Balloon Sinuplasty, Deep Brain Stimulation, Oral Chemotherapy, Immunotherapy, Intravitreal injections, Robotic surgeries, Stereotactic radiosurgery, Bronchial Thermoplasty Holmium laser treatment, IONM (Intra Operative Neuro Monitoring) are covered up to the Sum Insured."
+        },
+        {
+          "label": "AYUSH Treatment",
+          "value": "Inpatient hospitalisation expenses incurred for treatments under the Ayurveda, Yoga and Naturopathy, Unani, Sidha and Homeopathy systems of medicine in AYUSH hospitals are covered up to the Sum Insured."
+        },
+        {
+          "label": "Day Care Treatment",
+          "value": "All Day Care Procedures are covered."
+        },
+        {
+          "label": "Organ Donor Expenses",
+          "value": "Coverage for organ transplantation and related costs, including the donor's post-donation complications."
+        },
+        {
+          "label": "Home Care Treatment",
+          "value": "Coverage for home-based treatment for specified conditions, including fever, infections, and chronic illnesses, provided that specific criteria are fulfilled."
+        },
+        {
+          "label": "Domiciliary Hospitalisation",
+          "value": "Coverage for medical treatment at home for a duration exceeding three days when hospitalisation is not possible or available."
+        },
+        {
+          "label": "Premium Waiver",
+          "value": "Premium waiver for the next policy year if the proposer is diagnosed with a critical illness or dies due to an accident."
+        },
+        {
+          "label": "STAR Wellness Program",
+          "value": "The STAR Wellness Program—accessible through the STAR Health App and STAR Wellness App—allows you to earn over 1,000 points yearly through various wellness activities. These points can be redeemed for up to a 20% discount on renewal premiums."
+        },
+        {
+          "label": "E-Domestic Second Medical Opinion",
+          "value": "Access to a second medical opinion from a network doctor based on submitted medical records."
+        },
+        {
+          "label": "Value-Added Services",
+          "value": "Enhance your health journey with discounts on pharmacy, diagnostics, and consultations, all available through the STAR Health App."
+        },
+        {
+          "label": "Smart Network",
+          "value": "15% premium discount for treatments at Star Health’s Smart Network hospitals. 15% co-pay applies for out-of-network treatments, excluding accidents."
+        },
+        {
+          "label": "Quick Shield",
+          "value": "Waives PED Waiting Period for specific conditions (Diabetes, Hypertension, Asthma, Hyperlipidemia, certain Coronary Artery Diseases). Coverage starts from Day 31."
+        },
+        {
+          "label": "Coverage for Non-medical Items (Consumables)",
+          "value": "The coverage for non-medical items as specified in List I of the policy schedule will be payable if the claim for in-patient/ day care treatment is admissible under the policy."
+        },
+        {
+          "label": "Future Shield",
+          "value": "Extends continuity benefits for all waiting periods for a newly added spouse (must be under 35 years of age). The Spouse must be added within 120 days of marriage with a marriage certificate."
+        },
+        {
+          "label": "Maternity Expenses",
+          "value": "● Option A: Delivery Expenses (with 24 months waiting period) including the Caesarean section (both pre-natal and post-natal) are covered up to limits specified in the policy clause. Newborn treatment from Day 1 of birth is covered up to the limits specified in the policy clause. ● Option B: Delivery Expenses (with 12 months waiting period) including the Caesarean section (both pre-natal and post-natal) are covered up to limits specified in the policy clause. Newborn treatment from Day 1 of birth is covered up to the limits specified in the policy clause. ● Option C: Assisted Reproduction Treatment expenses are covered up to the limits specified in the policy clause."
+        },
+        {
+          "label": "Women Care",
+          "value": "Coverage for a newborn starts immediately after birth, up to specified limits, including congenital defects up to the Sum Insured. This requires the submission of 12 and 20-week pregnancy scan reports."
+        },
+        {
+          "label": "High-end Diagnostics",
+          "value": "Coverage for specific diagnostic tests up to ₹25,000 per policy year, including Brain Perfusion Imaging, CT-guided biopsy, CT urography, Digital Subtraction Angiography (DSA), Liver Biopsy, Magnetic Resonance Cholangiography Scan, PET CT, PET MRI, and Renogram."
+        },
+        {
+          "label": "Personal Accident Cover",
+          "value": "Provides payouts for accidents caused by external, violent, and visible factors under two options: Option A: Accidental Death of the Insured Person Option B: Accidental Death and Permanent Total Disablement of the Insured Person"
+        },
+        {
+          "label": "Annual Health Check-up",
+          "value": "Covers up to 1% of the sum insured for tests or vaccinations, available from day one on a cashless basis. Tests must be booked via digital platforms (e.g., Mobile App) and are subject to a ₹25,000 cap per year."
+        },
+        {
+          "label": "Voluntary Co-payment",
+          "value": "Option to choose between 10%/ 20%/ 30%/ 40%/ 50% co-payment for claims."
+        },
+        {
+          "label": "Voluntary Deductible",
+          "value": "Option to choose deductible amount of 10k/ 25k/ 50k/ 1L/ 2L/ 3L/ 4L/ 5L; applies on an aggregate basis for all hospitalisation expenses."
+        },
+        {
+          "label": "Room Rent Modification",
+          "value": "Option to modify room rent eligibility from Any Room to a Single Private AC Room/ Shared Room/ General Ward."
+        },
+        {
+          "label": "E-International Second Opinion",
+          "value": "Second medical opinion from an international panel, once per policy year for each insured person, based on medical records only."
+        },
+        {
+          "label": "Durable Medical Equipment Cover",
+          "value": "Coverage for rental/purchase of necessary medical equipment (e.g., oxygen concentrators, wheelchairs, etc.), up to ₹5 Lakh, payable once during the lifetime of the policy."
+        },
+        {
+          "label": "Compassionate Visit",
+          "value": "Covers up to ₹10,000 for a family member's travel in case of life-threatening emergency hospitalisation away from home. This benefit applies only if the hospitalisation claim is valid."
+        },
+        {
+          "label": "Hospital Cash",
+          "value": "A cash benefit for each completed day in the hospital is provided up to the limits mentioned in the policy clause."
+        },
+        {
+          "label": "Reduction of Specified Disease/ Procedure Waiting Period",
+          "value": "Reduces the waiting period from 24 months to 12 months for the first purchase of the policy, up to the chosen Sum Insured."
+        },
+        {
+          "label": "Reduction of Pre-Existing Diseases Waiting Period",
+          "value": "Reduces the waiting period from 36 months to either 12 or 24 months for the first purchase of the policy, up to the chosen Sum Insured."
+        },
+        {
+          "label": "Limitless Care",
+          "value": "Covers In-Patient/ Day Care Treatment with no Sum Insured limits for one claim in lifetime, after which the cover ends, and the Sum Insured resets to zero for that policy year."
+        },
+        {
+          "label": "Super Star Bonus (Guaranteed Bonus)",
+          "value": "Provides a 100% cumulative bonus of the Sum Insured, accumulating up to an unlimited amount. This cover is not available for policies with an Unlimited Sum Insured."
+        },
+        {
+          "label": "NRI Advantage",
+          "value": "A Non-Resident Indian (NRI)/ Overseas Citizen will get a 10% discount on their applicable premium."
+        },
+        {
+          "label": "Health Questionnaire Discount",
+          "value": "Get up to 10% discount at inception and renewal by taking lifestyle and habit-related health questionnaires."
+        },
+        {
+          "label": "CIBIL Score Discount",
+          "value": "Based on CIBIL Score get discount up to 15%. Available for ages up to 50 years."
+        },
+        {
+          "label": "Co-terminus Discount",
+          "value": "Buy a policy for yourself/family and another for parents/parents-in-law within 1 month to get a 2.5% discount for one parent or 7.5% for two, under floater/multi-individual plans."
+        },
+        {
+          "label": "Early Renewal Discount",
+          "value": "2.5% discount if renewed 30 days before the premium due date."
+        },
+        {
+          "label": "Wellness Discount",
+          "value": "Wellness rewards up to 20% on renewal premium."
+        },
+        {
+          "label": "Long-Term discount",
+          "value": "Avail a 10% discount on the 2nd-year premium, 12.5% discount on the 3rd-year premium, 14% discount on the 4th-year premium, and 16% discount on the 5th-year premium."
+        }
+      ]
+    },
+    "value-plus": {
+      "slug": "value-plus",
+      "ok": true,
+      "status": 200,
+      "rows": [
+        {
+          "label": "Policy Type",
+          "value": "This policy can be availed on both Individual and Floater basis."
+        },
+        {
+          "label": "Entry Age",
+          "value": "Adults: 18 years to any age Dependent children: 91 days to 25 years Floater coverage: Up to 2 adults + 4 dependent children"
+        },
+        {
+          "label": "Sum Insured Options",
+          "value": "₹7.5 Lakhs | ₹10 Lakhs | ₹15 Lakhs | ₹20 Lakhs | ₹25 Lakhs"
+        },
+        {
+          "label": "Policy Term",
+          "value": "Available for 1 Year, 2 Years and 3 Years."
+        },
+        {
+          "label": "In-Patient Hospitalisation",
+          "value": "Hospitalisation expenses incurred for a period of more than 24 hours on account of illness, injury or accidents are covered up to the Sum Insured."
+        },
+        {
+          "label": "Room Rent",
+          "value": "Covered up to ₹5,000 per day."
+        },
+        {
+          "label": "Pre-Hospitalisation",
+          "value": "Medical expenses incurred up to 30 days before hospitalisation are covered."
+        },
+        {
+          "label": "Post-Hospitalisation",
+          "value": "Medical expenses incurred up to 60 days after discharge are covered."
+        },
+        {
+          "label": "Day Care Procedures",
+          "value": "All day care treatments requiring less than 24 hours of hospitalisation are covered."
+        },
+        {
+          "label": "Modern Treatments",
+          "value": "Coverage for advanced medical procedures including robotic surgeries, oral chemotherapy, immunotherapy, stem cell therapy and more."
+        },
+        {
+          "label": "AYUSH Treatment",
+          "value": "Coverage for in-patient treatment under Ayurveda, Yoga, Naturopathy, Unani, Siddha and Homeopathy systems."
+        },
+        {
+          "label": "Home Care Treatment",
+          "value": "Coverage for specified treatments taken at home, subject to policy terms and eligibility."
+        },
+        {
+          "label": "Domiciliary Hospitalisation",
+          "value": "Medical treatment taken at home for more than 3 days when hospitalisation is not possible is covered."
+        },
+        {
+          "label": "Road Ambulance",
+          "value": "Coverage for ambulance expenses incurred for hospital admission, transfer between hospitals and transportation to residence."
+        },
+        {
+          "label": "Air Ambulance",
+          "value": "Covered up to ₹5 Lakhs per policy year, if medically advised."
+        },
+        {
+          "label": "Organ Donor Expenses",
+          "value": "Coverage for organ transplantation expenses, including donor-related Post Donation Complications."
+        },
+        {
+          "label": "Automatic Restoration of Sum Insured",
+          "value": "100% of the Sum Insured gets automatically restored unlimited times during the policy year upon partial or full utilization of the Sum Insured."
+        },
+        {
+          "label": "Cumulative Bonus",
+          "value": "50% increase in Sum Insured for every claim-free year, up to a maximum of 100%."
+        },
+        {
+          "label": "Premium Waiver",
+          "value": "One-year premium waiver if the proposer (who is also insured) is diagnosed with a listed critical illness or dies due to an accident."
+        },
+        {
+          "label": "Freeze Your Age",
+          "value": "Premiums are based on entry age until the first claim or up to 55 years of age, whichever is earlier."
+        },
+        {
+          "label": "Sum Insured Multiplier",
+          "value": "Combine & utilize the annual Sum Insured of base policy across the policy term. Applicable only for long term policies."
+        },
+        {
+          "label": "STAR Wellness Program",
+          "value": "Earn wellness points through healthy activities and redeem them for up to 20% discount on renewal premiums."
+        },
+        {
+          "label": "Durable Medical Equipment Cover",
+          "value": "Coverage up to ₹1 Lakh per policy year for rental or purchase of medical equipment like oxygen concentrators and wheelchairs."
+        },
+        {
+          "label": "Nursing at Home",
+          "value": "₹1,000 per day for up to 10 days post-hospitalisation for qualified nursing care at home."
+        },
+        {
+          "label": "Consumables Cover",
+          "value": "Coverage for listed non-payable consumable items during admissible hospitalisation claims."
+        },
+        {
+          "label": "Grace Period Cover",
+          "value": "Coverage available during the grace period for policies due for renewal."
+        },
+        {
+          "label": "Premium Return",
+          "value": "Refund of the 1st year base premium if there are no in-patient claims for 5 continuous years."
+        },
+        {
+          "label": "Health Booster",
+          "value": "Additional 100% base Sum Insured for every block of 7 claim-free years."
+        },
+        {
+          "label": "E-Connect",
+          "value": "Access to virtual fitness sessions, nutritionist support and E-International second medical opinion services."
+        },
+        {
+          "label": "Value Network",
+          "value": "Access to an extensive hospital network. A 15% co-payment applies if treatment is taken outside the Value Network Hospitals."
+        },
+        {
+          "label": "Optional Covers",
+          "value": "Customise your policy with optional benefits such as: Single Private AC Room upgrade, Stay Fit, Mamta (Women Wellness Care), Param Seva (Senior Citizen Wellness Care), In-Clinic Consultation, Voluntary Deductible, Voluntary Co-pay"
+        },
+        {
+          "label": "Waiting Periods",
+          "value": "Initial waiting period: 30 days, Specified diseases: 24 months, Pre-existing diseases: 36 months,"
+        }
+      ]
+    },
+    "women-care": {
+      "slug": "women-care",
+      "ok": true,
+      "status": 200,
+      "rows": [
+        {
+          "label": "Policy Type",
+          "value": "This policy can be availed either on an Individual or Floater basis."
+        },
+        {
+          "label": "Policy Term",
+          "value": "This policy can be availed for a term of one, two or three years."
+        },
+        {
+          "label": "Pre-Medical Examination",
+          "value": "No pre-acceptance medical screening is required to avail this policy. However, pregnant women need to submit their scan reports taken at Star Health specified scan centres during the 12th and 20th week of their pregnancy. The incurred costs of such a scan need to be borne by the insured."
+        },
+        {
+          "label": "Individual Entry Age",
+          "value": "Only female individuals aged between 18 and 75 years can avail this policy as Individual Sum Insured."
+        },
+        {
+          "label": "Floater Entry Age",
+          "value": "To avail the Floater Sum Insured there should be at least one female adult in the family aged between 18 and 75 years. This policy covers a maximum of up to three dependent children from 91 days to 25 years. Under this policy, the insured's daughter can continue to be covered max up to 30 years of age, if she is unmarried and/or unemployed."
+        },
+        {
+          "label": "Sum Insured",
+          "value": "The Sum Insured options under this policy are Rs.5,00,000/-, Rs.10,00,000/-, Rs.15,00,000/-, Rs.20,00,000/- , Rs.25,00,000/-, Rs.50,00,000/- and Rs.1,00,00,000/-."
+        },
+        {
+          "label": "In-Patient Hospitalisation",
+          "value": "Hospitalisation expenses incurred for a period of more than 24 hours on account of illness, injury or accidents are covered."
+        },
+        {
+          "label": "Pre-Hospitalisation",
+          "value": "In addition to in-patient hospitalisation, the medical expenses incurred up to 60 days before the date of admission to the hospital are also covered."
+        },
+        {
+          "label": "Post-Hospitalisation",
+          "value": "Post-hospitalisation medical expenses up to 90 days from the date of discharge from the hospital are covered."
+        },
+        {
+          "label": "Room Rent",
+          "value": "Room, boarding and nursing expenses incurred during in-patient hospitalisation are covered up to 1% of the Sum Insured per day for Rs. 5 lakh Sum Insured; any room (except suite or above category) for Rs. 10/15/20/25 lakh Sum Insured options, and any room for Rs. 50/100/ lakh Sum Insured options."
+        },
+        {
+          "label": "Road Ambulance",
+          "value": "This policy covers ambulance charges for admission in hospital, for shifting from one hospitals to another for better medical treatment and from hospital to residence."
+        },
+        {
+          "label": "Air Ambulance",
+          "value": "Air ambulance expenses are covered up to 10% of the Sum Insured for the entire policy period."
+        },
+        {
+          "label": "Modern Treatment",
+          "value": "Expenses incurred for modern treatments such as Oral Chemotherapy, Intra Vitreal injections, Robotic Surgeries, etc. are covered up to the limits mentioned in the policy clause."
+        },
+        {
+          "label": "AYUSH Treatment",
+          "value": "In patient hospitalisation expenses incurred for the treatment under Ayurveda, Unani, Sidha and Homeopathy systems of medicines in AYUSH hospitals are covered up to the Sum Insured."
+        },
+        {
+          "label": "Day Care Procedures",
+          "value": "Medical treatments and surgical procedures that require less than 24 hours of hospitalisation due to technological advancements are covered."
+        },
+        {
+          "label": "Star Mother Cover",
+          "value": "Covers the expenses of a Single Private A/c Room for the stay of the mother in the hospital if the insured person is a child of age less than 12 years, provided the child is treated in ICU and there is an admissible claim for hospitalisation."
+        },
+        {
+          "label": "Shared Accommodation",
+          "value": "Expenses incurred on occupying a shared accommodation by the insured person are covered up to the limits mentioned in the policy clause."
+        },
+        {
+          "label": "Rehabilitation & Pain Management",
+          "value": "Expenses incurred for Rehabilitation and Pain Management are covered up to the specified sub-limit or maximum up to 10% of the Sum Insured whichever is less, per policy year."
+        },
+        {
+          "label": "Organ Donor Expenses",
+          "value": "In-patient hospitalisation expenses incurred for organ transplantation from the Donor to the recipient insured person are payable provided the claim for transplantation is payable. In addition, the expenses incurred by the Donor, (if any) for the complications that necessitate a Redo Surgery / ICU admission will be covered."
+        },
+        {
+          "label": "In Utero Fetal Surgery / Repair",
+          "value": "Expenses incurred for In Utero Fetal surgeries and procedures mentioned in this policy are covered with a waiting period. However, the waiting period will not apply for treatment related to congenital disease/defects for the new born."
+        },
+        {
+          "label": "Voluntary Sterilisation Expenses",
+          "value": "Expenses incurred for Voluntary Sterilisation (Tubectomy / Vasectomy) are covered after a waiting period, provided if the insured person is married and he/she is 22 years and above."
+        },
+        {
+          "label": "Miscarriage due to Accident",
+          "value": "Lump Sum is provided for miscarriage arising due to an accident as per the limits of the policy, subject to a waiting period."
+        },
+        {
+          "label": "Coverage for Non-medical Items",
+          "value": "If there is an admissible claim under the policy, then non-medical items specified in this policy will become payable."
+        },
+        {
+          "label": "Outpatient Consultations",
+          "value": "Expenses incurred on medical consultations as an outpatient are covered up to the limits as mentioned in the policy."
+        },
+        {
+          "label": "Preventive Health Check Up",
+          "value": "Health check-up expenses incurred for the tests mentioned in the policy document are covered for every policy year up to the specified limits."
+        },
+        {
+          "label": "Automatic Restoration of Sum Insured",
+          "value": "On partial or full utilisation of the Sum Insured during the policy period, 100% of the Sum Insured will be restored once in the same policy year that can be utilised for all claims and subsequent hospitalisation."
+        },
+        {
+          "label": "Cumulative Bonus",
+          "value": "Cumulative bonus is provided at 20% of the Sum Insured for each claim-free year subject to a maximum of 100% of the Sum Insured."
+        },
+        {
+          "label": "Star Wellness Program",
+          "value": "Wellness program designed to motivate and encourage the healthy lifestyle of the insured person through various wellness activities. In addition, the earned wellness bonus points can be utilised for availing renewal discounts."
+        },
+        {
+          "label": "Long-Term discount",
+          "value": "Avail 10% discount on 2nd year premium and 11.25% on 2nd and 3rd year premium."
+        },
+        {
+          "label": "Instalment Options",
+          "value": "The policy premium can be paid on a quarterly or half-yearly basis. It can also be paid on an annual, biennial (once in 2 years) and triennial (once in 3 years) basis."
+        },
+        {
+          "label": "Surrogacy Cover",
+          "value": "The company will indemnify the inpatient hospitalization expenses covering post-partum delivery complications for a period of 36 months incurred for the Surrogate mother up to the sub-limits specified under “Assisted Reproduction Treatment”. The cover will commence from the date of initiation of the treatment/procedure. The company will pay lump sum amount in case of “Miscarriage due to Accident” for surrogate mother as specified under the coverage “Miscarriage due to Accident” and waiting period mentioned under this cover is not applicable."
+        },
+        {
+          "label": "Oocyte Donor cover",
+          "value": "The company will indemnify the inpatient hospitalization expenses for the complications arising out of Assisted Reproductive Treatment Procedures, for the Oocyte donor up to the sub-limits specified under “Assisted Reproduction Treatment” for a period of 12 months. The cover will commence from the date of initiation of the treatment/procedure."
+        }
+      ]
+    },
+    "young-star-add-on": {
+      "slug": "young-star-add-on",
+      "ok": true,
+      "status": 200,
+      "rows": [
+        {
+          "label": "Enhanced Room Rent",
+          "value": "This cover enhances the room, boarding and nursing expenses as per the limits mentioned in the policy clause."
+        },
+        {
+          "label": "Claim Guard (Coverage for Non-medical Items(Consumables))",
+          "value": "If there is an admissible claim under the base policy, then the expenses for non-medical items specified in this Add on Cover will become payable."
+        },
+        {
+          "label": "Enhanced Limit for Modern Treatments",
+          "value": "The listed modern treatments that are covered in the base policy will become payable up to the Sum Insured of the base policy."
+        },
+        {
+          "label": "AYUSH Treatment",
+          "value": "Medical expenses for In-patient Hospitalization incurred on treatment under Ayurveda, Unani, Siddha and Homeopathy systems of medicines in a AYUSH Hospital is payable up to sum insured (including Cumulative bonus if available) under the Base Policy."
+        },
+        {
+          "label": "Home Care Treatment",
+          "value": "Expenses incurred on home care treatment for the specified conditions as mentioned in the policy clause are covered up to 10% of the Sum Insured of the base policy subject to the maximum of Rs. 5,00,000/- in a policy year."
+        },
+        {
+          "label": "Bonus Guard",
+          "value": "I) Cumulative bonus available under Base Policy will not be reduced at the time of renewals unless the bonus is utilized. II) On full utilization of Sum Insured and nil utilization of cumulative bonus accrued, such cumulative bonus so granted under the Base Policy will not be reduced III) On full utilization of Sum Insured and partial utilization of cumulative bonus accrued, the cumulative bonus granted under the Base Policy on renewal will be the balance cumulative bonus available IV) On full utilization of Sum Insured and full utilization of cumulative bonus accrued, the cumulative bonus granted under the Base Policy on renewal will be “nil”"
+        }
+      ]
+    },
+    "youngstar": {
+      "slug": "youngstar",
+      "ok": true,
+      "status": 200,
+      "rows": [
+        {
+          "label": "In-Patient Hospitalisation",
+          "value": "Hospitalisation expenses incurred for a period of more than 24 hours on account of illness, injury or accidents are covered."
+        },
+        {
+          "label": "Pre-Hospitalisation",
+          "value": "In addition to in-patient hospitalisation, the medical expenses incurred up to 60 days before the date of admission to the hospital are also covered."
+        },
+        {
+          "label": "Post-Hospitalisation",
+          "value": "Post-hospitalisation medical expenses up to 90 days from the date of discharge from the hospital are covered as per the limits mentioned in the policy clause."
+        },
+        {
+          "label": "Room Rent",
+          "value": "Room (Single Private A/C Room), boarding and nursing expenses incurred during in-patient hospitalisation are covered."
+        },
+        {
+          "label": "Road Ambulance",
+          "value": "This policy covers ambulance charges for admission to the hospital, for shifting from one hospital to another and from hospital to residence."
+        },
+        {
+          "label": "Day Care Procedures",
+          "value": "Medical treatments and surgical procedures that require less than 24 hours of hospitalisation due to technological advancements are covered."
+        },
+        {
+          "label": "Modern Treatment",
+          "value": "Expenses incurred for modern treatments such as Oral Chemotherapy, Intra Vitreal injections, Robotic Surgeries, etc. are covered up to the limits mentioned in the policy clause."
+        },
+        {
+          "label": "Additional Basic Sum Insured for Road Traffic Accident (RTA)",
+          "value": "If the basic Sum Insured gets exhausted, then for hospitalisation due to Road Traffic Accidents, it will be increased by 25% to the maximum of Rs. 10,00,000/-."
+        },
+        {
+          "label": "AYUSH Treatment",
+          "value": "Medical expenses for Inpatient Hospitalization incurred on treatment under Ayurveda, Unani, Sidha and Homeopathy systems of medicines in a AYUSH Hospital is payable up to the sum insured."
+        },
+        {
+          "label": "Automatic Restoration of Sum Insured",
+          "value": "On partial or full utilisation of the Sum Insured during the policy period, 100% of the Sum Insured will be restored once in the same policy period."
+        },
+        {
+          "label": "Cumulative Bonus",
+          "value": "Cumulative bonus is provided at 20% of the Sum Insured for each claim-free year subject to a maximum of 100% of the Sum Insured."
+        },
+        {
+          "label": "Online Discount",
+          "value": "A 5% discount on premium is available for purchasing the policy for the first time through online."
+        },
+        {
+          "label": "Special Discount",
+          "value": "A 10% discount on premium is applicable on purchasing the policy before 36 years of age and renewing it after 40 years of age."
+        },
+        {
+          "label": "E-Domestic Second Medical Opinion",
+          "value": "Access to a second medical opinion from a network doctor based on submitted medical records."
+        },
+        {
+          "label": "Preventive Health Check-up",
+          "value": "We will arrange for a Preventive Health Check-up at Our Network Providers for the applicable package as per opted Sum Insured. For the updated and applicable list of tests available under such package, Insured Persons are required to check our website www.starhealth.in"
+        },
+        {
+          "label": "Star Wellness Program",
+          "value": "Wellness program designed to motivate and encourage the healthy lifestyle of the insured person through various wellness activities. In addition, the earned wellness bonus points can be utilised for availing renewal discounts up to a maximum of 10%."
+        },
+        {
+          "label": "Lifelong Renewal",
+          "value": "This policy provides a lifelong renewal option."
+        },
+        {
+          "label": "Delivery Expenses",
+          "value": "Delivery expenses including the Caesarean section are covered up to Rs. 30,000/- per delivery to the maximum of two deliveries."
+        },
+        {
+          "label": "Hospital Cash Benefit",
+          "value": "A cash benefit of Rs.1000/- for each completed day in the hospital is provided for a maximum of 7 days per hospitalisation and 14 days per policy period."
+        },
+        {
+          "label": "Home Care Treatment",
+          "value": "Payable up to 10% of Sum Insured subject to maximum of Rs.5 lakhs in a Policy Year, for treatment availed by the Insured Person at home, only for the specified conditions."
+        },
+        {
+          "label": "Unlimited Tele-Consultation",
+          "value": "Insured can avail unlimited number of Tele-consultations on Star Health mobile application or digital platforms."
+        }
+      ]
+    }
+  }
+}

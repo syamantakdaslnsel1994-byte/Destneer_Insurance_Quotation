@@ -1683,6 +1683,50 @@ app.get('/feature_comparison.json', (req, res) => {
   res.sendFile(p);
 });
 
+// Same reasoning as feature_comparison.json just above — insurance_hub.html's
+// loadCareLiveFeatures() also fetches a relative URL, which needs its own
+// explicit route rather than silently 404ing. See scripts/
+// build_care_feature_mapping.js for how this file is generated; when it's
+// missing, Care's column just falls back to the static feature_comparison.json
+// entry rather than the request failing.
+app.get('/care_features_mapped.json', (req, res) => {
+  const p = path.join(__dirname, '..', 'data', 'care_features_mapped.json');
+  if (!require('fs').existsSync(p))
+    return res.status(404).json({ error: 'care_features_mapped.json not found in data/ — run scripts/build_care_feature_mapping.js' });
+  res.setHeader('Content-Type', 'application/json');
+  res.sendFile(p);
+});
+
+// Same reasoning again — insurance_hub.html's loadNivaLiveFeatures() also
+// needs an explicit route. See scripts/build_niva_feature_mapping.js.
+app.get('/niva_features_mapped.json', (req, res) => {
+  const p = path.join(__dirname, '..', 'data', 'niva_features_mapped.json');
+  if (!require('fs').existsSync(p))
+    return res.status(404).json({ error: 'niva_features_mapped.json not found in data/ — run scripts/build_niva_feature_mapping.js' });
+  res.setHeader('Content-Type', 'application/json');
+  res.sendFile(p);
+});
+
+// Same reasoning again — insurance_hub.html's loadMcLiveFeatures() also
+// needs an explicit route. See scripts/build_mc_feature_mapping.js.
+app.get('/mc_features_mapped.json', (req, res) => {
+  const p = path.join(__dirname, '..', 'data', 'mc_features_mapped.json');
+  if (!require('fs').existsSync(p))
+    return res.status(404).json({ error: 'mc_features_mapped.json not found in data/ — run scripts/build_mc_feature_mapping.js' });
+  res.setHeader('Content-Type', 'application/json');
+  res.sendFile(p);
+});
+
+// Same reasoning again — insurance_hub.html's loadStarLiveFeatures() also
+// needs an explicit route. See scripts/build_star_feature_mapping.js.
+app.get('/star_features_mapped.json', (req, res) => {
+  const p = path.join(__dirname, '..', 'data', 'star_features_mapped.json');
+  if (!require('fs').existsSync(p))
+    return res.status(404).json({ error: 'star_features_mapped.json not found in data/ — run scripts/build_star_feature_mapping.js' });
+  res.setHeader('Content-Type', 'application/json');
+  res.sendFile(p);
+});
+
 // ── Serve ExcelJS from node_modules (avoids CDN dependency) ──────────────────
 app.get('/exceljs.js', (req, res) => {
   const candidates = [
