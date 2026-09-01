@@ -44,9 +44,32 @@ async function getBrowser() {
   return browserPromise;
 }
 
+// Minimizes the real Edge/Chrome window this automation drives, without
+// touching headless mode — Care's WAF punishes headless (see the file
+// header), but a plain OS-level "minimized" window state is something any
+// real user does routinely and doesn't change anything Chromium itself
+// reports about the page, so it carries none of headless's detection risk.
+// The launch-time `--start-minimized` flag was tried first and confirmed
+// live NOT to work (Browser.getWindowBounds still reported windowState:
+// "normal" after launch) — this explicit CDP call, made before the page
+// even navigates, is what actually works, confirmed live: the window
+// stays minimized through navigation and the page loads and is scriptable
+// completely normally while minimized (checked via this same file's own
+// #partnerAbacus canary).
+async function minimizeWindow(page) {
+  try {
+    const cdp = await page.context().newCDPSession(page);
+    const { windowId } = await cdp.send('Browser.getWindowForTarget');
+    await cdp.send('Browser.setWindowBounds', { windowId, bounds: { windowState: 'minimized' } });
+  } catch (e) {
+    console.warn('[CareAutomation] could not minimize the automation window:', e.message);
+  }
+}
+
 async function freshPage() {
   const browser = await getBrowser();
   const page = await browser.newPage();
+  await minimizeWindow(page);
   await page.goto(INIT_URL, { waitUntil: 'domcontentloaded' });
   return page;
 }
