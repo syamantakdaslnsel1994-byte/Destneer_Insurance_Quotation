@@ -104,8 +104,8 @@ function addQuote(co, plan, sa, prem, pt, tenure) {
 
 setTimeout(async () => {
  try {
-  w.sessionStorage.setItem('desteneerHubToken', STORE.token);
-  w.sessionStorage.setItem('desteneerHubUser', 'utpal');
+  w.localStorage.setItem('desteneerHubToken', STORE.token);
+  w.localStorage.setItem('desteneerHubUser', 'utpal');
 
   // ── build a quotation by hand: two members, a family block and a per-member one
   const mk = (name, rel, dob, gender) => {
