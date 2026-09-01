@@ -41,7 +41,46 @@ html,body{height:100%;overflow:hidden;font-family:'Inter',system-ui,sans-serif;b
 .hub-out{background:transparent;border:1px solid #334155;color:#94a3b8;border-radius:7px;
   padding:4px 10px;font-size:10.5px;font-weight:700;font-family:inherit;cursor:pointer;transition:all .13s}
 .hub-out:hover{border-color:#dc2626;color:#fca5a5}
+.hub-acct{background:transparent;border:1px solid #334155;color:#94a3b8;border-radius:7px;
+  padding:4px 10px;font-size:10.5px;font-weight:700;font-family:inherit;cursor:pointer;transition:all .13s}
+.hub-acct:hover{border-color:#8b5cf6;color:#c4b5fd}
 .h-sep{flex:1}
+
+/* ─── ACCOUNT PANEL ──────────────────────────────────────────── */
+.acct-overlay{position:fixed;inset:0;background:rgba(15,23,42,.6);z-index:200;
+  display:none;align-items:center;justify-content:center}
+.acct-overlay.show{display:flex}
+.acct-box{width:100%;max-width:440px;max-height:86vh;overflow-y:auto;background:#fff;color:#0f172a;
+  border-radius:14px;box-shadow:0 24px 60px rgba(0,0,0,.5)}
+.acct-head{display:flex;align-items:center;justify-content:space-between;
+  padding:16px 20px;border-bottom:1px solid #eef2f7}
+.acct-head h3{font-size:14px;font-weight:800}
+.acct-close{background:none;border:none;font-size:20px;color:#94a3b8;cursor:pointer;line-height:1}
+.acct-close:hover{color:#0f172a}
+.acct-body{padding:18px 20px}
+.acct-sec{margin-bottom:20px;padding-bottom:18px;border-bottom:1px solid #f1f5f9}
+.acct-sec:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0}
+.acct-sec h4{font-size:10.5px;font-weight:800;text-transform:uppercase;letter-spacing:.4px;
+  color:#64748b;margin-bottom:10px}
+.acct-field{margin-bottom:10px}
+.acct-field label{display:block;font-size:10.5px;font-weight:700;color:#64748b;margin-bottom:4px}
+.acct-field input,.acct-field select{width:100%;padding:9px 11px;border:1.5px solid #e2e8f0;
+  border-radius:8px;font-size:12.5px;font-family:inherit}
+.acct-btn{padding:9px 14px;border:none;border-radius:8px;background:#8b5cf6;color:#fff;
+  font-size:12px;font-weight:700;font-family:inherit;cursor:pointer}
+.acct-btn:hover{background:#7c3aed}
+.acct-btn:disabled{opacity:.55;cursor:default}
+.acct-msg{margin-top:8px;font-size:11.5px;padding:8px 10px;border-radius:7px;display:none}
+.acct-msg.bad{background:#fef2f2;border:1px solid #fca5a5;color:#991b1b;display:block}
+.acct-msg.ok{background:#ecfdf5;border:1px solid #6ee7b7;color:#065f46;display:block}
+.acct-code{font-family:Consolas,'SFMono-Regular',monospace;font-weight:700;color:#7c3aed;
+  background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:7px;padding:8px 10px;margin-top:8px;
+  font-size:12.5px;word-break:break-all}
+.acct-banner{background:#fffbeb;border:1px solid #fcd34d;color:#92400e;border-radius:8px;
+  padding:10px 12px;font-size:11.5px;margin-bottom:16px;display:flex;align-items:center;
+  justify-content:space-between;gap:10px}
+.acct-banner button{flex-shrink:0}
+.acct-body .hide{display:none}
 .step-pills{display:flex;align-items:center;gap:0}
 .step-pill{
   display:flex;align-items:center;gap:5px;padding:5px 12px;
@@ -458,10 +497,57 @@ html,body{height:100%;overflow:hidden;font-family:'Inter',system-ui,sans-serif;b
   <div class="hub-session" id="hub-session" style="display:none">
     <span class="hub-who-lbl">Signed in</span>
     <span class="hub-who" id="hub-who"></span>
+    <button class="hub-acct" onclick="acctOpen()" title="Account settings">Account</button>
     <button class="hub-out" onclick="hubLogout()" title="Sign out">Sign out</button>
   </div>
   <div class="h-badge"><div class="h-dot"></div>Live</div>
 </header>
+
+<!-- ── ACCOUNT PANEL ── -->
+<div class="acct-overlay" id="acct-overlay" onclick="if(event.target===this)acctClose()">
+  <div class="acct-box">
+    <div class="acct-head">
+      <h3>Account</h3>
+      <button class="acct-close" onclick="acctClose()">&times;</button>
+    </div>
+    <div class="acct-body">
+      <div class="acct-banner hide" id="acct-claim-banner">
+        <span>No admin is set for this install yet.</span>
+        <button class="acct-btn" onclick="acctClaimAdmin()">Make me the admin</button>
+      </div>
+
+      <div class="acct-sec">
+        <h4>Change password</h4>
+        <div class="acct-field"><label>Current password</label><input type="password" id="acct-pw-cur" autocomplete="current-password"></div>
+        <div class="acct-field"><label>New password</label><input type="password" id="acct-pw-new" autocomplete="new-password"></div>
+        <button class="acct-btn" onclick="acctChangePassword()">Update password</button>
+        <div class="acct-msg" id="acct-pw-msg"></div>
+      </div>
+
+      <div class="acct-sec">
+        <h4>My recovery code</h4>
+        <p style="font-size:11.5px;color:#64748b;line-height:1.5">
+          Used to reset your password if you forget it. Generating a new one replaces
+          any earlier code.
+        </p>
+        <button class="acct-btn" onclick="acctNewRecoveryCode()">Generate a new recovery code</button>
+        <div class="acct-msg" id="acct-rc-msg"></div>
+        <div id="acct-rc-code"></div>
+      </div>
+
+      <div class="acct-sec hide" id="acct-admin-sec">
+        <h4>Reset a teammate's password</h4>
+        <div class="acct-field">
+          <label>Account</label>
+          <select id="acct-admin-user"></select>
+        </div>
+        <div class="acct-field"><label>New password</label><input type="password" id="acct-admin-pw" autocomplete="new-password"></div>
+        <button class="acct-btn" onclick="acctAdminReset()">Reset their password</button>
+        <div class="acct-msg" id="acct-admin-msg"></div>
+      </div>
+    </div>
+  </div>
+</div>
 
 <!-- ── BODY ── -->
 <div class="app-body">
@@ -3501,14 +3587,15 @@ const HIST_API = 'http://localhost:3005';
 let _histList = [], _histDest = '';
 
 // ── Session ─────────────────────────────────────────────────────────────────
-// The token lives in sessionStorage rather than localStorage: closing the tab
-// signs out, which is the right default for a desk several people share. Every
-// call to the quotation routes carries it — those hold client names, dates of
-// birth and pincodes, so the server refuses them without it.
+// The token lives in localStorage: signed in once, stays signed in across
+// tab/browser restarts until an explicit logout (or the session actually
+// expires). Every call to the quotation routes carries it — those hold
+// client names, dates of birth and pincodes, so the server refuses them
+// without it.
 const HUB_TOKEN_KEY = 'desteneerHubToken';
 const HUB_USER_KEY  = 'desteneerHubUser';
-function hubToken(){ try { return sessionStorage.getItem(HUB_TOKEN_KEY) || ''; } catch (e) { return ''; } }
-function hubUser(){  try { return sessionStorage.getItem(HUB_USER_KEY)  || ''; } catch (e) { return ''; } }
+function hubToken(){ try { return localStorage.getItem(HUB_TOKEN_KEY) || ''; } catch (e) { return ''; } }
+function hubUser(){  try { return localStorage.getItem(HUB_USER_KEY)  || ''; } catch (e) { return ''; } }
 function hubAuthHeaders(extra){
   const h = Object.assign({}, extra || {});
   const t = hubToken();
@@ -3516,7 +3603,7 @@ function hubAuthHeaders(extra){
   return h;
 }
 function hubToLogin(){
-  try { sessionStorage.removeItem(HUB_TOKEN_KEY); sessionStorage.removeItem(HUB_USER_KEY); } catch (e) {}
+  try { localStorage.removeItem(HUB_TOKEN_KEY); localStorage.removeItem(HUB_USER_KEY); } catch (e) {}
   location.replace('/login?next=' + encodeURIComponent(location.pathname));
 }
 // A 401 from any history call means the session went away — a server restart
@@ -3549,6 +3636,101 @@ async function hubCheckSession(){
     showToast('⚠️ Cannot reach the server on port 3005 — is care_server.js running?', 7000);
     return false;
   }
+}
+
+// ── Account panel: change password, recovery code, admin tools ─────────────
+function acctMsg(id, text, cls){
+  const e = document.getElementById(id);
+  if (!e) return;
+  e.className = 'acct-msg ' + (cls || 'bad');
+  e.textContent = text || '';
+  e.style.display = text ? 'block' : 'none';
+}
+
+async function acctOpen(){
+  document.getElementById('acct-overlay').classList.add('show');
+  ['acct-pw-cur','acct-pw-new','acct-admin-pw'].forEach(id => document.getElementById(id).value = '');
+  ['acct-pw-msg','acct-rc-msg','acct-admin-msg'].forEach(id => acctMsg(id, ''));
+  document.getElementById('acct-rc-code').innerHTML = '';
+  try {
+    const r = await fetch(HIST_API + '/auth/me', { headers: hubAuthHeaders() });
+    if (!hubHandle401(r)) {
+      const j = await r.json();
+      document.getElementById('acct-claim-banner').classList.toggle('hide', !!j.adminExists);
+      const adminSec = document.getElementById('acct-admin-sec');
+      adminSec.classList.toggle('hide', !j.isAdmin);
+      if (j.isAdmin) acctLoadUsers();
+    }
+  } catch (e) { showToast('Cannot reach the server.', 4000); }
+}
+function acctClose(){ document.getElementById('acct-overlay').classList.remove('show'); }
+
+async function acctChangePassword(){
+  const current = document.getElementById('acct-pw-cur').value;
+  const next = document.getElementById('acct-pw-new').value;
+  if (next.length < 8) { acctMsg('acct-pw-msg', 'New password must be at least 8 characters.'); return; }
+  try {
+    const r = await fetch(HIST_API + '/auth/password', { method:'POST',
+      headers: hubAuthHeaders({ 'Content-Type':'application/json' }),
+      body: JSON.stringify({ current, next }) });
+    if (hubHandle401(r)) return;
+    const j = await r.json();
+    if (!r.ok || !j.ok) { acctMsg('acct-pw-msg', j.error || 'Could not update password.'); return; }
+    acctMsg('acct-pw-msg', 'Password updated.', 'ok');
+    document.getElementById('acct-pw-cur').value = ''; document.getElementById('acct-pw-new').value = '';
+  } catch (e) { acctMsg('acct-pw-msg', 'Cannot reach the server: ' + e.message); }
+}
+
+async function acctNewRecoveryCode(){
+  try {
+    const r = await fetch(HIST_API + '/auth/recovery-code/regenerate', { method:'POST', headers: hubAuthHeaders() });
+    if (hubHandle401(r)) return;
+    const j = await r.json();
+    if (!r.ok || !j.ok) { acctMsg('acct-rc-msg', j.error || 'Could not generate a code.'); return; }
+    acctMsg('acct-rc-msg', 'Save this now — it will not be shown again:', 'ok');
+    document.getElementById('acct-rc-code').innerHTML = '<div class="acct-code">' + j.recoveryCode + '</div>';
+  } catch (e) { acctMsg('acct-rc-msg', 'Cannot reach the server: ' + e.message); }
+}
+
+async function acctClaimAdmin(){
+  try {
+    const r = await fetch(HIST_API + '/auth/claim-admin', { method:'POST', headers: hubAuthHeaders() });
+    if (hubHandle401(r)) return;
+    const j = await r.json();
+    if (!r.ok || !j.ok) { showToast(j.error || 'Could not claim admin.', 4000); return; }
+    document.getElementById('acct-claim-banner').classList.add('hide');
+    document.getElementById('acct-admin-sec').classList.remove('hide');
+    acctLoadUsers();
+    showToast('You are now the admin for this install.', 3000);
+  } catch (e) { showToast('Cannot reach the server.', 4000); }
+}
+
+async function acctLoadUsers(){
+  try {
+    const r = await fetch(HIST_API + '/auth/admin/users', { headers: hubAuthHeaders() });
+    if (hubHandle401(r)) return;
+    const j = await r.json();
+    const sel = document.getElementById('acct-admin-user');
+    sel.innerHTML = (j.users || []).map(u =>
+      '<option value="' + u.username + '">' + u.username + (u.isAdmin ? ' (admin)' : '') + '</option>').join('');
+  } catch (e) {}
+}
+
+async function acctAdminReset(){
+  const username = document.getElementById('acct-admin-user').value;
+  const newPassword = document.getElementById('acct-admin-pw').value;
+  if (!username) { acctMsg('acct-admin-msg', 'Choose an account.'); return; }
+  if (newPassword.length < 8) { acctMsg('acct-admin-msg', 'New password must be at least 8 characters.'); return; }
+  try {
+    const r = await fetch(HIST_API + '/auth/admin/reset-password', { method:'POST',
+      headers: hubAuthHeaders({ 'Content-Type':'application/json' }),
+      body: JSON.stringify({ username, newPassword }) });
+    if (hubHandle401(r)) return;
+    const j = await r.json();
+    if (!r.ok || !j.ok) { acctMsg('acct-admin-msg', j.error || 'Could not reset that password.'); return; }
+    acctMsg('acct-admin-msg', 'Password reset for ' + username + '.', 'ok');
+    document.getElementById('acct-admin-pw').value = '';
+  } catch (e) { acctMsg('acct-admin-msg', 'Cannot reach the server: ' + e.message); }
 }
 
 function histMsg(el, text, cls){
