@@ -502,7 +502,7 @@ input[type="range"]::-webkit-slider-thumb {
       <div class="field-row" id="biz-row">
         <div class="field-label">Business Type <span class="q-icon">?</span></div>
         <div class="field-input">
-          <select id="sel-biz" onchange="onPricingInputChanged()">
+          <select id="sel-biz" onchange="onCascadingFieldChanged()">
             <option value="NB">NB</option>
             <option value="PORT">Portability</option>
             <option value="RENEW">Renewal</option>
@@ -514,7 +514,7 @@ input[type="range"]::-webkit-slider-thumb {
       <div class="field-row" id="plan-type-row" style="display:none">
         <div class="field-label">Plan Type <span class="q-icon">?</span></div>
         <div class="field-input">
-          <select id="sel-plan-type" onchange="onPricingInputChanged()">
+          <select id="sel-plan-type" onchange="onCascadingFieldChanged()">
             <!-- options built dynamically by applyFieldConfig() from PLAN_TYPE_MAP -->
           </select>
         </div>
@@ -524,7 +524,7 @@ input[type="range"]::-webkit-slider-thumb {
       <div class="field-row" id="ns-row" style="display:none">
         <div class="field-label">Nationality Status <span class="q-icon">?</span></div>
         <div class="field-input">
-          <select id="sel-ns" onchange="onPricingInputChanged()">
+          <select id="sel-ns" onchange="onCascadingFieldChanged()">
             <!-- options built dynamically by applyFieldConfig() from NS_MAP -->
           </select>
         </div>
@@ -534,11 +534,16 @@ input[type="range"]::-webkit-slider-thumb {
       <div class="field-row" id="gc-row" style="display:none">
         <div class="field-label">Global Coverage <span class="q-icon">?</span></div>
         <div class="field-input">
-          <select id="sel-gc" onchange="onPricingInputChanged()">
+          <select id="sel-gc" onchange="onCascadingFieldChanged()">
             <!-- options built dynamically by applyFieldConfig() from GC_MAP -->
           </select>
         </div>
       </div>
+
+      <!-- Extra per-plan fields with no checkbox gate (Deductible, OPD Sum
+           Insured, PED Tenure on plans that require them) — rows built
+           dynamically by applyFieldConfig() from the plan's extraFields. -->
+      <div id="extra-fields-container"></div>
 
       <!-- Pincode -->
       <div class="field-row">
@@ -549,11 +554,86 @@ input[type="range"]::-webkit-slider-thumb {
         </div>
       </div>
 
+      <!-- Travel plans (107 Student Explore, 5833 New Explore, 5834 POS
+           Explore) — a different product from every health plan above:
+           priced off a region/duration or date range, not members/age/cover
+           type. Shown instead of the regular fields when one of these is
+           selected (toggled in applyFieldConfig()). -->
+      <div id="travel-section" style="display:none">
+        <div class="field-row">
+          <div class="field-label" id="travel-region-label">Travelling To <span class="q-icon">?</span></div>
+          <div class="field-input">
+            <select id="sel-travel-region" onchange="onPricingInputChanged()"></select>
+          </div>
+        </div>
+        <!-- 107 only -->
+        <div class="field-row" id="travel-plantype-row" style="display:none">
+          <div class="field-label">Travel Plan Type <span class="q-icon">?</span></div>
+          <div class="field-input">
+            <select id="sel-travel-plantype" onchange="onPricingInputChanged()"></select>
+          </div>
+        </div>
+        <div class="field-row" id="travel-tenuremonths-row" style="display:none">
+          <div class="field-label">Policy Tenure (Months) <span class="q-icon">?</span></div>
+          <div class="field-input">
+            <select id="sel-travel-tenuremonths" onchange="onPricingInputChanged()">
+              <option>1</option><option>3</option><option>6</option><option>9</option>
+              <option selected>12</option><option>15</option><option>18</option><option>24</option>
+            </select>
+          </div>
+        </div>
+        <div id="travel-covers-container"></div>
+        <!-- 5833/5834 only -->
+        <div class="field-row" id="travel-triptype-row" style="display:none">
+          <div class="field-label">Trip Type <span class="q-icon">?</span></div>
+          <div class="field-input">
+            <select id="sel-travel-triptype" onchange="onPricingInputChanged()">
+              <option>Single</option><option>Multi-trip</option>
+            </select>
+          </div>
+        </div>
+        <div class="field-row" id="travel-maxduration-row" style="display:none">
+          <div class="field-label">Max Trip Duration (Days) <span class="q-icon">?</span></div>
+          <div class="field-input">
+            <select id="sel-travel-maxduration" onchange="onPricingInputChanged()">
+              <option>30</option><option>45</option><option>60</option>
+            </select>
+          </div>
+        </div>
+        <div class="field-row" id="travel-dates-row" style="display:none">
+          <div class="field-label">Travel Dates <span class="q-icon">?</span></div>
+          <div class="field-input" style="display:flex;gap:8px">
+            <input type="date" id="inp-travel-start" onchange="onTravelDatesChanged()" style="flex:1">
+            <input type="date" id="inp-travel-end" onchange="onTravelDatesChanged()" style="flex:1">
+          </div>
+        </div>
+        <div class="field-row" id="travel-days-row" style="display:none">
+          <div class="field-label">Trip Length</div>
+          <div class="field-input" id="travel-days-disp" style="padding-top:6px">— days</div>
+        </div>
+        <div class="field-row" id="travel-travelers-row" style="display:none">
+          <div class="field-label">No of Travelers <span class="q-icon">?</span></div>
+          <div class="field-input">
+            <select id="sel-travel-travelers" onchange="onTravelersChanged()">
+              <option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option>
+            </select>
+          </div>
+        </div>
+        <div id="travel-ages-container"></div>
+        <div class="field-row" id="travel-ped-row" style="display:none">
+          <div class="field-label">Any Traveler having PED <span class="q-icon">?</span></div>
+          <div class="field-input">
+            <label style="margin-right:14px"><input type="radio" name="travel-ped" value="No" checked onchange="onPricingInputChanged()"> No</label>
+            <label><input type="radio" name="travel-ped" value="Yes" onchange="onPricingInputChanged()"> Yes</label>
+          </div>
+        </div>
+      </div>
+
       <!-- Cover Type -->
       <div class="field-row" id="cover-row">
         <div class="field-label">Cover Type <span class="q-icon">?</span></div>
         <div class="field-input">
-          <select id="sel-cover" onchange="updateMemberFields()">
+          <select id="sel-cover" onchange="updateMemberFields();onCascadingFieldChanged()">
             <option value="Individual">Individual</option>
             <option value="Floater" selected>Floater</option>
           </select>
@@ -637,6 +717,22 @@ input[type="range"]::-webkit-slider-thumb {
         <div class="field-label">Age Of Member 4 <span class="q-icon">?</span></div>
         <div class="field-input">
           <select id="sel-age4" onchange="onPricingInputChanged()"></select>
+        </div>
+      </div>
+
+      <!-- Age Member 5 — plans with a live Total Members option up to 6 -->
+      <div class="field-row" id="age5-row" style="display:none">
+        <div class="field-label">Age Of Member 5 <span class="q-icon">?</span></div>
+        <div class="field-input">
+          <select id="sel-age5" onchange="onPricingInputChanged()"></select>
+        </div>
+      </div>
+
+      <!-- Age Member 6 -->
+      <div class="field-row" id="age6-row" style="display:none">
+        <div class="field-label">Age Of Member 6 <span class="q-icon">?</span></div>
+        <div class="field-input">
+          <select id="sel-age6" onchange="onPricingInputChanged()"></select>
         </div>
       </div>
     </div><!-- /form-fields -->
@@ -838,6 +934,46 @@ function childAgeOptions() {
     Array.from({length:24},(_,i)=>`<option value="${i+1}">${i+1}</option>`).join('');
 }
 
+// Age Of Eldest Member (field_3) — plans where the live portal uses a
+// string age-BAND as the value (not a plain year), confirmed via
+// /debug-fields. Sent through as-is: field_3 is a plain passthrough for
+// every plan not in SECURE_PLANS/LEGACY_SECURE, so whatever string sel-age1
+// holds is exactly what reaches the real API.
+// allMembersUseBand: on plans labelled "Age of Eldest Member" (748, 5674),
+// only the eldest's field is a band — member 2+ take a plain numeric age
+// (confirmed live: 748 with a plain-number member2Age succeeds). On plans
+// labelled just "Age of Member" (362, 585), EVERY member's age field is the
+// same band-string select — sending a plain number for member 2 there made
+// the live portal silently reject the whole request (confirmed live).
+//
+// Declared here, before the age-select init below, rather than down with
+// the other per-plan maps — updateMemberFields() reads AGE_BAND_MAP the
+// moment the page loads (see its call a few lines down), and a const
+// declared later in the file is in the temporal dead zone until its own
+// statement runs. Referencing it that early threw "Cannot access
+// 'AGE_BAND_MAP' before initialization", which aborted the rest of this
+// script — silently breaking every later declaration (addonState,
+// PLAN_TYPE_MAP additions, MEMBERS_MAP, the lot). That's why the app looked
+// broken across the board, not just on age-band plans.
+const AGE_BAND_MAP = {
+  '748': { options: ['18 to 24 Years','25 to 35 Years','36 to 40 Years','41 to 45 Years',
+                      '46 to 50 Years','51 to 55 Years','56 to 60 Years','61 to 65 Years',
+                      '66 to 70 Years','> 70 Years'], default: '18 to 24 Years' },
+  '585': { options: ['5 - 17 years','18 - 25 years','26 - 30 years','31 - 35 years',
+                      '36 - 40 years','41 - 45 years','46 - 50 years','51 - 55 years',
+                      '56 -  60 years'], default: '18 - 25 years', allMembersUseBand: true },
+  '362': { options: ['5 - 17 years','18 - 25 years','26 - 30 years','31 - 35 years',
+                      '36 - 40 years','41 - 45 years','46 - 50 years'], default: '18 - 25 years',
+           allMembersUseBand: true },
+  '5674':{ options: ['12 - 17 Year','18 - 25 Year','26 - 35 Year','36 - 45 Year','46 - 55 Year'],
+           default: '12 - 17 Year' },
+};
+// Plans where the live numeric range genuinely differs from the generic
+// 18-99 (e.g. a child-eligible plan) rather than needing a band string.
+const AGE_RANGE_MAP = {
+  '1734': { min: 5, max: 60, default: 5 },
+};
+
 // Init age selects
 document.getElementById('sel-age1').innerHTML = ageOptions(18, 99);
 document.getElementById('sel-age1').value = 30;
@@ -847,18 +983,32 @@ document.getElementById('sel-age3').innerHTML = ageOptions(18, 99);
 document.getElementById('sel-age3').value = 25;
 document.getElementById('sel-age4').innerHTML = ageOptions(18, 99);
 document.getElementById('sel-age4').value = 25;
+// Members 5 and 6 — only shown for plans whose live Total Members ladder
+// goes that high (MEMBERS_MAP); children (< 25 yrs) tops out at 3 on every
+// plan, which is always covered by members 2-4, so 5/6 are always adults.
+document.getElementById('sel-age5').innerHTML = ageOptions(18, 99);
+document.getElementById('sel-age5').value = 25;
+document.getElementById('sel-age6').innerHTML = ageOptions(18, 99);
+document.getElementById('sel-age6').value = 25;
 
 function updateMemberFields() {
   onPricingInputChanged();
   const cover = document.getElementById('sel-cover').value;
-  const total = cover === 'Individual' ? 1 : +document.getElementById('sel-members').value;
+  // Individual cover means each member gets their own separate sum insured
+  // rather than sharing one Floater sum — it doesn't mean "one person only".
+  // Confirmed live: under field_9=Individual the real portal still renders
+  // Total Members with its full 1-6 option list (still defaulting to "2"),
+  // it only hides Children.
+  const total = +document.getElementById('sel-members').value;
   const kids  = +document.getElementById('sel-children').value;
 
-  document.getElementById('members-row').style.display  = cover === 'Individual' ? 'none' : '';
+  document.getElementById('members-row').style.display  = '';
   document.getElementById('children-row').style.display = cover === 'Individual' ? 'none' : '';
   document.getElementById('age2-row').style.display     = total >= 2 ? '' : 'none';
   document.getElementById('age3-row').style.display     = total >= 3 ? '' : 'none';
   document.getElementById('age4-row').style.display     = total >= 4 ? '' : 'none';
+  document.getElementById('age5-row').style.display     = total >= 5 ? '' : 'none';
+  document.getElementById('age6-row').style.display     = total >= 6 ? '' : 'none';
 
   // Adjust member 2-4 age options (adult vs child).
   //
@@ -868,9 +1018,35 @@ function updateMemberFields() {
   // Total Members or Children. And even a legitimate rebuild threw away the
   // age that had been entered. Now the mode is compared as a string, and any
   // age still valid in the new option set is carried across.
+  // Plans where every member's age is the same band-string select as the
+  // eldest's (AGE_BAND_MAP[planId].allMembersUseBand) — a plain numeric age
+  // for member 2+ is silently rejected by the live portal on these plans.
+  const planId = document.getElementById('sel-plan')?.value;
+  const bandSpec = AGE_BAND_MAP[planId];
+  if (bandSpec && bandSpec.allMembersUseBand) {
+    ['sel-age2','sel-age3','sel-age4','sel-age5','sel-age6'].forEach(id => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      if (el.dataset.ageMode === 'band-' + planId) return;
+      const previous = el.value;
+      el.innerHTML = bandSpec.options.map(v => `<option value="${v}">${v}</option>`).join('');
+      el.dataset.ageMode = 'band-' + planId;
+      el.value = bandSpec.options.includes(previous) ? previous : bandSpec.default;
+    });
+    return;
+  }
+
   setMemberAgeMode('sel-age2', kids >= 1, '18');
   setMemberAgeMode('sel-age3', kids >= 2, '25');
   setMemberAgeMode('sel-age4', kids >= 3, '25');
+  ['sel-age5','sel-age6'].forEach(id => {
+    const el = document.getElementById(id);
+    if (!el || el.dataset.ageMode === 'adult') return;
+    const previous = el.value;
+    el.innerHTML = ageOptions(18, 99);
+    el.dataset.ageMode = 'adult';
+    el.value = Array.prototype.some.call(el.options, o => o.value === previous) ? previous : '25';
+  });
 }
 
 function setMemberAgeMode(selectId, isChild, adultDefault) {
@@ -908,8 +1084,9 @@ const PLAN_TYPE_MAP = {
   '2813': ['Care Supreme', 'Senior Premium', 'Senior Super'],  // Care Supreme
   '5399': ['Care Supreme', 'Senior Premium', 'Senior Super'],  // POS Care Supreme
   '6434': ['Option 1', 'Option 2'],                           // Supreme Enhance
+  '748':  ['Enhance 1', 'Enhance 2'],                         // Enhance — confirmed via /debug-fields
   '6395': ['SURROGACY'],                                       // Surrogacy and Oocyte Donor
-  '362':  ['Cancer', 'Critical', 'Operation', 'Heart'],        // Super Mediclaim
+  '362':  ['Critical', 'Cancer', 'Operation', 'Heart'],        // Super Mediclaim — live default is "Critical"
 };
 
 // Plans that do NOT show the Cover Type (Individual / Floater) selector
@@ -978,14 +1155,120 @@ const NS_MAP = {
            'Out of India employment','Merchant Navy','Education Overseas'],
   '362':  ['Resident of India','NRI/NRO/OCI/PIO','Foreign Citizen/Dual Citizenship',
            'Out of India employment','Merchant Navy','Education Overseas'],
+  // Type C — Secure family. The live form offers "NRI/OCI/PIO" as a
+  // dropdown option on every one of these plans (plus a "Please Select"
+  // placeholder, not listed — not a real choice), but confirmed live: every
+  // POS variant (7425, 7424, 573) actually REJECTS that value outright —
+  // consistent with IRDAI's point-of-sale product rules restricting POS
+  // covers to resident Indians. The non-POS siblings (6740, 6384, 188)
+  // genuinely accept it. So POS plans here only get the one real, working
+  // choice — offering NRI would just be a guaranteed-to-fail option.
+  '7425': ['Resident of India'],
+  '7424': ['Resident of India'],
+  '573':  ['Resident of India'],
+  '6740': ['Resident of India','NRI/OCI/PIO'],
+  '6384': ['Resident of India','NRI/OCI/PIO'],
+  '188':  ['Resident of India','NRI/OCI/PIO'],
 };
 
-// Global Coverage (field_GC) — verified from portal audit (Jul 2026)
-// Only 5673 (Care Global) is user-selectable; 6196 auto-sends "Not Opted"
-const GC_MAP = {
-  '5673': ['WW Excluding USA','WW Including USA'],
+// Travel plans — a different product from every health plan (see
+// server/care_server.js's TRAVEL_PLANS for the matching backend branch).
+// 5674 (Student Explore-Health Unlimited) is deliberately NOT included here
+// yet: its date-range payload still fails against the live API for reasons
+// not yet isolated, so its UI stays off rather than offering a flow that
+// cannot work.
+const TRAVEL_PLANS = new Set(['107', '5833', '5834']);
+const TRAVEL_REGIONS = ['Asia','Africa','ANZ','Worldwide - Silver','WW excl US/CAN- Silver',
+  'Europe','Worldwide - Gold','WW excl US/CAN- Gold','Canada','Worldwide- Platinum','WW excl US/CAN- Platinum'];
+const GEO_SCOPES = ['Worldwide','WW-Excl. US and Canada'];
+const TRAVEL_PLAN_TYPES = ['Explore Start','Explore Plus','Explore Super','Explore Ultra'];
+const TRAVELER_AGE_BANDS = ['up to 40 Years','41 Years - 60 Years','61 Years - 70 Years',
+  '71 Years - 75 Years','76 Years - 80 Years','81 Years - 85 Years','> 85 Years'];
+// 107's six optional covers — one (MNBC) has its own value dropdown once
+// checked. Labels are inferred from the field codes (SII/HIV/VC/MNBC/ASI/
+// PEDC) since the live label markup for this table didn't parse cleanly —
+// field IDs and the maternity $ options confirm the mapping.
+const TRAVEL_107_COVERS = [
+  { field: 'opt_cvr_SII',  label: 'Self Inflicted Injury' },
+  { field: 'opt_cvr_HIV',  label: 'HIV Cover' },
+  { field: 'opt_cvr_VC',   label: 'Vision Care' },
+  { field: 'opt_cvr_MNBC', label: 'Maternity & New Born Cover', sub: ['Upto SI','1,000 $','5,000 $'] },
+  { field: 'opt_cvr_ASI',  label: 'Adventure Sports Injury' },
+  { field: 'opt_cvr_PEDC', label: 'PED Cover' },
+];
+let travelCoverState = {};   // { field -> checked }
+let travelSubState = {};     // { 'opt_cvr_MNBC' -> chosen value }
+
+function onTravelDatesChanged(){
+  const s = document.getElementById('inp-travel-start').value;
+  const e = document.getElementById('inp-travel-end').value;
+  const disp = document.getElementById('travel-days-disp');
+  if (s && e) {
+    const days = Math.round((new Date(e) - new Date(s)) / 86400000);
+    disp.textContent = days > 0 ? (days + ' days') : '— days';
+  } else {
+    disp.textContent = '— days';
+  }
+  onPricingInputChanged();
+}
+
+function onTravelersChanged(){
+  const n = +document.getElementById('sel-travel-travelers').value;
+  const container = document.getElementById('travel-ages-container');
+  const prev = Array.from(container.querySelectorAll('select')).map(s => s.value);
+  const rows = [];
+  for (let i = 0; i < n; i++) {
+    const opts = TRAVELER_AGE_BANDS.map(v =>
+      `<option value="${v}"${v === (prev[i] || TRAVELER_AGE_BANDS[0]) ? ' selected' : ''}>${v}</option>`).join('');
+    rows.push(`<div class="field-row">
+      <div class="field-label">Traveler ${i+1} Age <span class="q-icon">?</span></div>
+      <div class="field-input"><select onchange="onPricingInputChanged()">${opts}</select></div>
+    </div>`);
+  }
+  container.innerHTML = rows.join('');
+  onPricingInputChanged();
+}
+
+// Total Members (field_1) — plans whose live ladder differs from the
+// generic 1-4. Confirmed via /debug-fields. options is display order;
+// default is that plan's actual live default (not necessarily the first).
+const MEMBERS_MAP = {
+  // Up to 6, default 2 unless noted
+  '6434':{options:['1','2','3','4','5','6'],default:'2'},
+  '2534':{options:['1','2','3','4','5','6'],default:'1'},
+  '748': {options:['1','2','3','4','5','6'],default:'2'},
+  '1734':{options:['1','2','3','4','5','6'],default:'1'},
+  '5412':{options:['1','2','3','4','5','6'],default:'2'},
+  '6196':{options:['1','2','3','4','5','6'],default:'2'},
+  '3485':{options:['1','2','3','4','5','6'],default:'2'},
+  '3486':{options:['1','2','3','4','5','6'],default:'2'},
+  '5334':{options:['1','2','3','4','5','6'],default:'2'},
+  '5335':{options:['1','2','3','4','5','6'],default:'2'},
+  '5673':{options:['1','2','3','4','5','6'],default:'1'},
+  '362': {options:['1','2','3','4','5','6'],default:'1'},
+  // 2-5, no "1"
+  '1432':{options:['2','3','4','5'],default:'2'},
+  '1992':{options:['2','3','4','5'],default:'2'},
+  // 2/3/4, default 3 (not the generic default of 2)
+  '5955':{options:['2','3','4'],default:'3'},
 };
-const GC_AUTO_PLANS = new Set(['6196']); // always send "Not Opted", no UI shown
+
+// Children (field_10) — plans where the live portal offers only 0 or 1,
+// not the generic 0-3 every other plan gets. Confirmed via /debug-fields.
+const CHILDREN_MAP = {
+  '3485': ['0','1'], '3486': ['0','1'], '5334': ['0','1'],
+  '5335': ['0','1'], '1432': ['0','1'], '1992': ['0','1'],
+};
+
+// Global Coverage (field_GC) — verified from portal audit (Jul 2026).
+// "WW Including USA" first — that's the live portal's actual default.
+// 5673 (Care Global) offers a real choice; 6196 has the field but only one
+// option ("Not Opted") — still shown as a (single-option) row rather than
+// hidden, since the real portal displays it too rather than omitting it.
+const GC_MAP = {
+  '5673': ['WW Including USA','WW Excluding USA'],
+  '6196': ['Not Opted'],
+};
 
 // All Secure family plans — need Annual Income + Job Type fields
 const INCOME_PLANS = new Set(['7425','7424','6740','6384','188','573']);
@@ -1030,6 +1313,18 @@ function buildMonthlyIncomeTicks(min, max) {
 }
 
 let addonState = {}; // { field -> checked }
+let subValueState = {};   // { subField -> chosen value }, e.g. field_NCB_Value -> 'CB Booster'
+let extraFieldState = {}; // { field -> chosen value }, e.g. field_OPD_SI -> '10000'
+
+// Add-ons that offer a real second choice once checked, confirmed via
+// /debug-fields — same fields server.js's SUB_DEFAULTS knows about, minus
+// field_CS (only one real option, no dropdown needed).
+const ADDON_SUBVALUE_MAP = {
+  'field_NCB': { subField: 'field_NCB_Value', options: ['CB Super', 'CB Booster'] },
+  'field_IC':  { subField: 'field_IC_Value',  options: ['Instant Cover', 'Instant Cover Advanced'] },
+  'field_OPD': { subField: 'field_OPD_Value', options: ['OPD', 'OPD-PLUS'] },
+  'field_43':  { subField: 'field_PED_TENURE', options: ['1 Year', '2 Year'] },
+};
 
 async function onPlanChange() {
   const planSel = document.getElementById('sel-plan');
@@ -1083,10 +1378,26 @@ async function loadAddons(planId) {
   addonState = {};
 
   try {
+    // Care's own RAW default for some of these fields is a blank
+    // "Please select" placeholder — confirmed live on Nationality Status,
+    // where "Resident of India" is actually the LAST option in Care's own
+    // list, not pre-selected. Our maps below deliberately reorder these so
+    // the dropdown shows a sensible default instead of a placeholder, but
+    // that only matters if the cascade is told about it — otherwise the
+    // very first /addons call (before the operator has touched anything)
+    // computes fields/SI-ladder for Care's blank state, not the state the
+    // UI is about to display. Passing what's ABOUT to be shown as the
+    // default here keeps the two in sync from the first paint, not just
+    // after the operator happens to change a dropdown.
+    const initOverrides = {
+      planType:          (PLAN_TYPE_MAP[planId] || [])[0],
+      nationalityStatus: (NS_MAP[planId]        || [])[0],
+      globalCoverage:    (GC_MAP[planId]        || [])[0],
+    };
     const resp = await fetch(`${API}/addons`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ abacusId: planId }),
+      body: JSON.stringify({ abacusId: planId, ...initOverrides }),
     });
     const data = await resp.json();
     loading.style.display = 'none';
@@ -1142,12 +1453,31 @@ function renderAddons(addons) {
   const grid = document.getElementById('addon-grid');
   grid.innerHTML = '';
   addonState = {};
+  subValueState = {};
 
   addons.forEach(a => {
     addonState[a.field] = a.checked;
 
     const item = document.createElement('label');
     item.className = 'addon-item';
+
+    // Sub-option row (e.g. NCB -> CB Super/CB Booster) — built first so the
+    // checkbox handler below can reach it by reference.
+    const subInfo = ADDON_SUBVALUE_MAP[a.field];
+    let subRow = null;
+    if (subInfo) {
+      subValueState[subInfo.subField] = subInfo.options[0];
+      subRow = document.createElement('div');
+      subRow.className = 'addon-sub';
+      subRow.style.display = a.checked ? '' : 'none';
+      const sub = document.createElement('select');
+      sub.innerHTML = subInfo.options.map(v => `<option value="${v}">${v}</option>`).join('');
+      sub.addEventListener('change', () => {
+        subValueState[subInfo.subField] = sub.value;
+        invalidatePremium('Add-ons changed — click Calculate Premium');
+      });
+      subRow.appendChild(sub);
+    }
 
     const cb = document.createElement('input');
     cb.type      = 'checkbox';
@@ -1156,6 +1486,7 @@ function renderAddons(addons) {
     cb.dataset.field = a.field;
     cb.addEventListener('change', () => {
       addonState[a.field] = cb.checked;
+      if (subRow) subRow.style.display = cb.checked ? '' : 'none';
       // The portal reprices on every add-on change. Until the operator
       // recalculates, the displayed premium no longer matches the ticked
       // add-ons — so blank it rather than let it be read or exported.
@@ -1169,6 +1500,7 @@ function renderAddons(addons) {
     item.appendChild(cb);
     item.appendChild(lbl);
     grid.appendChild(item);
+    if (subRow) grid.appendChild(subRow);
   });
 }
 
@@ -1345,6 +1677,82 @@ function defaultFieldConfig(planId) {
   };
 }
 
+// Renders the extra-fields-container from the plan's static catalogue
+// entries plus whatever the live portal revealed dynamically for the
+// current Plan Type/Business Type (see onCascadingFieldChanged) — shared so
+// a plan switch and a Plan Type/Business Type change use the exact same
+// rendering.
+function renderExtraFields(staticSpecs, dynamicSpecs) {
+  const container = document.getElementById('extra-fields-container');
+  if (!container) return;
+  const specs = [...staticSpecs, ...dynamicSpecs];
+  extraFieldState = {};
+  container.innerHTML = specs.map(spec => {
+    extraFieldState[spec.field] = spec.default;
+    const opts = spec.options.map(v =>
+      `<option value="${v}"${v === spec.default ? ' selected' : ''}>${v}</option>`).join('');
+    return `<div class="field-row">
+      <div class="field-label">${spec.label} <span class="q-icon">?</span></div>
+      <div class="field-input">
+        <select onchange="extraFieldState['${spec.field}']=this.value;onPricingInputChanged()">${opts}</select>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// Plan Type (field_23) and Business Type (field_75) can each change what
+// the live form actually looks like — confirmed on Care Supreme (2813):
+// switching to "Senior Premium" swaps in a different Sum Insured ladder, a
+// different add-on set, and reveals a "PED" field that the base plan type
+// doesn't have; switching Business Type to "PORT" separately reveals a
+// "Port Tenure" field and shortens the SI ladder further. Re-fetching
+// /addons with the current selections is the only way to know what the
+// live form looks like right now — the static catalogue only ever recorded
+// one (default) combination.
+async function onCascadingFieldChanged(){
+  onPricingInputChanged();
+  const planSel = document.getElementById('sel-plan');
+  const abacusId = planSel.value;
+  const bizRow   = document.getElementById('biz-row');
+  const ptRow    = document.getElementById('plan-type-row');
+  const coverRow = document.getElementById('cover-row');
+  const nsRow    = document.getElementById('ns-row');
+  const gcRow    = document.getElementById('gc-row');
+  const bizVisible  = bizRow.style.display   !== 'none';
+  const ptVisible   = ptRow.style.display    !== 'none';
+  const nsVisible   = nsRow && nsRow.style.display !== 'none';
+  const gcVisible   = gcRow && gcRow.style.display !== 'none';
+  const businessType     = bizVisible ? document.getElementById('sel-biz').value       : undefined;
+  const planType          = ptVisible  ? document.getElementById('sel-plan-type').value : undefined;
+  // Cover Type always has a real value (forced internally to Floater/Individual
+  // even when the row is hidden — see applyFieldConfig) so it's always sent as
+  // cascade context, but a hidden row can't itself trigger the guard below.
+  const coverType         = document.getElementById('sel-cover').value;
+  const nationalityStatus = nsVisible ? document.getElementById('sel-ns').value : undefined;
+  const globalCoverage    = gcVisible ? document.getElementById('sel-gc').value : undefined;
+  // Nothing that could cascade is even shown for this plan — skip the live round-trip.
+  if (!bizVisible && !ptVisible && coverRow.style.display === 'none' && !nsVisible && !gcVisible) return;
+
+  try {
+    const resp = await fetch(`${API}/addons`, { method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ abacusId, businessType, planType, coverType, nationalityStatus, globalCoverage }) });
+    const data = await resp.json();
+    if (!data.ok) return;
+
+    if (data.addons && data.addons.length) renderAddons(data.addons);
+    const staticSpecs = (PLAN_INFO[abacusId] && PLAN_INFO[abacusId].extraFields) || [];
+    renderExtraFields(staticSpecs, data.dynamicExtraFields || []);
+    if (data.fields && data.fields.siValues && data.fields.siValues.length && data.fields.siSource) {
+      const isKUnit = THOUSANDS_SI_PLANS.has(abacusId);
+      const cat = PLAN_INFO[abacusId] || null;
+      rebuildSISlider(data.fields.siValues, isKUnit ? 'K' : 'L', cat ? cat.defaultSumInsured : null);
+    }
+  } catch (e) {
+    console.warn('[Care] onCascadingFieldChanged error:', e.message);
+  }
+}
+
 function applyFieldConfig(cfg, planId) {
   if (!cfg) return;
 
@@ -1369,6 +1777,26 @@ function applyFieldConfig(cfg, planId) {
       document.getElementById('sel-ns').innerHTML =
         nsOpts.map(v => `<option value="${v}">${v}</option>`).join('');
     }
+  }
+
+  // 1c2. Extra per-plan fields with no checkbox gate (Deductible, OPD Sum
+  // Insured, PED Tenure) — one row per entry in the catalogue's extraFields,
+  // confirmed per plan via /debug-fields, PLUS whatever the live portal
+  // reveals dynamically for the current Plan Type/Business Type (see
+  // renderExtraFields below). Rebuilt fresh on every plan switch.
+  renderExtraFields((PLAN_INFO[planId] && PLAN_INFO[planId].extraFields) || [], []);
+
+  // 1c3. Total Members options — most plans really do offer only 1-4, but
+  // MEMBERS_MAP overrides the ladder for plans confirmed to go higher (or
+  // to skip "1", or to default somewhere other than "2").
+  {
+    const memberSel = document.getElementById('sel-members');
+    const spec = MEMBERS_MAP[planId];
+    const opts = spec ? spec.options : ['1','2','3','4'];
+    const def  = spec ? spec.default : '2';
+    const prevMembers = memberSel.value;
+    memberSel.innerHTML = opts.map(v => `<option value="${v}">${v}</option>`).join('');
+    memberSel.value = opts.includes(prevMembers) ? prevMembers : def;
   }
 
   // 1d. Global Coverage (field_GC) — user-selectable only for plans in GC_MAP
@@ -1411,24 +1839,57 @@ function applyFieldConfig(cfg, planId) {
   document.getElementById('age-band-row').style.display  = isSingleBand    ? '' : 'none';
   document.getElementById('age-band2-row').style.display = isLegacySecure  ? '' : 'none';
 
-  // 4b. Age rows for members 2/3/4
+  // 4a2. Age Of Eldest Member options — band-string plans get their real
+  // text options instead of a numeric year; a couple of others just need a
+  // wider/narrower numeric range than the generic 18-99.
+  if (!isSingleBand && !isLegacySecure) {
+    const age1Sel  = document.getElementById('sel-age1');
+    const bandSpec = AGE_BAND_MAP[planId];
+    const rangeSpec = AGE_RANGE_MAP[planId];
+    const prevAge1 = age1Sel.value;
+    if (bandSpec) {
+      age1Sel.innerHTML = bandSpec.options.map(v => `<option value="${v}">${v}</option>`).join('');
+      age1Sel.value = bandSpec.options.includes(prevAge1) ? prevAge1 : bandSpec.default;
+    } else {
+      const { min, max, default: def } = rangeSpec || { min: 18, max: 99, default: 30 };
+      age1Sel.innerHTML = ageOptions(min, max);
+      const prevNum = +prevAge1;
+      age1Sel.value = (prevNum >= min && prevNum <= max) ? prevAge1 : def;
+    }
+  }
+
+  // 4b. Age rows for members 2-6
   if (INCOME_PLANS.has(planId)) {
     // All Secure plans: hide extra member age rows (band applies to whole plan)
     document.getElementById('age2-row').style.display = 'none';
     document.getElementById('age3-row').style.display = 'none';
     document.getElementById('age4-row').style.display = 'none';
+    document.getElementById('age5-row').style.display = 'none';
+    document.getElementById('age6-row').style.display = 'none';
   } else if (cfg.hasMembers) {
-    updateMemberFields(); // handles age2/age3/age4 rows
+    updateMemberFields(); // handles age2-age6 rows
   } else {
     // No members at all — hide all age-2+ rows
     document.getElementById('age2-row').style.display = 'none';
     document.getElementById('age3-row').style.display = 'none';
     document.getElementById('age4-row').style.display = 'none';
+    document.getElementById('age5-row').style.display = 'none';
+    document.getElementById('age6-row').style.display = 'none';
   }
 
   // 5. Members / Children rows — cfg is authoritative (overrides updateMemberFields)
   document.getElementById('members-row').style.display  = cfg.hasMembers  ? '' : 'none';
   document.getElementById('children-row').style.display = cfg.hasChildren ? '' : 'none';
+  // Children options — most plans genuinely offer 0-3, but a few only ever
+  // show 0/1 on the live form (confirmed via /debug-fields); rebuild the
+  // select so an operator can't pick a count that plan doesn't support.
+  {
+    const childSel = document.getElementById('sel-children');
+    const childOpts = CHILDREN_MAP[planId] || ['0','1','2','3'];
+    const prevChild = childSel.value;
+    childSel.innerHTML = childOpts.map(v => `<option value="${v}">${v}</option>`).join('');
+    childSel.value = childOpts.includes(prevChild) ? prevChild : '0';
+  }
 
   // 6. SI slider — all plans show SI; 6740 uses ₹K units; 5674 is Unlimited
   const siSection    = document.getElementById('si-section-wrap');
@@ -1481,6 +1942,76 @@ function applyFieldConfig(cfg, planId) {
     slider.value  = incConf.min;
     onMonthlyIncome(incConf.min);
     buildMonthlyIncomeTicks(incConf.min, incConf.max);
+  }
+
+  // 10. Travel plans (107/5833/5834) — hide every regular health field and
+  // show the travel-specific section instead. Applied last, after the block
+  // above has already set its own (irrelevant, for these plans) display
+  // values, so this always wins.
+  const travelSection = document.getElementById('travel-section');
+  const isTravel = TRAVEL_PLANS.has(planId);
+  if (travelSection) travelSection.style.display = isTravel ? '' : 'none';
+  if (isTravel) {
+    ['cover-row','members-row','children-row','age1-row','age2-row','age3-row',
+     'age4-row','age5-row','age6-row','age-band-row','age-band2-row',
+     'income-section','extra-fields-container','biz-row','plan-type-row',
+     'ns-row','gc-row'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.style.display = 'none';
+    });
+    if (tenureSec) tenureSec.style.display = 'none'; // replaced by Max Trip Duration for 5833/5834
+
+    const isStudentExplore = planId === '107';
+    // 107's SI is a single fixed value sent straight from the server, no
+    // real choice — hide the slider. 5833/5834 have a genuine 5-6 value
+    // ladder (₹ in thousands) an operator needs to pick, so leave it shown;
+    // section 6 above already rebuilt it correctly from the catalogue.
+    if (isStudentExplore) {
+      if (siSection)   siSection.style.display = 'none';
+      if (siUnlimited) siUnlimited.style.display = 'none';
+    }
+    document.getElementById('travel-region-label').textContent =
+      isStudentExplore ? 'Geographical Scope' : 'Travelling To';
+    const regionOpts = isStudentExplore ? GEO_SCOPES : TRAVEL_REGIONS;
+    document.getElementById('sel-travel-region').innerHTML =
+      regionOpts.map(v => `<option value="${v}">${v}</option>`).join('');
+
+    document.getElementById('travel-plantype-row').style.display     = isStudentExplore ? '' : 'none';
+    document.getElementById('travel-tenuremonths-row').style.display = isStudentExplore ? '' : 'none';
+    document.getElementById('travel-covers-container').innerHTML     = isStudentExplore ? '' : '';
+    document.getElementById('travel-triptype-row').style.display     = isStudentExplore ? 'none' : '';
+    document.getElementById('travel-maxduration-row').style.display  = isStudentExplore ? 'none' : '';
+    document.getElementById('travel-dates-row').style.display        = isStudentExplore ? 'none' : '';
+    document.getElementById('travel-days-row').style.display         = isStudentExplore ? 'none' : '';
+    document.getElementById('travel-travelers-row').style.display    = isStudentExplore ? 'none' : '';
+    document.getElementById('travel-ped-row').style.display          = isStudentExplore ? 'none' : '';
+    document.getElementById('travel-ages-container').innerHTML       = '';
+
+    if (isStudentExplore) {
+      document.getElementById('sel-travel-plantype').innerHTML =
+        TRAVEL_PLAN_TYPES.map(v => `<option value="${v}">${v}</option>`).join('');
+      travelCoverState = {}; travelSubState = {};
+      document.getElementById('travel-covers-container').innerHTML = TRAVEL_107_COVERS.map(c => {
+        travelCoverState[c.field] = false;
+        const subHtml = c.sub ? `<div class="field-row" id="travel-sub-${c.field}" style="display:none">
+          <div class="field-label">${c.label} — amount</div>
+          <div class="field-input"><select onchange="travelSubState['${c.field}']=this.value">
+            ${c.sub.map(v => `<option value="${v}">${v}</option>`).join('')}
+          </select></div>
+        </div>` : '';
+        return `<div class="field-row">
+          <div class="field-label">${c.label}</div>
+          <div class="field-input">
+            <label><input type="checkbox" onchange="travelCoverState['${c.field}']=this.checked;
+              const r=document.getElementById('travel-sub-${c.field}'); if(r) r.style.display=this.checked?'':'none';
+              onPricingInputChanged();"> Include</label>
+          </div>
+        </div>${subHtml}`;
+      }).join('');
+    } else {
+      document.getElementById('sel-travel-travelers').value = '1';
+      onTravelersChanged();
+    }
   }
 }
 
@@ -1639,8 +2170,70 @@ async function calculate() {
   const planSel  = document.getElementById('sel-plan');
   const abacusId = planSel.value;
   const planName = planSel.options[planSel.selectedIndex].text;
+
+  if (TRAVEL_PLANS.has(abacusId)) {
+    const isStudentExplore = abacusId === '107';
+    const body = { abacusId, pincode, travel: {} };
+    if (isStudentExplore) {
+      body.travel.geoScope      = document.getElementById('sel-travel-region').value;
+      body.travel.planType      = document.getElementById('sel-travel-plantype').value;
+      body.travel.tenureMonths  = document.getElementById('sel-travel-tenuremonths').value;
+      body.travel.optionalCovers = { ...travelCoverState };
+      body.travel.mnbcOption    = travelSubState['opt_cvr_MNBC'] || 'Upto SI';
+    } else {
+      const start = document.getElementById('inp-travel-start').value;
+      const end   = document.getElementById('inp-travel-end').value;
+      const toDDMMYYYY = iso => { if (!iso) return ''; const [y,m,d] = iso.split('-'); return `${d}-${m}-${y}`; };
+      const days = (start && end) ? Math.round((new Date(end) - new Date(start)) / 86400000) : '';
+      body.travel.region       = document.getElementById('sel-travel-region').value;
+      body.travel.tripType     = document.getElementById('sel-travel-triptype').value;
+      body.travel.maxDuration  = document.getElementById('sel-travel-maxduration').value;
+      body.travel.startDate    = toDDMMYYYY(start);
+      body.travel.endDate      = toDDMMYYYY(end);
+      body.travel.days         = String(days);
+      body.travel.travelers    = document.getElementById('sel-travel-travelers').value;
+      body.travel.travelerAges = Array.from(document.querySelectorAll('#travel-ages-container select')).map(s => s.value);
+      body.travel.hasPED       = document.querySelector('input[name="travel-ped"]:checked').value === 'Yes';
+      body.travel.sumInsured   = String(SI_VALS[siIdx]);
+      if (!start || !end || days <= 0) {
+        errDiv.style.display = 'block';
+        errDiv.textContent   = '⚠️ Please pick a valid travel start and end date.';
+        btn.disabled = false; btn.classList.remove('loading');
+        return;
+      }
+    }
+    try {
+      const resp = await fetch(`${API}/calculate`, { method: 'POST',
+        headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+      const data = await resp.json();
+      if (!data.ok) {
+        invalidatePremium('No premium returned');
+        errDiv.style.display = 'block';
+        errDiv.textContent   = '⚠️ ' + [data.error, data.portalMessage, data.hint].filter(Boolean).join(' — ');
+        _emitStatus('failed');
+        return;
+      }
+      showPremium(data, planName);
+      _emitStatus('ready');
+    } catch (e) {
+      invalidatePremium('Calculation failed');
+      errDiv.style.display = 'block';
+      errDiv.textContent   = '⚠️ Cannot reach server. Is care_server.js running on port 3005?';
+      _emitStatus('down');
+    } finally {
+      btn.disabled = false;
+      btn.classList.remove('loading');
+    }
+    return;
+  }
+
   const cover    = document.getElementById('sel-cover').value;
-  const total    = cover === 'Individual' ? 1 : +document.getElementById('sel-members').value;
+  // Individual cover still bills every selected member (each gets their own
+  // separate sum insured) — it doesn't mean "one person only". Same fix as
+  // updateMemberFields(); this copy builds the actual submitted payload, so
+  // missing it here was still sending totalMembers=1 even though the UI
+  // displayed and let the operator pick 2+.
+  const total    = +document.getElementById('sel-members').value;
   const tenure   = document.querySelector('input[name="tenure"]:checked').value;
 
   // Build addons object: raw field name → boolean
@@ -1660,6 +2253,8 @@ async function calculate() {
     member2Age:   total >= 2 ? document.getElementById('sel-age2').value : undefined,
     member3Age:   total >= 3 ? document.getElementById('sel-age3').value : undefined,
     member4Age:   total >= 4 ? document.getElementById('sel-age4').value : undefined,
+    member5Age:   total >= 5 ? document.getElementById('sel-age5').value : undefined,
+    member6Age:   total >= 6 ? document.getElementById('sel-age6').value : undefined,
     sumInsured:   NO_USER_SI_PLANS.has(abacusId) ? 'Unlimited' : String(SI_VALS[siIdx]),
     tenure,
     businessType: document.getElementById('sel-biz') && document.getElementById('biz-row').style.display !== 'none'
@@ -1670,9 +2265,10 @@ async function calculate() {
     nationalityStatus: (NS_MAP[abacusId] && document.getElementById('ns-row').style.display !== 'none')
                        ? document.getElementById('sel-ns').value : '',
     globalCoverage:    (GC_MAP[abacusId] && document.getElementById('gc-row').style.display !== 'none')
-                       ? document.getElementById('sel-gc').value
-                       : (GC_AUTO_PLANS.has(abacusId) ? 'Not Opted' : ''),
+                       ? document.getElementById('sel-gc').value : '',
     addons,
+    subValues:   { ...subValueState },
+    extraFields: { ...extraFieldState },
   };
 
   // Income fields for Secure family plans
@@ -1877,22 +2473,31 @@ window.addEventListener('message', async function(ev) {
     }
 
     // ── Member count ───────────────────────────────────────────
+    // The plan cascade above has already rebuilt sel-members/sel-children's
+    // own option lists for the current plan (MEMBERS_MAP/CHILDREN_MAP), so
+    // the real per-plan cap is just whatever those selects now offer —
+    // rather than a single hardcoded "4" for every plan.
+    const memberSel = document.getElementById('sel-members');
+    const childSel = document.getElementById('sel-children');
+    const maxMembers = memberSel && memberSel.options.length
+      ? Math.max(...Array.from(memberSel.options, o => +o.value)) : 4;
+    const maxChildren = childSel && childSel.options.length
+      ? Math.max(...Array.from(childSel.options, o => +o.value)) : 3;
+
     const adults   = Math.max(1, d.members?.adults   || 1);
     const children = Math.max(0, d.members?.children || 0);
     const wanted   = adults + children;
-    const totalM   = Math.min(4, wanted);
-    if (wanted > 4) {
+    const totalM   = Math.min(maxMembers, wanted);
+    if (wanted > maxMembers) {
       clamped.push({ field:'members', requested:wanted, used:totalM,
-                     reason:'this calculator supports at most 4 members' });
+                     reason:'this plan supports at most ' + maxMembers + ' members' });
     } else if (d.members) { accepted.push('members'); }
-    const memberSel = document.getElementById('sel-members');
     if (memberSel) memberSel.value = String(totalM);
-    const childSel = document.getElementById('sel-children');
     if (childSel) {
-      childSel.value = String(Math.min(3, children));
-      if (children > 3) {
-        clamped.push({ field:'children', requested:children, used:3,
-                       reason:'at most 3 children' });
+      childSel.value = String(Math.min(maxChildren, children));
+      if (children > maxChildren) {
+        clamped.push({ field:'children', requested:children, used:maxChildren,
+                       reason:'at most ' + maxChildren + ' children on this plan' });
       }
     }
     if (typeof updateMemberFields === 'function') updateMemberFields();
@@ -1918,6 +2523,14 @@ window.addEventListener('message', async function(ev) {
     const a4 = document.getElementById('sel-age4');
     if (a4 && totalM >= 4 && allAges[3] != null) {
       a4.value = String(clamp(allAges[3], 0, 99));
+    }
+    const a5 = document.getElementById('sel-age5');
+    if (a5 && totalM >= 5 && allAges[4] != null) {
+      a5.value = String(clamp(allAges[4], 18, 99));
+    }
+    const a6 = document.getElementById('sel-age6');
+    if (a6 && totalM >= 6 && allAges[5] != null) {
+      a6.value = String(clamp(allAges[5], 18, 99));
     }
     if (allAges.length) accepted.push('ages');
 

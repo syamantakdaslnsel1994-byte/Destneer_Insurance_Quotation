@@ -136,10 +136,35 @@
       "sumInsuredSource": "v1 live slider scrape",
       "memberOptions": "2,3,4",
       "ageRange": "60 – 99",
-      "unmappedPortalFields": [
-        "field_Deductible_SI",
-        "field_OPD_SI",
-        "field_PED_TENURE"
+      "unmappedPortalFields": [],
+      "extraFields": [
+        {
+          "field": "field_PED_TENURE",
+          "label": "PED Tenure",
+          "options": [
+            "1 Year",
+            "2 Year"
+          ],
+          "default": "1 Year"
+        },
+        {
+          "field": "field_Deductible_SI",
+          "label": "Deductible SI (₹)",
+          "options": [
+            "25000"
+          ],
+          "default": "25000"
+        },
+        {
+          "field": "field_OPD_SI",
+          "label": "OPD Sum Insured (₹)",
+          "options": [
+            "500",
+            "5000",
+            "OPD Plus"
+          ],
+          "default": "500"
+        }
       ]
     },
     {
@@ -169,9 +194,27 @@
       "sumInsuredSource": "v1 live slider scrape",
       "memberOptions": "2,3,4",
       "ageRange": "18 – 99",
-      "unmappedPortalFields": [
-        "field_PED_TENURE",
-        "field_deductible_si"
+      "unmappedPortalFields": [],
+      "extraFields": [
+        {
+          "field": "field_PED_TENURE",
+          "label": "PED Tenure",
+          "options": [
+            "1 Year",
+            "2 Year"
+          ],
+          "default": "1 Year"
+        },
+        {
+          "field": "field_deductible_si",
+          "label": "Deductible SI (₹)",
+          "options": [
+            "25000",
+            "50000",
+            "100000"
+          ],
+          "default": "25000"
+        }
       ]
     },
     {
@@ -223,9 +266,27 @@
       "sumInsuredSource": "v1 live slider scrape",
       "memberOptions": "2,3,4",
       "ageRange": "18 – 99",
-      "unmappedPortalFields": [
-        "field_OPD_SI",
-        "field_PED_TENURE"
+      "unmappedPortalFields": [],
+      "extraFields": [
+        {
+          "field": "field_PED_TENURE",
+          "label": "PED Tenure",
+          "options": [
+            "1 Year",
+            "2 Year"
+          ],
+          "default": "1 Year"
+        },
+        {
+          "field": "field_OPD_SI",
+          "label": "OPD Sum Insured (₹)",
+          "options": [
+            "500",
+            "5000",
+            "OPD Plus"
+          ],
+          "default": "500"
+        }
       ]
     },
     {
@@ -402,9 +463,27 @@
       "sumInsuredSource": "v1 live slider scrape",
       "memberOptions": "2,3,4",
       "ageRange": "18 – 99",
-      "unmappedPortalFields": [
-        "field_OPD_SI",
-        "field_PED_TENURE"
+      "unmappedPortalFields": [],
+      "extraFields": [
+        {
+          "field": "field_PED_TENURE",
+          "label": "PED Tenure",
+          "options": [
+            "1 Year",
+            "2 Year"
+          ],
+          "default": "1 Year"
+        },
+        {
+          "field": "field_OPD_SI",
+          "label": "OPD Sum Insured (₹)",
+          "options": [
+            "500",
+            "5000",
+            "OPD Plus"
+          ],
+          "default": "500"
+        }
       ]
     },
     {
@@ -435,9 +514,27 @@
       "sumInsuredSource": "v1 live slider scrape",
       "memberOptions": "2,3,4",
       "ageRange": "18 – 99",
-      "unmappedPortalFields": [
-        "field_PED_TENURE",
-        "field_deductible_si"
+      "unmappedPortalFields": [],
+      "extraFields": [
+        {
+          "field": "field_PED_TENURE",
+          "label": "PED Tenure",
+          "options": [
+            "1 Year",
+            "2 Year"
+          ],
+          "default": "1 Year"
+        },
+        {
+          "field": "field_deductible_si",
+          "label": "Deductible SI (₹)",
+          "options": [
+            "25000",
+            "50000",
+            "100000"
+          ],
+          "default": "25000"
+        }
       ]
     },
     {
@@ -472,12 +569,23 @@
       "memberOptions": "1,2,3,4,5,6",
       "ageRange": "18 – > 65",
       "unmappedPortalFields": [
-        "field_11"
+        "field_OPD_SI"
       ],
       "planTypeOptions": [
         "Option 1",
         "Option 2"
-      ]
+      ],
+      "extraFields": [
+        {
+          "field": "field_11",
+          "label": "Deductible (in Lakhs)",
+          "options": [
+            "5"
+          ],
+          "default": "5"
+        }
+      ],
+      "_note6434": "field_OPD_SI appears on the live portal only when Cover Type=Individual (dynamic AJAX field); never captured, so left unmapped rather than guessed at."
     },
     {
       "id": "6395",
@@ -592,7 +700,7 @@
       "defaultSumInsured": "25",
       "userSelectableSI": true,
       "sumInsuredSource": "v1 live slider scrape",
-      "memberOptions": null,
+      "memberOptions": "1,2,3,4,5,6",
       "ageRange": "18 – 99"
     },
     {
@@ -677,7 +785,7 @@
         "100",
         "250"
       ],
-      "sumInsuredUnit": "lakhs",
+      "sumInsuredUnit": "thousands",
       "defaultSumInsured": "10",
       "userSelectableSI": true,
       "sumInsuredSource": "v1 live slider scrape",
@@ -716,7 +824,7 @@
         "250",
         "500"
       ],
-      "sumInsuredUnit": "lakhs",
+      "sumInsuredUnit": "thousands",
       "defaultSumInsured": "10",
       "userSelectableSI": true,
       "sumInsuredSource": "v1 live slider scrape",
@@ -782,7 +890,7 @@
       "defaultSumInsured": "100",
       "userSelectableSI": true,
       "sumInsuredSource": "v1 live slider scrape",
-      "memberOptions": null,
+      "memberOptions": "1,2,3,4,5,6",
       "ageRange": "18 – 60"
     },
     {
@@ -808,7 +916,7 @@
       "defaultSumInsured": "3",
       "userSelectableSI": true,
       "sumInsuredSource": "v1 live slider scrape",
-      "memberOptions": null,
+      "memberOptions": "1,2,3,4,5,6",
       "ageRange": "18 – 99"
     },
     {
@@ -871,10 +979,27 @@
       "defaultSumInsured": null,
       "userSelectableSI": false,
       "sumInsuredSource": "none (no SI selector on the portal)",
-      "memberOptions": null,
+      "memberOptions": "1,2,3,4,5,6",
       "ageRange": "18 – 99",
-      "unmappedPortalFields": [
-        "field_OPD_SI"
+      "unmappedPortalFields": [],
+      "extraFields": [
+        {
+          "field": "field_OPD_SI",
+          "label": "OPD Sum Insured (₹)",
+          "options": [
+            "5000",
+            "10000",
+            "15000",
+            "20000",
+            "25000",
+            "30000",
+            "35000",
+            "40000",
+            "45000",
+            "50000"
+          ],
+          "default": "5000"
+        }
       ]
     },
     {
@@ -908,10 +1033,27 @@
       "defaultSumInsured": "20",
       "userSelectableSI": true,
       "sumInsuredSource": "v1 live slider scrape",
-      "memberOptions": null,
+      "memberOptions": "1,2,3,4,5,6",
       "ageRange": "18 – 99",
-      "unmappedPortalFields": [
-        "field_OPD_SI"
+      "unmappedPortalFields": [],
+      "extraFields": [
+        {
+          "field": "field_OPD_SI",
+          "label": "OPD Sum Insured (₹)",
+          "options": [
+            "5000",
+            "10000",
+            "15000",
+            "20000",
+            "25000",
+            "30000",
+            "35000",
+            "40000",
+            "45000",
+            "50000"
+          ],
+          "default": "5000"
+        }
       ]
     },
     {
@@ -939,8 +1081,25 @@
       "sumInsuredSource": "v1 live slider scrape",
       "memberOptions": null,
       "ageRange": "61 – 99",
-      "unmappedPortalFields": [
-        "field_OPD_SI"
+      "unmappedPortalFields": [],
+      "extraFields": [
+        {
+          "field": "field_OPD_SI",
+          "label": "OPD Sum Insured (₹)",
+          "options": [
+            "5000",
+            "10000",
+            "15000",
+            "20000",
+            "25000",
+            "30000",
+            "35000",
+            "40000",
+            "45000",
+            "50000"
+          ],
+          "default": "5000"
+        }
       ]
     },
     {
@@ -970,8 +1129,25 @@
       "sumInsuredSource": "v1 live slider scrape",
       "memberOptions": null,
       "ageRange": "61 – 99",
-      "unmappedPortalFields": [
-        "field_OPD_SI"
+      "unmappedPortalFields": [],
+      "extraFields": [
+        {
+          "field": "field_OPD_SI",
+          "label": "OPD Sum Insured (₹)",
+          "options": [
+            "5000",
+            "10000",
+            "15000",
+            "20000",
+            "25000",
+            "30000",
+            "35000",
+            "40000",
+            "45000",
+            "50000"
+          ],
+          "default": "5000"
+        }
       ]
     },
     {
@@ -1003,10 +1179,27 @@
       "defaultSumInsured": "5",
       "userSelectableSI": true,
       "sumInsuredSource": "curated SI_MAP",
-      "memberOptions": null,
+      "memberOptions": "1,2,3,4,5,6",
       "ageRange": "18 – 99",
-      "unmappedPortalFields": [
-        "field_OPD_SI"
+      "unmappedPortalFields": [],
+      "extraFields": [
+        {
+          "field": "field_OPD_SI",
+          "label": "OPD Sum Insured (₹)",
+          "options": [
+            "5000",
+            "10000",
+            "15000",
+            "20000",
+            "25000",
+            "30000",
+            "35000",
+            "40000",
+            "45000",
+            "50000"
+          ],
+          "default": "5000"
+        }
       ]
     },
     {
@@ -1041,10 +1234,27 @@
       "defaultSumInsured": "10",
       "userSelectableSI": true,
       "sumInsuredSource": "v1 live slider scrape",
-      "memberOptions": null,
+      "memberOptions": "1,2,3,4,5,6",
       "ageRange": "18 – 99",
-      "unmappedPortalFields": [
-        "field_OPD_SI"
+      "unmappedPortalFields": [],
+      "extraFields": [
+        {
+          "field": "field_OPD_SI",
+          "label": "OPD Sum Insured (₹)",
+          "options": [
+            "5000",
+            "10000",
+            "15000",
+            "20000",
+            "25000",
+            "30000",
+            "35000",
+            "40000",
+            "45000",
+            "50000"
+          ],
+          "default": "5000"
+        }
       ]
     },
     {
@@ -1141,10 +1351,20 @@
       "defaultSumInsured": "5",
       "userSelectableSI": true,
       "sumInsuredSource": "v1 live slider scrape",
-      "memberOptions": null,
+      "memberOptions": "2,3,4,5",
       "ageRange": "18 – 65",
-      "unmappedPortalFields": [
-        "field_OPD_SI"
+      "unmappedPortalFields": [],
+      "extraFields": [
+        {
+          "field": "field_OPD_SI",
+          "label": "OPD Sum Insured (₹)",
+          "options": [
+            "3000",
+            "5000",
+            "10000"
+          ],
+          "default": "3000"
+        }
       ]
     },
     {
@@ -1203,10 +1423,20 @@
       "defaultSumInsured": "10",
       "userSelectableSI": true,
       "sumInsuredSource": "v1 live slider scrape",
-      "memberOptions": null,
+      "memberOptions": "2,3,4,5",
       "ageRange": "18 – 65",
-      "unmappedPortalFields": [
-        "field_OPD_SI"
+      "unmappedPortalFields": [],
+      "extraFields": [
+        {
+          "field": "field_OPD_SI",
+          "label": "OPD Sum Insured (₹)",
+          "options": [
+            "3000",
+            "5000",
+            "10000"
+          ],
+          "default": "5000"
+        }
       ]
     },
     {
@@ -1299,9 +1529,7 @@
       "sumInsuredSource": "v1 live slider scrape",
       "memberOptions": "1,2,3,4,5,6",
       "ageRange": "18 to 24 Years – > 70 Years",
-      "unmappedPortalFields": [
-        "field_11"
-      ],
+      "unmappedPortalFields": [],
       "extraSliders": {
         "field_11": {
           "label": "Deductible (in Lakhs)",
@@ -1319,7 +1547,28 @@
           "source": "v1 backend (server.js PLAN_EXTRA_SLIDERS) — the only record of this range"
         }
       },
-      "planTypeOptions": []
+      "planTypeOptions": [
+        "Enhance 1",
+        "Enhance 2"
+      ],
+      "extraFields": [
+        {
+          "field": "field_11",
+          "label": "Deductible (in Lakhs)",
+          "options": [
+            "2",
+            "3",
+            "4",
+            "5",
+            "6",
+            "7",
+            "8",
+            "9",
+            "10"
+          ],
+          "default": "2"
+        }
+      ]
     },
     {
       "id": "585",
@@ -1435,8 +1684,8 @@
       "memberOptions": "1,2,3,4,5,6",
       "ageRange": "5 - 17 years – 46 - 50 years",
       "planTypeOptions": [
-        "Cancer",
         "Critical",
+        "Cancer",
         "Operation",
         "Heart"
       ]
@@ -1493,7 +1742,7 @@
       ],
       "sumInsuredUnit": "lakhs",
       "defaultSumInsured": "30",
-      "userSelectableSI": true,
+      "userSelectableSI": false,
       "sumInsuredSource": "curated SI_MAP",
       "memberOptions": null,
       "ageRange": "12 - 40 – 12 - 40",

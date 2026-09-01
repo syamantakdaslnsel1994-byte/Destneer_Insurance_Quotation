@@ -8,6 +8,20 @@ const fs      = require('fs');
 const app     = express();
 const PORT    = Number(process.env.PORT) || 3005;
 
+// Shared HTML scrapers — used by both this file's raw-POST path and
+// care_automation.js's browser-automation path (server/care_scrapers.js).
+const {
+  extractCSRF, parsePremium, parseAddons, parseFields, parseDynamicExtraFields,
+  FIELD_LABELS, KNOWN_BASE_FIELDS,
+} = require('./care_scrapers');
+const careAutomation = require('./care_automation');
+// Plans not yet migrated to browser automation — travel products (date/
+// region-driven, no member/age/cover-type fields) and the Secure/income-band
+// family (different age-band and income-field structure). These stay on the
+// old raw-POST path below until a follow-up pass covers them; every other
+// plan goes through care_automation.js.
+const NOT_YET_AUTOMATED = new Set(['107','5674','5833','5834','7425','7424','6740','6384','188','573']);
+
 // ── Public origins ────────────────────────────────────────────────────────
 // Every calculator page and the hub hardcode each other's origin (iframe src,
 // API base, postMessage allow-list) so they work with zero config on
@@ -78,6 +92,10 @@ const BASE_HEADERS = {
 // ── Hardcoded plan_id map (abacusId → plan_id) ────────────────────────────────
 // plan_id is fetched dynamically via init POST, but known values skip that step.
 // Confirmed via /debug-fields endpoint (Jul 2026).
+// Travel policies — a different product from every other plan in this file
+// (date/duration-priced, not member/age-priced). See the /calculate handler.
+const TRAVEL_PLANS = new Set(['107', '5674', '5833', '5834']);
+
 const PLAN_ID_MAP = {
   '2813': '110',  // Care Supreme
   '6384': '187',  // Secure Plus           — confirmed via /debug-fields
@@ -123,11 +141,7 @@ function mergeCookies(existing, fresh) {
   return Object.values(map).join('; ');
 }
 
-/** Extract _csrf-frontend form token from HTML. */
-function extractCSRF(html) {
-  const m = html.match(/name="_csrf-frontend"\s+value="([^"]+)"/);
-  return m ? m[1] : '';
-}
+// extractCSRF now lives in ./care_scrapers (required at the top of this file).
 
 /** Build URL-encoded body that supports duplicate keys. */
 function buildBody(pairs) {
@@ -207,42 +221,7 @@ async function postCalc(pairs, sess) {
   catch { return { content: text, plan_content: '' }; }
 }
 
-// ── Parse premium from response HTML ─────────────────────────────────────────
-function parsePremium(html, sess) {
-  if (!html) return { ok: false };
-
-  // Rotate CSRF for the next request in THIS session only. Passing no session
-  // makes the parse read-only, which is what the diagnostic routes want.
-  const csrf = extractCSRF(html);
-  if (csrf && sess) sess.csrf = csrf;
-
-  // plan_id hidden field
-  const pidM   = html.match(/name="PartnerPreviewForm\[plan_id\]"\s+value="([^"]+)"/);
-  const planId = pidM?.[1] ?? null;
-
-  // Check for "pincode required" state
-  const needsPincode = html.includes('Enter Above Pincode') || html.includes('---- ') ||
-    (html.includes('outputPremium') && html.includes('----'));
-
-  // Premium spans: first = discounted (after welcome discount), second = original
-  const premSpans = [...html.matchAll(/<span class="outputPremium">([\d,]+)<\/span>/g)];
-  const discounted = premSpans[0]?.[1] ?? null;
-  const original   = premSpans[1]?.[1] ?? discounted;
-
-  // Grand total from #grand_total
-  const gtM      = html.match(/id="grand_total"[\s\S]{0,400}?<span>([\d,]+)<\/span>/);
-  const grandTotal = gtM?.[1] ?? discounted;
-
-  // Numeric base premium
-  const baseM = html.match(/data-basePremium="([\d.]+)"/);
-  const base  = baseM ? parseFloat(baseM[1]) : null;
-
-  // Discount %
-  const discPctM = html.match(/data-basepremiumdiscountpercent="([^"]+)"/);
-  const discPct  = discPctM?.[1] ?? null;
-
-  return { planId, discounted, original, grandTotal, base, discPct, needsPincode, ok: !!discounted };
-}
+// parsePremium now lives in ./care_scrapers (required at the top of this file).
 
 // ── /debug  — detailed session + request diagnostics ──────────────────────────
 app.get('/debug', async (req, res) => {
@@ -408,260 +387,36 @@ const PLAN_BY_ID = Object.fromEntries(PLAN_CATALOGUE.plans.map(p => [p.id, p]));
 // their plan pickers from this instead of carrying their own copies.
 app.get('/plans', (_, res) => res.json(PLAN_CATALOGUE));
 
-// ── Field-to-label map ────────────────────────────────────────────────────────
-// Keys: EXACT field names as they appear in PartnerPreviewForm[extra][FIELD][field_value]
-// Confirmed from live portal DOM inspection (Jul 2026)
-const FIELD_LABELS = {
-  // Confirmed exact field names from DOM
-  'field_35':    'Air Ambulance',
-  'field_WB':    'Wellness Benefit',
-  'field_COPAY': 'Co Payment',          // confirmed: NOT field_CP
-  'field_SL':    'Sub Limit',
-  'field_RR':    'Recharge Remover',
-  'field_BR':    'Bonus Remover',       // confirmed: NOT field_NCB for this label
-  'field_34':    'Room Rent Modification', // confirmed: NOT field_RRM
-  'field_AHC':   'Annual Health Check-up',
-  'field_BFB':   'Be-Fit Benefit',
-  'field_OPD':   'Care OPD',
-  'field_PB':    'Plus Benefit',
-  // Care Supreme / non-POS plans
-  'field_NCB':   'Bonus Benefits',
-  'field_43':    'PED Modification',
-  'field_UC':    'Unlimited Care',
-  'field_IC':    'Instant Cover',
-  'field_CS':    'Claim Shield',
-  'field_SS':    'Super Restore',
-  // Other possible fields
-  'field_CP':    'Co Payment',
-  'field_RRM':   'Room Rent Modification',
-  'field_NMB':   'No Medical Benefit',
-  'field_LD':    'Loading Discount',
-  'field_DAB':   'Daily Allowance Benefit',
-  'field_HCB':   'Hospital Cash Benefit',
-  'field_MW':    'Maternity & Newborn',
-  'field_DC':    'Domiciliary Cover',
-  'field_EMI':   'EMI Benefit',
-  'field_PW':    'Plus Wellness',
-  'field_GR':    'Global Recharge',
-  'field_OC':    'OPD Cover',
-};
-
-// ── parseAddons — extract add-on checkboxes from form HTML ───────────────────
-function parseAddons(html) {
-  const addons = [];
-  const seen   = new Set();
-
-  // Match every checkbox for PartnerPreviewForm[extra][FIELD][field_value] value="checked"
-  const re = /name="PartnerPreviewForm\[extra\]\[([^\]]+)\]\[field_value\]"\s+value="checked"([^>]*?)>/gi;
-  let m;
-  while ((m = re.exec(html)) !== null) {
-    const field     = m[1];   // e.g. "field_WB" or "field_COPAY"
-    if (seen.has(field)) continue;
-    seen.add(field);
-    const isChecked = / checked/i.test(m[2]);
-
-    // 1. Hardcoded map (most reliable — confirmed from live DOM)
-    let label = FIELD_LABELS[field];
-
-    // 2. Yii2 generates IDs like: partnerpreviewform-extra-field_wb-field_value
-    //    Labels use for="<yii2-id>"
-    if (!label) {
-      const yiiId = 'partnerpreviewform-extra-' + field.toLowerCase() + '-field_value';
-      const lbRe  = new RegExp(`for="${yiiId}"[^>]*>([^<]+)<`, 'i');
-      const lbM   = html.match(lbRe);
-      if (lbM) label = lbM[1].trim();
-    }
-
-    // 3. Adjacent label within 400 chars
-    if (!label) {
-      const nearby = html.slice(re.lastIndex, re.lastIndex + 400);
-      const nearLb = nearby.match(/<label[^>]*>([^<]{3,60})<\/label>/i);
-      if (nearLb) label = nearLb[1].trim();
-    }
-
-    // 4. Absolute fallback: strip "field_" prefix
-    if (!label) label = field.replace(/^field_/i, '');
-
-    addons.push({ field, label, checked: isChecked });
-  }
-  return addons;
-}
-
-// ── parseFields — extract visible input fields and SI options from form HTML ──
-function parseFields(html) {
-  const result = {
-    hasBizType:   false,
-    hasCoverType: false,
-    hasMembers:   false,
-    hasChildren:  false,
-    hasSI:        false,
-    hasTenure:    false,
-    siValues:     [],    // e.g. [5, 7, 10, 15, 25, 50, 100]
-    coverOptions: [],    // e.g. ['Individual', 'Floater']
-    memberOptions:[],
-    tenureOptions:[],
-    planTypeOptions: [],
-    hasPlanType:  false,
-  };
-
-  // Business Type field_75
-  result.hasBizType = /name="PartnerPreviewForm\[input\]\[field_75\]/.test(html);
-
-  // Cover Type field_9
-  result.hasCoverType = /name="PartnerPreviewForm\[input\]\[field_9\]/.test(html);
-  if (result.hasCoverType) {
-    const opts = [...html.matchAll(/<option[^>]*value="([^"]+)"[^>]*>([^<]+)<\/option>/gi)]
-      .filter(m => ['Individual','Floater','individual','floater'].includes(m[1]))
-      .map(m => m[1]);
-    result.coverOptions = [...new Set(opts)];
-  }
-
-  // Total Members field_1
-  result.hasMembers = /name="PartnerPreviewForm\[input\]\[field_1\]/.test(html);
-
-  // Children field_10
-  result.hasChildren = /name="PartnerPreviewForm\[input\]\[field_10\]/.test(html);
-
-  // Sum Insured field_2 — look for range slider or select options
-  result.hasSI = /name="PartnerPreviewForm\[input\]\[field_2\]/.test(html);
-  if (result.hasSI) {
-    // Try range input min/max
-    const rangeM = html.match(/name="PartnerPreviewForm\[input\]\[field_2\][^"]*"[^>]*type="range"[^>]*>/i)
-                || html.match(/type="range"[^>]*name="PartnerPreviewForm\[input\]\[field_2\][^"]*"[^>]*>/i);
-    if (rangeM) {
-      const minM  = rangeM[0].match(/min="(\d+)"/i);
-      const maxM  = rangeM[0].match(/max="(\d+)"/i);
-      if (minM && maxM) {
-        // Record the range only. We deliberately do NOT invent a ladder here.
-        // The previous version did `[5,7,10,15,25,50,100].filter(in range)`,
-        // which fabricated sum-insured options the plan may not sell — and
-        // the front-end preferred that fabrication over the curated table.
-        result.siMin = +minM[1];
-        result.siMax = +maxM[1];
-      }
-    }
-
-    // ── The real ladder: Care renders a jQuery slider, not a native range
-    // input, and the discrete options live in data-values="[5,7,10,...]" on
-    // the .custom-range div. This reader is ported from the v1 backend
-    // (server.js), which is the only place in the project that ever read the
-    // true values off the portal.
-    if (!result.siValues.length) {
-      const dv = [...html.matchAll(/class="[^"]*custom-range[^"]*"[^>]*data-values="([^"]+)"/gi)]
-        .concat([...html.matchAll(/data-values="([^"]+)"[^>]*class="[^"]*custom-range[^"]*"/gi)]);
-      for (const m of dv) {
-        try {
-          const parsed = JSON.parse(m[1].replace(/&quot;/g, '"'));
-          if (Array.isArray(parsed) && parsed.length) {
-            result.siValues  = parsed.map(v => (typeof v === 'number' ? v : String(v)));
-            result.siSource  = 'portal slider data-values';
-            break;
-          }
-        } catch (e) { /* not JSON — try the next match */ }
-      }
-    }
-
-    // Try select options for field_2
-    if (!result.siValues.length) {
-      const selBlock = html.match(/name="PartnerPreviewForm\[input\]\[field_2\][^"]*"[\s\S]{0,2000}?<\/select>/i);
-      if (selBlock) {
-        result.siValues = [...selBlock[0].matchAll(/<option[^>]*value="([\d.]+)"/gi)]
-          .map(m => parseFloat(m[1])).filter(Boolean);
-        if (result.siValues.length) result.siSource = 'portal select options';
-      }
-    }
-
-    // Try data-slider-values or similar JSON in nearby script
-    if (!result.siValues.length) {
-      const dvM = html.match(/data-slider-values?="([^"]+)"/i)
-               || html.match(/siValues?\s*=\s*(\[[^\]]+\])/i);
-      if (dvM) {
-        try {
-          result.siValues = JSON.parse(dvM[1]);
-          if (result.siValues.length) result.siSource = 'portal data-slider-values';
-        } catch {}
-      }
-    }
-
-    // Try step marks / ticks in HTML
-    if (!result.siValues.length) {
-      const tickMs = [...html.matchAll(/class="[^"]*step-mark[^"]*"[^>]*data-value="([\d.]+)"/gi)];
-      if (tickMs.length) {
-        result.siValues = tickMs.map(m => parseFloat(m[1]));
-        result.siSource = 'portal step marks';
-      }
-    }
-  }
-
-  // Tenure field_4
-  result.hasTenure = /name="PartnerPreviewForm\[input\]\[field_4\]/.test(html);
-  if (result.hasTenure) {
-    const tenMs = [...html.matchAll(/<input[^>]*name="PartnerPreviewForm\[input\]\[field_4\][^"]*"[^>]*value="([^"]+)"/gi)];
-    result.tenureOptions = tenMs.map(m => m[1]).filter(v => /year/i.test(v));
-  }
-
-  // Plan Type field_23
-  result.hasPlanType = /name="PartnerPreviewForm\[input\]\[field_23\]/.test(html);
-
-  // ── Income fields (Secure family plans) ────────────────────────────────────
-  // Search FORWARD from the label to correctly identify the field that follows it.
-  // (Searching backward is unreliable — it picks up the previous field in the form.)
-
-  // Annual Income — label text "Annual Income", then the field_XX input follows
-  result.hasAnnualIncome = false;
-  result.annualIncomeField = null;
-  {
-    const pos = html.search(/annual\s*income/i);
-    if (pos !== -1) {
-      result.hasAnnualIncome = true;
-      // Search FORWARD from label to find the input field that belongs to it
-      const ctx = html.slice(pos, pos + 600);
-      const fm  = ctx.match(/name="PartnerPreviewForm\[input\]\[(field_\d+)\]\[field_value\]"/i);
-      result.annualIncomeField = fm?.[1] || null;
-    }
-  }
-
-  // Job Type — label text "Job Type", then radio field follows
-  result.hasJobType = false;
-  result.jobTypeField = null;
-  {
-    const pos = html.search(/job\s*type/i);
-    if (pos !== -1) {
-      result.hasJobType = true;
-      const ctx = html.slice(pos, pos + 600);
-      // Match either a standard input name or a radio id like id="radio_field_13"
-      const fm  = ctx.match(/name="PartnerPreviewForm\[input\]\[(field_\d+)\]\[field_value\]"/i)
-               || ctx.match(/id="radio_(field_\d+)"/i);
-      result.jobTypeField = fm?.[1] || null;
-    }
-  }
-
-  // Monthly Income — label text "Monthly Income", then range slider follows
-  result.hasMonthlyIncome = false;
-  result.monthlyIncomeField = null;
-  result.monthlyIncomeMin = 30;
-  result.monthlyIncomeMax = 50;
-  {
-    const pos = html.search(/monthly\s*income/i);
-    if (pos !== -1) {
-      result.hasMonthlyIncome = true;
-      const ctx = html.slice(pos, pos + 600);
-      const fm  = ctx.match(/name="PartnerPreviewForm\[input\]\[(field_\d+)\]\[field_value\]"/i);
-      result.monthlyIncomeField = fm?.[1] || null;
-      const minM = ctx.match(/min="(\d+)"/i);
-      const maxM = ctx.match(/max="(\d+)"/i);
-      if (minM) result.monthlyIncomeMin = +minM[1];
-      if (maxM) result.monthlyIncomeMax = +maxM[1];
-    }
-  }
-
-  return result;
-}
+// FIELD_LABELS, parseAddons, parseFields, KNOWN_BASE_FIELDS, and
+// parseDynamicExtraFields now live in ./care_scrapers (required at the top
+// of this file).
 
 // ── /addons  — fetch plan-specific add-on checkboxes ─────────────────────────
+// Browser-automation path (server/care_automation.js) — drives Care's own
+// live page instead of replaying a guessed raw POST. Covers every plan
+// except NOT_YET_AUTOMATED (travel + Secure/income-band family), which fall
+// through to legacyAddons below.
 app.post('/addons', async (req, res) => {
+  const { abacusId = '2813' } = req.body;
+  if (NOT_YET_AUTOMATED.has(abacusId)) return legacyAddons(req, res);
   try {
-    const { abacusId = '2813' } = req.body;
+    const { businessType, planType, coverType, nationalityStatus, globalCoverage } = req.body;
+    const catalogueExtra = ((PLAN_BY_ID[abacusId] || {}).extraFields || []).map(f => f.field);
+    const result = await careAutomation.previewCascade({ abacusId, businessType, planType, coverType, nationalityStatus, globalCoverage });
+    // Merge in the plan's static catalogue extraFields so they aren't
+    // re-reported as "dynamic" (previewCascade doesn't know the catalogue).
+    const dynamicExtraFields = (result.dynamicExtraFields || []).filter(f => !catalogueExtra.includes(f.field));
+    res.json({ ok: true, addons: result.addons, fields: result.fields, dynamicExtraFields, catalogue: PLAN_BY_ID[abacusId] || null });
+  } catch (e) {
+    console.error('[Care /addons automation]', e.message);
+    res.status(503).json({ ok: false, error: `Care's live calculator is unavailable right now: ${e.message}`, addons: [], fields: null, dynamicExtraFields: [] });
+  }
+});
+
+// ── legacyAddons — raw-POST path, kept only for NOT_YET_AUTOMATED plans ──────
+async function legacyAddons(req, res) {
+  try {
+    const { abacusId = '2813', businessType, planType, coverType, nationalityStatus, globalCoverage } = req.body;
 
     // Fresh session
     const pageRes  = await fetch(INIT_URL, {
@@ -696,19 +451,113 @@ app.post('/addons', async (req, res) => {
     try { initJson = JSON.parse(initText); } catch {}
     const initHtml = initJson.content || initText;
 
-    const addons = parseAddons(initHtml);
-    const fields = parseFields(initHtml);
+    // ── Cascade: if the operator has Plan Type / Business Type already
+    // selected, the bare init HTML above is the WRONG snapshot — it always
+    // reflects the plan's default combo. Resubmit with the current values,
+    // the same way the real page's own dropdown-change handler does, and
+    // parse the re-rendered form instead. Confirmed live on Care Supreme
+    // (2813): Plan Type "Senior Premium" swaps in a different Sum Insured
+    // ladder, a different add-on set, and reveals a "PED" field that plain
+    // "Care Supreme" doesn't have at all.
+    let html = initHtml;
+    let dynamicExtraFields = [];
+    if (businessType || planType || coverType || nationalityStatus || globalCoverage) {
+      const csrf2 = extractCSRF(initHtml) || csrf;
+      const planIdM = initHtml.match(/name="PartnerPreviewForm\[plan_id\]"\s+value="([^"]+)"/);
+      const planId = planIdM ? planIdM[1] : (PLAN_ID_MAP[abacusId] || '');
+      const cascadePairs = [
+        ['_csrf-frontend', csrf2],
+        // Baseline "someone is filled in" context — the portal's
+        // field-changed handler is the calc endpoint itself, and it wants a
+        // complete form, not just the one field that changed. Values here
+        // are placeholders; they only affect which fields/options/add-ons
+        // get rendered back, not anything actually calculated yet.
+        ['PartnerPreviewForm[input][field_9][field_value]',  coverType || 'Floater'],
+        ['PartnerPreviewForm[input][field_1][field_value]',  '2'],
+        ['PartnerPreviewForm[input][field_10][field_value]', '0'],
+        ['PartnerPreviewForm[input][field_3][field_value]',  '30'],
+        ['PartnerPreviewForm[input][newMem_2][field_value]', '28'],
+        ['PartnerPreviewForm[input][field_2][field_value]',  '10'],
+        ['PartnerPreviewForm[input][field_4][field_value]',  '1 Year'],
+      ];
+      if (businessType)      cascadePairs.push(['PartnerPreviewForm[input][field_75][field_value]', businessType]);
+      if (planType)          cascadePairs.push(['PartnerPreviewForm[input][field_23][field_value]', planType]);
+      if (nationalityStatus) cascadePairs.push(['PartnerPreviewForm[input][field_NS][field_value]', nationalityStatus]);
+      if (globalCoverage)    cascadePairs.push(['PartnerPreviewForm[input][field_GC][field_value]', globalCoverage]);
+      // Same boilerplate /calculate sends on every request — the portal
+      // 400s without it (learned the hard way building the travel-plan
+      // support earlier).
+      cascadePairs.push(
+        ['PartnerPreviewForm[abacusId]',        abacusId],
+        ['PartnerPreviewForm[partnerAbacusId]', '3'],
+        ['PartnerPreviewForm[plan_id]',         planId],
+        ['PartnerPreviewForm[output][outPutField][field_value][]', ''],
+        ['PartnerPreviewForm[output][outPutField][field_value][]', 'field_8'],
+        ['PartnerPreviewForm[selectedBasePremium]', '1'],
+        ['PartnerPreviewForm[premium_type]',        ''],
+        ['PartnerPreviewForm[premium_amount]',      ''],
+        ['PartnerPreviewForm[addonTags]',           ''],
+        ['PartnerPreviewForm[agentCode]',           ''],
+        ['PartnerPreviewForm[source]',              'GenericAbacus'],
+      );
+      const cascadeRes = await fetch(CALC_URL, {
+        method: 'POST',
+        headers: { ...BASE_HEADERS, 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+          'Cookie': cookie, 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json, text/javascript, */*; q=0.01' },
+        body: buildBody(cascadePairs),
+      });
+      const cascadeText = await cascadeRes.text();
+      let cascadeJson = {};
+      try { cascadeJson = JSON.parse(cascadeText); } catch {}
+      html = cascadeJson.content || cascadeText;
+      const catalogueExtra = ((PLAN_BY_ID[abacusId] || {}).extraFields || []).map(f => f.field);
+      dynamicExtraFields = parseDynamicExtraFields(html, catalogueExtra);
+    }
+
+    const addons = parseAddons(html);
+    const fields = parseFields(html);
     // Include the catalogue record so the front-end never needs its own copy
     // of the plan's capabilities, sum-insured ladder or portal default.
-    res.json({ ok: true, addons, fields, catalogue: PLAN_BY_ID[abacusId] || null });
+    res.json({ ok: true, addons, fields, dynamicExtraFields, catalogue: PLAN_BY_ID[abacusId] || null });
   } catch (e) {
     console.error('[Care /addons]', e.message);
-    res.status(500).json({ ok: false, error: e.message, addons: [], fields: null });
+    res.status(500).json({ ok: false, error: e.message, addons: [], fields: null, dynamicExtraFields: [] });
+  }
+}
+
+// ── /calculate ────────────────────────────────────────────────────────────────
+// Browser-automation path for every plan except NOT_YET_AUTOMATED (travel +
+// Secure/income-band family), which fall through to legacyCalculate below.
+app.post('/calculate', async (req, res) => {
+  const { abacusId = '2813', pincode = '' } = req.body;
+  if (NOT_YET_AUTOMATED.has(abacusId)) return legacyCalculate(req, res);
+
+  if (!pincode || pincode.length < 6) {
+    return res.status(422).json({ ok: false, error: 'Pincode is required (6 digits).' });
+  }
+  try {
+    const result = await careAutomation.runQuote(req.body);
+    if (!result.ok) {
+      if (result.needsPincode) {
+        return res.status(422).json({ ok: false, error: 'Please enter a valid pincode to get premium.' });
+      }
+      return res.status(422).json({ ok: false, error: 'No premium returned. Please try again.' });
+    }
+    res.json({
+      ok:                true,
+      discountedPremium: result.discounted,
+      basePremium:       result.original || result.discounted,
+      grandTotal:        result.grandTotal || result.discounted,
+      discountPct:       result.discPct,
+    });
+  } catch (e) {
+    console.error('[Care /calculate automation]', e.message);
+    res.status(503).json({ ok: false, error: `Care's live calculator is unavailable right now: ${e.message}` });
   }
 });
 
-// ── /calculate ────────────────────────────────────────────────────────────────
-app.post('/calculate', async (req, res) => {
+// ── legacyCalculate — raw-POST path, kept only for NOT_YET_AUTOMATED plans ──
+async function legacyCalculate(req, res) {
   try {
     // Fresh session for THIS request only — Care Health sessions can expire
     // server-side quickly, and a shared one would be clobbered by any
@@ -725,6 +574,9 @@ app.post('/calculate', async (req, res) => {
       member2Age   = '25',
       member3Age,
       member4Age,
+      member5Age,
+      member6Age,
+      travel,
       sumInsured   = '10',
       tenure       = '1 Year',
       businessType = 'NB',
@@ -732,6 +584,16 @@ app.post('/calculate', async (req, res) => {
       nationalityStatus = '',
       globalCoverage    = '',
       addons            = {},
+      // Chosen sub-option for a checked add-on that offers a real second
+      // choice — { 'field_NCB_Value': 'CB Booster', ... }. Falls back to
+      // SUB_DEFAULTS' first option when a field isn't present here.
+      subValues         = {},
+      // Plan-specific fields with no checkbox gate at all (e.g. Deductible,
+      // OPD Sum Insured, PED Tenure on the Super Saver/Ultimate Care family)
+      // — { 'field_11': '5', 'field_OPD_SI': '10000', ... }. Any field the
+      // plan's catalogue entry lists but the caller didn't send gets that
+      // entry's own default, since the real form requires a value either way.
+      extraFields       = {},
       // Income fields (Secure family plans)
       annualIncome,
       jobType,
@@ -775,6 +637,99 @@ app.post('/calculate', async (req, res) => {
       parsePremium(initHtml, sess); // rotates this session's CSRF
     }
 
+    // ── Travel plans — a genuinely different product shape ──────────────────
+    // Student Explore (107), Student Explore-Health Unlimited (5674), New
+    // Explore (5833) and POS Explore (5834) aren't health covers with the
+    // usual member/age/cover-type fields — they're travel policies priced
+    // off a date range (or, for 107, a month count) and, for 5833/5834, a
+    // per-traveler age band. Handled entirely separately rather than forcing
+    // them through the health-plan field logic below, which doesn't apply.
+    if (TRAVEL_PLANS.has(abacusId)) {
+      const t = travel || {};
+      const tPairs = [
+        ['_csrf-frontend', sess.csrf],
+        ['assignedAbacus', abacusId],
+        ['PartnerPreviewForm[input][field_54][field_value]', pincode],
+        // Same boilerplate the health-plan pairs below send — required by
+        // the portal regardless of product type.
+        ['PartnerPreviewForm[abacusId]',        abacusId],
+        ['PartnerPreviewForm[partnerAbacusId]', '3'],
+        ['PartnerPreviewForm[plan_id]',         planId],
+        ['PartnerPreviewForm[output][outPutField][field_value][]', ''],
+        ['PartnerPreviewForm[output][outPutField][field_value][]', 'field_8'],
+        ['PartnerPreviewForm[selectedBasePremium]', '1'],
+        ['PartnerPreviewForm[premium_type]',        ''],
+        ['PartnerPreviewForm[premium_amount]',      ''],
+        ['PartnerPreviewForm[addonTags]',           ''],
+        ['PartnerPreviewForm[agentCode]',           ''],
+        ['PartnerPreviewForm[source]',              'GenericAbacus'],
+      ];
+      if (abacusId === '107') {
+        // Student Explore: fixed 12-40 age band, month-based tenure, a
+        // 2-option geographical scope, 4-option plan tier, six optional
+        // covers (each a Yes/No radio) plus one with its own sub-choice.
+        tPairs.push(
+          ['PartnerPreviewForm[input][field_3][field_value]',  '12 - 40'],
+          ['PartnerPreviewForm[input][field_16][field_value]', t.geoScope || 'Worldwide'],
+          ['PartnerPreviewForm[input][field_21][field_value]', t.planType || 'Explore Start'],
+          ['PartnerPreviewForm[input][field_4][field_value]',  t.tenureMonths || '1'],
+          ['PartnerPreviewForm[input][field_2][field_value]',  '30'],
+        );
+        const covers = t.optionalCovers || {};
+        for (const field of ['opt_cvr_SII','opt_cvr_HIV','opt_cvr_VC','opt_cvr_MNBC','opt_cvr_ASI','opt_cvr_PEDC']) {
+          tPairs.push([`PartnerPreviewForm[input][${field}][field_value]`, covers[field] ? 'checked' : 'No']);
+        }
+        if (covers.opt_cvr_MNBC) {
+          tPairs.push(['PartnerPreviewForm[input][opt_cvr_MNBC_dropdown][field_value]', t.mnbcOption || 'Upto SI']);
+        }
+      } else if (abacusId === '5674') {
+        // Student Explore-Health Unlimited: date range only, fixed
+        // Unlimited SI, fixed 12-17/... age band (already handled as a
+        // regular AGE_BAND_MAP field via eldestAge, so just forwarded).
+        tPairs.push(
+          ['PartnerPreviewForm[input][field_3][field_value]',  eldestAge],
+          ['PartnerPreviewForm[input][start_date][field_value]', t.startDate || ''],
+          ['PartnerPreviewForm[input][end_date][field_value]',   t.endDate   || ''],
+          ['PartnerPreviewForm[input][field_4][field_value]',    String(t.days || '')],
+          ['PartnerPreviewForm[input][field_2][field_value]',    'Unlimited'],
+        );
+      } else {
+        // 5833 (New Explore) / 5834 (POS Explore): region, trip type, max
+        // duration, currency, date range, travelers + per-traveler age band,
+        // PED flag, sum insured. field_21 "Travel Plan Type" is cosmetic —
+        // confirmed live it doesn't affect the premium and always mirrors
+        // whatever region is chosen, so it's sent as the same value rather
+        // than exposing a second, meaningless control to the operator.
+        const travelers = Math.max(1, Math.min(6, parseInt(t.travelers, 10) || 1));
+        tPairs.push(
+          ['PartnerPreviewForm[input][field_16][field_value]',  t.region || 'Asia'],
+          ['PartnerPreviewForm[input][field_21][field_value]',  t.region || 'Asia'],
+          ['PartnerPreviewForm[input][field_20][field_value]',  t.tripType || 'Single'],
+          ['PartnerPreviewForm[input][field_221][field_value]', 'Dollar'],
+          ['PartnerPreviewForm[input][field_MTD][field_value]', t.maxDuration || '30'],
+          ['PartnerPreviewForm[input][start_date][field_value]', t.startDate || ''],
+          ['PartnerPreviewForm[input][end_date][field_value]',   t.endDate   || ''],
+          ['PartnerPreviewForm[input][field_4][field_value]',    String(t.days || '')],
+          ['PartnerPreviewForm[input][field_17][field_value]',   String(travelers)],
+          ['PartnerPreviewForm[input][field_19][field_value]',   t.hasPED ? 'Yes' : 'No'],
+          ['PartnerPreviewForm[input][field_2][field_value]',    t.sumInsured || '10'],
+        );
+        const ages = Array.isArray(t.travelerAges) ? t.travelerAges : [];
+        if (ages[0]) tPairs.push(['PartnerPreviewForm[input][field_18][field_value]', ages[0]]);
+        for (let i = 1; i < travelers; i++) {
+          if (ages[i]) tPairs.push([`PartnerPreviewForm[input][newMem_${i}][field_value]`, ages[i]]);
+        }
+      }
+
+      const calcData = await postCalc(tPairs, sess);
+      const result = parsePremium(calcData.content || '', sess);
+      if (!result.ok) {
+        return res.status(422).json({ ok: false, error: 'No premium returned. Please try again.' });
+      }
+      return res.json({ ok: true, discountedPremium: result.discounted, basePremium: result.original,
+                         grandTotal: result.grandTotal, discountPct: result.discPct });
+    }
+
     // ── Step 2: Full calculation ──────────────────────────────────────────────
     // Secure family plan sets — confirmed from /debug-fields (Jul 2026)
     const SECURE_PLANS   = new Set(['7425','7424','6740','6384','188','573']); // all income plans
@@ -801,10 +756,16 @@ app.post('/calculate', async (req, res) => {
     if (globalCoverage)   pairs.push(['PartnerPreviewForm[input][field_GC][field_value]', globalCoverage]);
     if (pincode)          pairs.push(['PartnerPreviewForm[input][field_54][field_value]', pincode]);
 
-    // Cover type, members, children — only for plans that have these fields
-    // Secure family plans (6384, 7424, 7425, 6740, 188, 573) have no cover type or children
-    if (!SECURE_PLANS.has(abacusId)) {
+    // Cover type, children — only for plans that actually have these fields.
+    // Secure family plans (6384, 7424, 7425, 6740, 188, 573) never have them;
+    // beyond that, some plans (e.g. 362 Super Mediclaim) have no Cover Type
+    // or Children field at all on the live portal — sending field_9/field_10
+    // to those plans made the portal reject the request outright (HTTP 400).
+    const planRec = PLAN_BY_ID[abacusId];
+    if (!SECURE_PLANS.has(abacusId) && (!planRec || planRec.coverType !== false)) {
       pairs.push(['PartnerPreviewForm[input][field_9][field_value]',  coverType]);
+    }
+    if (!SECURE_PLANS.has(abacusId) && (!planRec || planRec.children !== false)) {
       pairs.push(['PartnerPreviewForm[input][field_10][field_value]', children]);
     }
     pairs.push(['PartnerPreviewForm[input][field_1][field_value]',  totalMembers]);
@@ -831,6 +792,13 @@ app.post('/calculate', async (req, res) => {
     if (total >= 2)              pairs.push(['PartnerPreviewForm[input][newMem_2][field_value]', member2Age]);
     if (total >= 3 && member3Age) pairs.push(['PartnerPreviewForm[input][newMem_3][field_value]', member3Age]);
     if (total >= 4 && member4Age) pairs.push(['PartnerPreviewForm[input][newMem_4][field_value]', member4Age]);
+    // Members 5/6 — only a handful of plans go this high (confirmed via
+    // /debug-fields: field_1 offers up to 6 there). newMem_5/newMem_6 follow
+    // the same naming the portal already confirmed for newMem_2/3/4; the
+    // live form only renders these fields once Total Members is raised that
+    // high via its own AJAX, so this couldn't be captured in a static dump.
+    if (total >= 5 && member5Age) pairs.push(['PartnerPreviewForm[input][newMem_5][field_value]', member5Age]);
+    if (total >= 6 && member6Age) pairs.push(['PartnerPreviewForm[input][newMem_6][field_value]', member6Age]);
 
     // Income fields for Secure family plans
     // Field IDs confirmed from live portal via /debug-fields (Jul 2026):
@@ -900,12 +868,15 @@ app.post('/calculate', async (req, res) => {
 
     // ── Add-ons: accept raw field→boolean map from frontend ─────────────────
     // Frontend sends { 'field_WB': true, 'field_COPAY': false, ... }
-    // Sub-option defaults for fields that require a value when checked
+    // Sub-option defaults for fields that require a value when checked. Each
+    // one but field_CS genuinely offers two real choices on the live portal
+    // (confirmed via /debug-fields) — subValues (below) lets the operator
+    // actually pick one instead of always getting the first.
     const SUB_DEFAULTS = {
       'field_NCB': { subField: 'field_NCB_Value', value: 'CB Super'         },
       'field_OPD': { subField: 'field_OPD_Value', value: 'OPD'             },
       'field_IC':  { subField: 'field_IC_Value',  value: 'Instant Cover'    },
-      'field_CS':  { subField: 'field_CS_Value',  value: 'Claim Shield Plus'},
+      'field_CS':  { subField: 'field_CS_Value',  value: 'Claim Shield Plus'}, // only one real option
       'field_43':  { subField: 'field_PED_TENURE',value: '1 Year'           },
     };
 
@@ -916,8 +887,9 @@ app.post('/calculate', async (req, res) => {
         if (checked) {
           pairs.push([`PartnerPreviewForm[extra][${field}][field_value]`, 'checked']);
           if (SUB_DEFAULTS[field]) {
-            pairs.push([`PartnerPreviewForm[input][${SUB_DEFAULTS[field].subField}][field_value]`,
-              SUB_DEFAULTS[field].value]);
+            const sub = SUB_DEFAULTS[field];
+            const chosen = (subValues && subValues[sub.subField]) || sub.value;
+            pairs.push([`PartnerPreviewForm[input][${sub.subField}][field_value]`, chosen]);
           }
         }
       }
@@ -941,6 +913,29 @@ app.post('/calculate', async (req, res) => {
       pairs.push(['PartnerPreviewForm[input][field_OPD_Value][field_value]', 'OPD']);
     }
     // Secure plans with no add-ons: send nothing extra
+
+    // ── Plan-specific fields with no checkbox gate ───────────────────────────
+    // Deductible sliders, OPD Sum Insured and (on some plans) PED Tenure are
+    // required inputs the real form always shows for these plans — never
+    // behind an add-on checkbox — so every one the catalogue lists for this
+    // plan gets sent, using the caller's choice or that field's own default.
+    // Confirmed per plan via /debug-fields; see care_plans.json's extraFields.
+    const planExtraFields = (PLAN_BY_ID[abacusId] && PLAN_BY_ID[abacusId].extraFields) || [];
+    const knownExtraFieldNames = new Set(planExtraFields.map(s => s.field));
+    for (const spec of planExtraFields) {
+      const value = extraFields[spec.field] || spec.default;
+      pairs.push([`PartnerPreviewForm[input][${spec.field}][field_value]`, value]);
+    }
+    // Fields the current Plan Type/Business Type combo revealed dynamically
+    // (e.g. Care Supreme's "PED" field, only shown for Senior Premium/Senior
+    // Super — see /addons' dynamicExtraFields) aren't in the static catalogue
+    // list above, so aren't caught by that loop. Send whatever the frontend
+    // has rendered for them; there's no server-side default to fall back to
+    // since these were only ever discovered per-request, not stored.
+    for (const [field, value] of Object.entries(extraFields || {})) {
+      if (knownExtraFieldNames.has(field) || !value) continue;
+      pairs.push([`PartnerPreviewForm[input][${field}][field_value]`, value]);
+    }
 
     const calcData = await postCalc(pairs, sess);
     const calcHtml = calcData.content || '';
@@ -986,7 +981,7 @@ app.post('/calculate', async (req, res) => {
     }
     res.status(500).json({ ok: false, error: err.message });
   }
-});
+}
 
 // ── /debug-fields/:id  — show ALL field IDs from the plan's init POST ─────────
 // Usage: http://localhost:3005/debug-fields/6384
