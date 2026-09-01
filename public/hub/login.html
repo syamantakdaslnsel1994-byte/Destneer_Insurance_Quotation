@@ -46,6 +46,16 @@ button:disabled{opacity:.55;cursor:default}
 .addbtn:hover{background:#f8fafc;border-color:#8b5cf6;color:#6d28d9}
 .link{background:none;border:none;color:#8b5cf6;font-size:11.5px;font-weight:700;
   cursor:pointer;padding:0;width:auto;margin-top:14px;text-decoration:underline}
+.urow .admin{display:flex;align-items:center;gap:5px;font-size:10px;color:#64748b;
+  flex:0 0 auto;white-space:nowrap}
+.urow .admin input{width:auto}
+.code-list{background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:9px;padding:12px 14px;
+  margin-top:10px;font-size:12px}
+.code-row{display:flex;justify-content:space-between;gap:10px;padding:4px 0;
+  font-family:Consolas,'SFMono-Regular',monospace}
+.code-row b{color:#0f172a}
+.code-row span{color:#7c3aed;font-weight:700;letter-spacing:.3px}
+.code-warn{font-size:11px;color:#b45309;margin-top:8px;line-height:1.5}
 </style>
 </head>
 <body>
@@ -72,6 +82,7 @@ button:disabled{opacity:.55;cursor:default}
       <button type="submit" id="loginBtn">Sign in</button>
     </form>
     <div class="msg" id="loginMsg"></div>
+    <button class="link" type="button" onclick="showForgot()">Forgot your username or password?</button>
     <div class="foot">Developed by <b>Lee &amp; Nee Softwares</b> &middot; Kolkata</div>
   </div>
 
@@ -81,13 +92,46 @@ button:disabled{opacity:.55;cursor:default}
       <strong>No accounts exist yet.</strong> Create one for each person who will use
       the hub. Passwords are stored as salted hashes on this machine — they are never
       written in plain text and cannot be recovered, so note them down somewhere safe.
-      Minimum 8 characters.
+      Minimum 8 characters. Each account also gets a one-time recovery code shown after
+      creation — save those too, they're how a forgotten password gets reset later.
     </div>
     <div id="urows"></div>
     <button class="addbtn" type="button" onclick="addRow()">+ Add another person</button>
     <button type="button" id="setupBtn" onclick="doSetup()">Create accounts</button>
     <div class="msg" id="setupMsg"></div>
+    <div id="setupCodes"></div>
     <div class="foot">Developed by <b>Lee &amp; Nee Softwares</b> &middot; Kolkata</div>
+  </div>
+
+  <!-- ── Forgot password: step 1, recovery code ── -->
+  <div class="card-body hide" id="pane-forgot1">
+    <div class="setup-note">
+      Enter the recovery code you saved when your account was created. It also tells us
+      your username, in case you've forgotten that too.
+    </div>
+    <div class="field">
+      <label for="rc">Recovery code</label>
+      <input id="rc" type="text" placeholder="XXXX-XXXX-XXXX-XXXX-XXXX" spellcheck="false" autocomplete="off">
+    </div>
+    <button type="button" id="forgotVerifyBtn" onclick="doForgotVerify()">Continue</button>
+    <div class="msg" id="forgotMsg"></div>
+    <button class="link" type="button" onclick="showLogin()">Back to sign in</button>
+    <div class="foot">
+      No recovery code saved? Ask whoever administers this install to reset your password
+      from their Account panel.
+    </div>
+  </div>
+
+  <!-- ── Forgot password: step 2, set new password ── -->
+  <div class="card-body hide" id="pane-forgot2">
+    <div class="setup-note">Signed in as <strong id="forgotUser"></strong>. Choose a new password.</div>
+    <div class="field">
+      <label for="np">New password</label>
+      <input id="np" type="password" autocomplete="new-password">
+    </div>
+    <button type="button" id="forgotResetBtn" onclick="doForgotReset()">Set new password</button>
+    <div class="msg" id="forgot2Msg"></div>
+    <div id="forgotNewCode"></div>
   </div>
 </div>
 
@@ -122,11 +166,11 @@ async function boot(){
       return;
     }
     // Already signed in on this tab? Go straight through.
-    const tok = sessionStorage.getItem(TOKEN_KEY);
+    const tok = localStorage.getItem(TOKEN_KEY);
     if (tok) {
       const me = await fetch('/auth/me', { headers:{ 'Authorization':'Bearer ' + tok } });
       if (me.ok) { location.replace(nextPath()); return; }
-      sessionStorage.removeItem(TOKEN_KEY); sessionStorage.removeItem(USER_KEY);
+      localStorage.removeItem(TOKEN_KEY); localStorage.removeItem(USER_KEY);
     }
   } catch (e) {
     show('loginMsg', 'Cannot reach the server. Is care_server.js running on port 3005?', 'bad');
@@ -152,10 +196,10 @@ document.getElementById('loginForm').addEventListener('submit', async function(e
       document.getElementById('p').focus();
       return;
     }
-    // sessionStorage, not localStorage: closing the tab signs out, which is the
-    // right default for a machine several people share.
-    sessionStorage.setItem(TOKEN_KEY, j.token);
-    sessionStorage.setItem(USER_KEY, j.user);
+    // localStorage, not sessionStorage: stays signed in across tab/browser
+    // restarts until an explicit logout (or the session actually expires).
+    localStorage.setItem(TOKEN_KEY, j.token);
+    localStorage.setItem(USER_KEY, j.user);
     location.replace(nextPath());
   } catch (e) {
     show('loginMsg', 'Cannot reach the server: ' + e.message, 'bad');
@@ -167,11 +211,14 @@ document.getElementById('loginForm').addEventListener('submit', async function(e
 // ── first-run setup ──
 function addRow(){
   const wrap = document.getElementById('urows');
+  const isFirst = !wrap.children.length;
   const row = document.createElement('div');
   row.className = 'urow';
   row.innerHTML = '<input class="u" type="text" placeholder="username" spellcheck="false" '
     + 'autocomplete="off">'
     + '<input class="p" type="password" placeholder="password (min 8)" autocomplete="new-password">'
+    + '<label class="admin" title="Can reset teammates\' passwords"><input class="a" type="checkbox"'
+    + (isFirst ? ' checked' : '') + '> Admin</label>'
     + '<button type="button" title="Remove" onclick="this.parentNode.remove()">&times;</button>';
   wrap.appendChild(row);
 }
@@ -181,6 +228,7 @@ async function doSetup(){
   const users = rows.map(r => ({
     username: r.querySelector('.u').value.trim(),
     password: r.querySelector('.p').value,
+    isAdmin: r.querySelector('.a').checked,
   })).filter(u => u.username || u.password);
   if (!users.length) { show('setupMsg', 'Add at least one person.'); return; }
   const short = users.find(u => u.password.length < 8);
@@ -193,18 +241,88 @@ async function doSetup(){
       headers:{ 'Content-Type':'application/json' }, body: JSON.stringify({ users }) });
     const j = await r.json();
     if (!r.ok || !j.ok) { show('setupMsg', j.error || 'Setup failed.', 'bad'); return; }
-    show('setupMsg', 'Created ' + j.created.length + ' account(s): ' + j.created.join(', ')
-      + '. Sign in below.', 'ok');
-    setTimeout(function(){
-      document.getElementById('pane-setup').classList.add('hide');
-      document.getElementById('pane-login').classList.remove('hide');
-      document.getElementById('sub').textContent = 'Sign in to continue';
-      document.getElementById('u').focus();
-    }, 1600);
+    show('setupMsg', 'Created ' + j.created.length + ' account(s). Save these recovery codes now:', 'ok');
+    const list = document.getElementById('setupCodes');
+    list.innerHTML = '<div class="code-list">' + j.created.map(function(c){
+      return '<div class="code-row"><b>' + escapeHtml(c.username) + '</b><span>' + escapeHtml(c.recoveryCode) + '</span></div>';
+    }).join('') + '<div class="code-warn">These codes are shown once and cannot be retrieved again — write '
+      + 'them down before continuing.</div></div>';
+    document.getElementById('setupBtn').classList.add('hide');
   } catch (e) {
     show('setupMsg', 'Cannot reach the server: ' + e.message, 'bad');
   } finally {
     btn.disabled = false; btn.textContent = 'Create accounts';
+  }
+}
+
+function escapeHtml(s){
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+// ── forgot username / password ──
+let _resetToken = null;
+
+function showLogin(){
+  ['pane-setup','pane-forgot1','pane-forgot2'].forEach(id => document.getElementById(id).classList.add('hide'));
+  document.getElementById('pane-login').classList.remove('hide');
+  document.getElementById('sub').textContent = 'Sign in to continue';
+}
+function showForgot(){
+  document.getElementById('pane-login').classList.add('hide');
+  document.getElementById('pane-forgot1').classList.remove('hide');
+  document.getElementById('sub').textContent = 'Reset your password';
+  show('forgotMsg', '');
+  document.getElementById('rc').value = '';
+  document.getElementById('rc').focus();
+}
+
+async function doForgotVerify(){
+  const code = document.getElementById('rc').value.trim();
+  if (!code) { show('forgotMsg', 'Enter your recovery code.'); return; }
+  const btn = document.getElementById('forgotVerifyBtn');
+  btn.disabled = true; btn.textContent = 'Checking…';
+  show('forgotMsg', '');
+  try {
+    const r = await fetch('/auth/forgot/verify', { method:'POST',
+      headers:{ 'Content-Type':'application/json' }, body: JSON.stringify({ recoveryCode: code }) });
+    const j = await r.json();
+    if (!r.ok || !j.ok) { show('forgotMsg', j.error || 'That code was not recognised.', 'bad'); return; }
+    _resetToken = j.resetToken;
+    document.getElementById('forgotUser').textContent = j.user || j.username;
+    document.getElementById('pane-forgot1').classList.add('hide');
+    document.getElementById('pane-forgot2').classList.remove('hide');
+    document.getElementById('sub').textContent = 'Choose a new password';
+    document.getElementById('np').value = '';
+    document.getElementById('np').focus();
+  } catch (e) {
+    show('forgotMsg', 'Cannot reach the server: ' + e.message, 'bad');
+  } finally {
+    btn.disabled = false; btn.textContent = 'Continue';
+  }
+}
+
+async function doForgotReset(){
+  const pw = document.getElementById('np').value;
+  if (pw.length < 8) { show('forgot2Msg', 'New password must be at least 8 characters.'); return; }
+  const btn = document.getElementById('forgotResetBtn');
+  btn.disabled = true; btn.textContent = 'Saving…';
+  show('forgot2Msg', '');
+  try {
+    const r = await fetch('/auth/forgot/reset', { method:'POST',
+      headers:{ 'Content-Type':'application/json' },
+      body: JSON.stringify({ resetToken: _resetToken, newPassword: pw }) });
+    const j = await r.json();
+    if (!r.ok || !j.ok) { show('forgot2Msg', j.error || 'Could not reset the password.', 'bad'); return; }
+    show('forgot2Msg', 'Password changed. A new recovery code has been generated — save this one too:', 'ok');
+    document.getElementById('forgotNewCode').innerHTML = '<div class="code-list"><div class="code-row">'
+      + '<b>' + escapeHtml(j.username) + '</b><span>' + escapeHtml(j.newRecoveryCode) + '</span></div>'
+      + '<div class="code-warn">This code replaces the one you just used — it is shown once.</div></div>';
+    btn.classList.add('hide');
+    setTimeout(function(){ showLogin(); document.getElementById('u').value = j.username; document.getElementById('p').focus(); }, 2500);
+  } catch (e) {
+    show('forgot2Msg', 'Cannot reach the server: ' + e.message, 'bad');
+  } finally {
+    btn.disabled = false; btn.textContent = 'Set new password';
   }
 }
 

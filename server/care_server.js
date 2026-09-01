@@ -1180,7 +1180,9 @@ async function qCheckDestination(dir){
 // offers a one-time setup screen to create the accounts.
 const crypto  = require('crypto');
 const QUSERS  = path.join(QROOT, 'users.json');
-const SESSION_HOURS = 12;
+// Long-lived on purpose: signed in once, stays signed in until an explicit
+// logout, rather than expiring on its own on a normal desk.
+const SESSION_HOURS = 24 * 30;
 const MAX_USERS = 25;
 
 function authHash(password, salt){
@@ -1197,6 +1199,17 @@ function authSame(a, b){
   return x.length === y.length && crypto.timingSafeEqual(x, y);
 }
 
+// A recovery code is a second secret, generated for the person (never chosen
+// by them) and shown exactly once. It is hashed the same way as a password —
+// scrypt, per-user salt, never stored in plain text — so losing users.json
+// doesn't hand out anyone's codes either. 80 bits is plenty against guessing
+// even with no separate rate limit; the scrypt cost slows attempts the same
+// way it already does for passwords.
+function genRecoveryCode(){
+  const hex = crypto.randomBytes(10).toString('hex').toUpperCase();
+  return hex.match(/.{1,4}/g).join('-');
+}
+
 async function authReadUsers(){
   try { const j = JSON.parse(await fsp.readFile(QUSERS, 'utf8'));
         return Array.isArray(j.users) ? j.users : []; }
@@ -1211,12 +1224,30 @@ async function authWriteUsers(users){
     users }, null, 2), { mode: 0o600 });
 }
 
-// Sessions are in memory: a server restart signs everyone out, which is the
-// right default for a tool people leave open on shared desks.
-const SESSIONS = new Map();          // token → { user, expires }
+// Sessions are persisted to quotations/sessions.json (same gitignored folder
+// as users.json) so a server restart doesn't sign everyone out either — only
+// an explicit logout, or the session actually expiring, does.
+const QSESSIONS = path.join(QROOT, 'sessions.json');
+function loadSessions(){
+  try {
+    const raw = JSON.parse(fss.readFileSync(QSESSIONS, 'utf8'));
+    const now = Date.now();
+    return Object.entries(raw).filter(([, s]) => s && s.expires > now);
+  } catch (e) { return []; }
+}
+function saveSessions(){
+  const obj = {};
+  for (const [token, s] of SESSIONS) obj[token] = s;
+  try {
+    fss.mkdirSync(QROOT, { recursive: true });
+    fss.writeFileSync(QSESSIONS, JSON.stringify(obj), { mode: 0o600 });
+  } catch (e) { console.warn('[Care] Could not persist sessions:', e.message); }
+}
+const SESSIONS = new Map(loadSessions());          // token → { user, expires }
 function authIssue(user){
   const token = crypto.randomBytes(24).toString('hex');
   SESSIONS.set(token, { user, expires: Date.now() + SESSION_HOURS * 3600e3 });
+  saveSessions();
   return token;
 }
 function authWhois(req){
@@ -1244,7 +1275,8 @@ app.get('/login', (req, res) => res.sendFile(path.join(__dirname, '..', 'public'
 app.get('/auth/status', async (req, res) => {
   const users = await authReadUsers();
   res.json({ setupNeeded: users.length === 0, userCount: users.length,
-             signedInAs: authWhois(req) || null });
+             signedInAs: authWhois(req) || null,
+             adminExists: users.some(u => u.isAdmin) });
 });
 
 // One-time setup. Refused once any account exists, so it cannot be used to add
@@ -1259,7 +1291,7 @@ app.post('/auth/setup', async (req, res) => {
     return res.status(400).json({ error: 'Give at least one username and password.' });
   if (list.length > MAX_USERS)
     return res.status(400).json({ error: 'At most ' + MAX_USERS + ' accounts.' });
-  const seen = new Set(), users = [];
+  const seen = new Set(), users = [], created = [];
   for (const u of list) {
     const name = String((u && u.username) || '').trim();
     const pw   = String((u && u.password) || '');
@@ -1272,11 +1304,20 @@ app.post('/auth/setup', async (req, res) => {
     if (seen.has(key)) return res.status(400).json({ error: 'Duplicate username: ' + name });
     seen.add(key);
     const salt = authNewSalt();
-    users.push({ username: name, salt, hash: authHash(pw, salt), createdAt: new Date().toISOString() });
+    const recoverySalt = authNewSalt();
+    const recoveryCode = genRecoveryCode();
+    users.push({ username: name, salt, hash: authHash(pw, salt),
+      recoverySalt, recoveryHash: authHash(recoveryCode, recoverySalt),
+      isAdmin: !!(u && u.isAdmin), createdAt: new Date().toISOString() });
+    created.push({ username: name, recoveryCode });
   }
+  // Every install needs at least one admin so a lost recovery code has a way
+  // back in — if the setup form didn't mark anyone, the first account becomes
+  // admin rather than leaving nobody able to reset a teammate.
+  if (!users.some(u => u.isAdmin)) users[0].isAdmin = true;
   await authWriteUsers(users);
   console.log('[Care] ' + users.length + ' hub account(s) created:', users.map(u => u.username).join(', '));
-  res.json({ ok: true, created: users.map(u => u.username) });
+  res.json({ ok: true, created });
 });
 
 app.post('/auth/login', async (req, res) => {
@@ -1298,20 +1339,20 @@ app.post('/auth/login', async (req, res) => {
 app.post('/auth/logout', (req, res) => {
   const h = String(req.headers['authorization'] || '');
   const token = h.startsWith('Bearer ') ? h.slice(7) : (req.headers['x-hub-token'] || '');
-  if (token) SESSIONS.delete(String(token));
+  if (token && SESSIONS.delete(String(token))) saveSessions();
   res.json({ ok: true });
 });
 
-app.get('/auth/me', (req, res) => {
+app.get('/auth/me', async (req, res) => {
   const u = authWhois(req);
   if (!u) return res.status(401).json({ error: 'Not signed in.', needsLogin: true });
-  res.json({ user: u });
+  const users = await authReadUsers();
+  const me = users.find(x => x.username === u);
+  res.json({ user: u, isAdmin: !!(me && me.isAdmin),
+             adminExists: users.some(x => x.isAdmin) });
 });
 
-// Let a signed-in user change their own password. Nothing else can: there is no
-// admin reset, because that would mean an endpoint that sets someone else's
-// password. Forgotten passwords are fixed by deleting users.json and running
-// setup again.
+// Let a signed-in user change their own password.
 app.post('/auth/password', authRequired, async (req, res) => {
   const b = req.body || {};
   const users = await authReadUsers();
@@ -1323,6 +1364,122 @@ app.post('/auth/password', authRequired, async (req, res) => {
   if (next.length < 8) return res.status(400).json({ error: 'New password must be at least 8 characters.' });
   u.salt = authNewSalt(); u.hash = authHash(next, u.salt);
   u.passwordChangedAt = new Date().toISOString();
+  await authWriteUsers(users);
+  res.json({ ok: true });
+});
+
+// ═════════════════════════════════════════════════════════════════════════════
+//  PASSWORD / USERNAME RECOVERY
+// ═════════════════════════════════════════════════════════════════════════════
+// Two independent ways back in for someone locked out, since this install has
+// no email to send a reset link to:
+//  1. The recovery code shown once at account creation — /auth/forgot/verify
+//     + /auth/forgot/reset. Looking it up by scanning every account (rather
+//     than requiring a username first) means it also answers "what's my
+//     username", which a forgotten-password person has often also forgotten.
+//  2. An admin account resetting a teammate's password outright — the admin
+//     still has to be signed in with their own credentials; this cannot be
+//     used to set your own password without knowing it.
+
+// Reset tokens are short-lived and single-use, kept in memory only (unlike
+// SESSIONS, they are not worth persisting across a restart — a lost one just
+// means asking for the code again).
+const RESET_TOKENS = new Map();          // token → { username, expires }
+const RESET_TOKEN_MINUTES = 15;
+
+app.post('/auth/forgot/verify', async (req, res) => {
+  const code = String((req.body || {}).recoveryCode || '').trim();
+  const FAIL = { error: 'That recovery code was not recognised.' };
+  if (!code) return res.status(400).json(FAIL);
+  const users = await authReadUsers();
+  const match = users.find(u => u.recoveryHash
+    && authSame(authHash(code, u.recoverySalt), u.recoveryHash));
+  if (!match) return res.status(401).json(FAIL);
+  const token = crypto.randomBytes(24).toString('hex');
+  RESET_TOKENS.set(token, { username: match.username, expires: Date.now() + RESET_TOKEN_MINUTES * 60e3 });
+  res.json({ ok: true, username: match.username, resetToken: token });
+});
+
+app.post('/auth/forgot/reset', async (req, res) => {
+  const b = req.body || {};
+  const token = String(b.resetToken || '');
+  const entry = RESET_TOKENS.get(token);
+  if (!entry || entry.expires < Date.now()) {
+    RESET_TOKENS.delete(token);
+    return res.status(401).json({ error: 'That reset link has expired. Start over with your recovery code.' });
+  }
+  const next = String(b.newPassword || '');
+  if (next.length < 8) return res.status(400).json({ error: 'New password must be at least 8 characters.' });
+  const users = await authReadUsers();
+  const u = users.find(x => x.username === entry.username);
+  if (!u) { RESET_TOKENS.delete(token); return res.status(404).json({ error: 'Account not found.' }); }
+  u.salt = authNewSalt(); u.hash = authHash(next, u.salt);
+  u.passwordChangedAt = new Date().toISOString();
+  // The code just used is consumed and replaced — otherwise the same code
+  // (or an intercepted copy of it) would keep working after the reset.
+  const recoverySalt = authNewSalt();
+  const newRecoveryCode = genRecoveryCode();
+  u.recoverySalt = recoverySalt; u.recoveryHash = authHash(newRecoveryCode, recoverySalt);
+  await authWriteUsers(users);
+  RESET_TOKENS.delete(token);
+  res.json({ ok: true, username: u.username, newRecoveryCode });
+});
+
+// Self-service: (re)generate my own recovery code. Also how an account
+// created before this feature existed gets one for the first time.
+app.post('/auth/recovery-code/regenerate', authRequired, async (req, res) => {
+  const users = await authReadUsers();
+  const u = users.find(x => x.username === req.hubUser);
+  if (!u) return res.status(404).json({ error: 'Account not found.' });
+  const recoverySalt = authNewSalt();
+  const recoveryCode = genRecoveryCode();
+  u.recoverySalt = recoverySalt; u.recoveryHash = authHash(recoveryCode, recoverySalt);
+  await authWriteUsers(users);
+  res.json({ ok: true, recoveryCode });
+});
+
+// Bootstraps installs whose users.json predates the admin flag: whoever signs
+// in first can claim it, but only while genuinely nobody holds it yet — once
+// any account is admin this always refuses, so it can't be used to escalate
+// later (mirrors how /auth/setup refuses once accounts already exist).
+app.post('/auth/claim-admin', authRequired, async (req, res) => {
+  const users = await authReadUsers();
+  if (users.some(u => u.isAdmin))
+    return res.status(409).json({ error: 'This install already has an admin.' });
+  const u = users.find(x => x.username === req.hubUser);
+  if (!u) return res.status(404).json({ error: 'Account not found.' });
+  u.isAdmin = true;
+  await authWriteUsers(users);
+  res.json({ ok: true });
+});
+
+function adminRequired(req, res, next){
+  authReadUsers().then(users => {
+    const me = users.find(x => x.username === req.hubUser);
+    if (!me || !me.isAdmin) return res.status(403).json({ error: 'Admin only.' });
+    next();
+  }).catch(e => res.status(500).json({ error: e.message }));
+}
+
+app.get('/auth/admin/users', authRequired, adminRequired, async (req, res) => {
+  const users = await authReadUsers();
+  res.json({ users: users.map(u => ({ username: u.username, isAdmin: !!u.isAdmin, createdAt: u.createdAt })) });
+});
+
+// Resets a teammate's password without needing to know it. Does not touch
+// their recovery code — once they can sign in again they can regenerate
+// their own from the account panel.
+app.post('/auth/admin/reset-password', authRequired, adminRequired, async (req, res) => {
+  const b = req.body || {};
+  const name = String(b.username || '').trim();
+  const next = String(b.newPassword || '');
+  if (next.length < 8) return res.status(400).json({ error: 'New password must be at least 8 characters.' });
+  const users = await authReadUsers();
+  const u = users.find(x => x.username === name);
+  if (!u) return res.status(404).json({ error: 'No such account.' });
+  u.salt = authNewSalt(); u.hash = authHash(next, u.salt);
+  u.passwordChangedAt = new Date().toISOString();
+  u.passwordResetByAdmin = req.hubUser;
   await authWriteUsers(users);
   res.json({ ok: true });
 });
