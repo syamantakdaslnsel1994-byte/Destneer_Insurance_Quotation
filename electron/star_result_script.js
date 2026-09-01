@@ -16,12 +16,22 @@
 //
 // Exact selectors confirmed live from a real product-customize screen's
 // outerHTML (not guessed):
+//   Plan name does NOT come from the Premium Breakup card's own header —
+//   confirmed live that one only ever holds the base product name ("Super
+//   Star"), never the variant ("Value Plus"/"Preferred"/etc.), because the
+//   real full name lives in a SEPARATE, page-level header elsewhere on the
+//   same screen. Both headers share the exact same class names
+//   (.MuiCardHeader-content/.MuiCardHeader-title — a reused component), so
+//   what actually distinguishes them, confirmed live: the full-name header
+//   wraps its <p> parts in a `.MuiStack-root` div; the Premium Breakup
+//   card's own header does not. That's the same structure the recommend-
+//   ations-list cards use for their own (correctly full) plan names, so
+//   `.MuiCardHeader-content .MuiStack-root p` is used everywhere a plan
+//   name is read, not just here — an earlier version of this file used a
+//   bare `.MuiCardHeader-content p` scoped to the Premium Breakup card,
+//   which is exactly the truncated one.
 //   A landmark <p> whose exact text is "Premium Breakup" — its parent is
-//   the whole summary card. Scoping everything below to THIS card matters:
-//   a bare, unscoped `.MuiCardHeader-content p` query on the page matched
-//   3 elements, not the 2 that make up this card's own plan name — there's
-//   an unrelated header elsewhere on the same screen.
-//     .MuiCardHeader-content p         -> plan name (scoped to the card)
+//   the summary card the rest of these are scoped to:
 //     "Sum Insured" <p>, next sibling  -> value, e.g. "10 Lakh"
 //     "Policy Period" <p>, next sibling -> value, e.g. "1 Year"
 //     "Total Premium" <p>, next sibling -> value, e.g. "₹11,327"
@@ -57,8 +67,17 @@ const RESULT_OBSERVER_SCRIPT = `
     const card = breakupLabel ? breakupLabel.closest('.MuiCard-root') : null;
     if (!card) return; // not on a single-plan detail screen (yet, or not this page)
 
-    const nameEl = card.querySelector('.MuiCardHeader-content p');
-    const planName = nameEl ? clean(nameEl.textContent) : 'Star Health';
+    // Page-level full name (base + variant) — NOT scoped to the card
+    // variable above, since the Premium Breakup card's own header only
+    // ever has the base name.
+    // Falls back to whatever plain .MuiCardHeader-content p exists (the
+    // old truncated behavior) only if no .MuiStack-root header is found at
+    // all, rather than reporting no plan name.
+    const fullNameParts = Array.from(document.querySelectorAll('.MuiCardHeader-content .MuiStack-root p'))
+      .map((p) => clean(p.textContent)).filter(Boolean);
+    const fallbackNameEl = document.querySelector('.MuiCardHeader-content p');
+    const planName = fullNameParts.length ? fullNameParts.join(' ')
+      : (fallbackNameEl ? clean(fallbackNameEl.textContent) : 'Star Health');
     const amount = valueForLabel(card, 'Total Premium');
     if (!amount) return;
     const sumInsured = valueForLabel(card, 'Sum Insured');

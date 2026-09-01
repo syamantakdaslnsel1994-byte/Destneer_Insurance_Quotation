@@ -3786,15 +3786,24 @@ function applyNivaLiveOverlay(liveRows){
 }
 
 // Unlike Care, there's no existing 48-plan catalogue keying Niva's real
-// captured plan names to a product slug — the exact string Niva's real
-// quote flow captures has not been confirmed live this pass (Niva was
-// never brought into this session's real-page-capture work). Matched by
-// keyword fragment instead of exact name, same principle as the pre-
-// exactMatch FEATURE_DATA.plans columns: ordered so more specific
-// fragments (reassure2/reassure3) are checked before the bare "reassure"
-// fallback, so a versioned quote can't be swallowed by the unversioned
-// entry. Treat any match here as unverified until a real captured Niva
-// plan name is seen and checked against this list.
+// captured plan names to a product slug. Matched by keyword fragment
+// instead of exact name, same principle as the pre-exactMatch
+// FEATURE_DATA.plans columns: ordered so more specific fragments
+// (reassure2/reassure3) are checked before the bare "reassure" fallback,
+// so a versioned quote can't be swallowed by the unversioned entry.
+//
+// Confirmed live this session (electron/niva-view.js's own real-page
+// capture): a real quote's captured plan name includes the full variant,
+// e.g. "ReAssure2.0 Titanium+" — that correctly hits the 'reassure2'/
+// 'reassure 2.0' fragment and resolves to reassurev2-insurance, so the
+// keyword matching itself is doing the right thing. What it CAN'T do:
+// data/niva_features_mapped.json has exactly one entry per base product
+// family (reassurev2-insurance, aspire, etc.) — no separate Titanium+/
+// Platinum/Gold rows — because nivabupa.com's own brochure PDFs (the
+// scrape source) don't break tiers out separately either. So a real
+// "Titanium+" quote and a real "Platinum" quote of the same base product
+// both correctly resolve to the SAME slug and show the SAME feature
+// values — not a matching bug, a ceiling on what's publicly scrapeable.
 const NIVA_SLUG_KEYWORDS = [
   { slug: 'reassurev2-insurance', any: ['reassure2', 'reassure 2.0', 'reassurev2'] },
   { slug: 'reassurev3-insurance', any: ['reassure3', 'reassure 3.0', 'reassurev3'] },
@@ -3811,6 +3820,19 @@ const NIVA_SLUG_KEYWORDS = [
   { slug: 'criti-care', any: ['criti care', 'criticare'] },
   { slug: 'accident-care', any: ['accident care'] },
   { slug: 'rise', any: ['rise'] },
+  // Confirmed live these 4 are real entries in data/niva_features_mapped.json
+  // (scripts/scrape_niva_features.js's own product list) but had no keyword
+  // entry here at all — a real quote for any of them could never resolve to
+  // its live data no matter what name was captured. Fragments are the
+  // product's own plain-English name (same convention as every entry
+  // above); unlike reassurev2-insurance's "ReAssure2.0 Titanium+", no real
+  // captured name has been seen for any of these four specifically to
+  // verify the fragment against — flagging that honestly rather than
+  // implying it's been checked.
+  { slug: 'super-saver', any: ['super saver'] },
+  { slug: 'money-saver', any: ['money saver'] },
+  { slug: 'health-premia', any: ['health premia'] },
+  { slug: 'saral-suraksha-bima', any: ['saral suraksha bima'] },
 ];
 
 function resolveLiveNivaPlan(quotedNivaNames){
@@ -3888,9 +3910,8 @@ function applyStarLiveOverlay(liveRows){
   });
 }
 
-// Star has no captured-plan-name precedent in this codebase at all (no
-// BrowserView/real-page capture, no existing static column) — matched by
-// keyword like Niva/MC. More specific slugs (e.g. 'cardiac-care-platinum')
+// Star has no existing static column at all — matched by keyword like
+// Niva/MC. More specific slugs (e.g. 'cardiac-care-platinum')
 // are listed before their shorter substrings ('cardiac-care') so a
 // Platinum quote can't be swallowed by the base-tier entry. 'assure' alone
 // is included for star-assure since that's the literal example already
@@ -3915,8 +3936,24 @@ const STAR_SLUG_KEYWORDS = [
   { slug: 'opd-health-insurance', any: ['opd health', 'opd insurance'] },
   { slug: 'smart-health-pro', any: ['smart health pro'] },
   { slug: 'star-assure', any: ['star assure', 'assure'] },
-  { slug: 'super-star', any: ['super star', 'superstar'] },
+  // value-plus MUST be checked before the bare super-star fallback below —
+  // confirmed live this was a real bug, not just a naming coincidence:
+  // data/star_features_mapped.json's value-plus entry is genuinely a
+  // separately scraped page (starhealth.in/health-insurance/value-plus/,
+  // confirmed live via the site's own sitemap.xml) with real feature
+  // differences from super-star's own entry (e.g. Post Hospitalisation is
+  // "60 days" for Value Plus vs "180 days" for the bare Super Star page) —
+  // but with value-plus listed AFTER super-star, a real captured name like
+  // "Super Star Value Plus" always matched the bare 'super star' fragment
+  // first and never reached this entry at all. Preferred/Secure/Classic
+  // (Super Star's other real variants, confirmed live from the actual
+  // recommendations screen) have no such separate page — starhealth.in's
+  // sitemap has exactly one super-star URL and one value-plus URL, nothing
+  // else — so those three still fall through to the bare super-star entry;
+  // that part IS a genuine ceiling on what's publicly scrapeable, not a
+  // fixable ordering bug like this one was.
   { slug: 'value-plus', any: ['value plus'] },
+  { slug: 'super-star', any: ['super star', 'superstar'] },
   { slug: 'women-care', any: ['women care', 'woman care'] },
 ];
 
