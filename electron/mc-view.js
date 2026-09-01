@@ -378,9 +378,15 @@ function registerIpc() {
         if (String(verify.pincode) === String(params.pincode)) appliedFields.push('pincode');
         else errors.push({ field: 'pincode', reason: `expected "${params.pincode}", page shows "${verify.pincode}"` });
       }
-      appliedFields.push(...setup.applied);
+      const genders = Array.isArray(params && params.genders) ? params.genders : [];
+      (verify.genders || []).forEach((v, i) => {
+        if (genders[i] == null) return; // no gender was requested for this row — nothing to check
+        if (String(v) === String(genders[i])) appliedFields.push(`gender[${i}]`);
+        else errors.push({ field: `gender[${i}]`, reason: `expected "${genders[i]}", page shows "${v}"` });
+      });
+      appliedFields.push(...setup.applied.filter((f) => !f.startsWith('gender[')));
 
-      const result = { ok: errors.length === 0, appliedFields, errors, genderPending: true };
+      const result = { ok: errors.length === 0, appliedFields, errors };
       log(`mc-autofill result: ok=${result.ok} applied=${appliedFields.join(',')} errors=${JSON.stringify(errors)}`);
       return result;
     } catch (e) {

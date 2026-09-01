@@ -107,11 +107,21 @@ function buildStarSetupScript(params) {
     // age field that didn't exist before) — give the re-render a moment.
     await sleep(600);
 
-    // Ages are plain integer years for both adults (18-100) and children
-    // (0-25, "<1 year" itself is data-value="0") — confirmed live via each
-    // dropdown's real option list, not assumed from one sample.
+    // Ages are plain integer years for adults (18-100), children (0-25,
+    // "<1 year" itself is data-value="0"), and parents (18-75, same
+    // integer-year shape, confirmed live via #mui-component-select-
+    // parent1.age's own real option list once Number of Parents is set
+    // above) — confirmed live via each dropdown's real option list, not
+    // assumed from one sample.
+    const parentAges = Array.isArray(P.parentAges) ? P.parentAges : [];
     const adultAges = Array.isArray(P.adultAges) ? P.adultAges : [];
     const childAges = Array.isArray(P.childAges) ? P.childAges : [];
+    for (let i = 0; i < parents && i < parentAges.length; i++) {
+      const label = 'parent' + (i + 1) + '.age';
+      const age = Math.max(18, Math.min(75, parseInt(parentAges[i], 10) || 45));
+      if (await pickSelect('mui-component-select-' + label, age)) applied.push(label + '=' + age);
+      else errors.push({ field: label, reason: 'age option not found for ' + age });
+    }
     for (let i = 0; i < adults && i < adultAges.length; i++) {
       const label = 'adult' + (i + 1) + '.age';
       const age = Math.max(18, Math.min(100, parseInt(adultAges[i], 10) || 30));

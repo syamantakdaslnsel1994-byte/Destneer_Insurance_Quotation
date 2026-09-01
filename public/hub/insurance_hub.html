@@ -1750,12 +1750,25 @@ function mapNivaParamsToBasicDetails(params) {
   const m = params.members || {};
   const adultAges = m.adultAges || [];
   const childAges = m.childAges || [];
+  const adultRealDobs = m.adultDobs || [];
+  const childRealDobs = m.childDobs || [];
   const today = new Date();
   const dobFromAge = (age) => ({
     day: today.getDate(),
     month: today.getMonth() + 1,
     year: today.getFullYear() - (parseInt(age, 10) || 30),
   });
+  // The member form's own real DOB (yyyy-mm-dd, from buildParams()'s
+  // adultDobs/childDobs) is preferred whenever the operator actually
+  // entered one — only invents a date from age when they didn't, same
+  // fallback as before.
+  const resolveDob = (realDob, age) => {
+    const parts = String(realDob || '').split('-').map((n) => parseInt(n, 10));
+    if (parts.length === 3 && parts.every((n) => !isNaN(n))) {
+      return { year: parts[0], month: parts[1], day: parts[2] };
+    }
+    return dobFromAge(age);
+  };
   return {
     adults: Math.max(1, adultAges.length || m.adults || 1),
     kids: Math.max(0, childAges.length || m.children || 0),
@@ -1764,8 +1777,8 @@ function mapNivaParamsToBasicDetails(params) {
     // their own label, not one merged sequential list (electron/
     // niva_fill_script.js's findDobInputByLabel), so they're kept separate
     // here rather than concatenated.
-    adultDobs: adultAges.map(dobFromAge),
-    childDobs: childAges.map(dobFromAge),
+    adultDobs: adultAges.map((age, i) => resolveDob(adultRealDobs[i], age)),
+    childDobs: childAges.map((age, i) => resolveDob(childRealDobs[i], age)),
   };
 }
 
@@ -1876,6 +1889,28 @@ function mapStarParamsToBasicDetails(params) {
   // _planSel.star value buildParamsForProvider() already resolves for the
   // replica calculator), so that case is honored when present.
   const hasPED = members.some((mem) => mem.ped && mem.ped.trim() && mem.ped.trim().toLowerCase() !== 'nil');
+
+  // Star's real form has a genuine Parents (18-75) bucket separate from
+  // Adults (18-100) — confirmed live, "Number of Parents" and "Number of
+  // Adults" are independent counters, not one merged pool. buildParams()
+  // doesn't split members that way itself (Care/MC/Niva have no such
+  // concept, so adultAges/adultRels stay as one combined list for them),
+  // so the split happens here instead, using adultRels — already computed
+  // by buildParams(), parallel to adultAges — to pull out whoever's
+  // relation reads as a parent AND whose age actually fits Star's 18-75
+  // band (an 80-year-old "Father" doesn't fit Star's Parents field
+  // either, so stays a regular Adult rather than being force-fit).
+  const PARENT_RELATIONS = ['Father', 'Mother', 'Father-in-law', 'Mother-in-law'];
+  const allAdultAges = m.adultAges || [];
+  const allAdultRels = m.adultRels || [];
+  const parentAges = [];
+  const nonParentAdultAges = [];
+  allAdultAges.forEach((age, i) => {
+    const rel = allAdultRels[i] || '';
+    if (PARENT_RELATIONS.includes(rel) && age >= 18 && age <= 75) parentAges.push(age);
+    else nonParentAdultAges.push(age);
+  });
+
   return {
     pincode: params.pincode || '',
     product: /^(BPRD-\d+|REC\d+)$/.test(params.plan || '') ? params.plan : undefined,
@@ -1883,10 +1918,11 @@ function mapStarParamsToBasicDetails(params) {
     // concept) — only override the site's own Individual default when the
     // hub's own coverType explicitly says Family Floater.
     policyType: params.coverType === 'ff' ? 'FLOATER' : undefined,
-    parents: 0, // the hub has no "parent" member category distinct from adult
-    adults: Math.max(1, (m.adultAges || []).length || m.adults || 1),
+    parents: parentAges.length,
+    parentAges,
+    adults: Math.max(1, nonParentAdultAges.length || m.adults || 1),
     children: Math.max(0, (m.childAges || []).length || m.children || 0),
-    adultAges: m.adultAges || [],
+    adultAges: nonParentAdultAges,
     childAges: m.childAges || [],
     ped: hasPED ? 'yes' : 'no',
   };
@@ -2534,6 +2570,15 @@ function buildParams() {
       childRels : childMs.map(m=>m.relation||'').slice(0,4),
       adultGenders : adultMs.map(m=>m.gender==='Female'?'F':'M').slice(0,6),
       childGenders : childMs.map(m=>m.gender==='Female'?'F':'M').slice(0,4),
+      // The real Date of Birth string (yyyy-mm-dd, from the member form's
+      // own <input type="date">), parallel to adultAges/childAges — added
+      // so Niva's real DOB-driven form can receive the actual entered
+      // date instead of inventing one from age alone (see
+      // mapNivaParamsToBasicDetails()). '' when a member has no DOB
+      // entered yet; callers already have the age-derived fallback for
+      // that case.
+      adultDobs : adultMs.map(m=>m.dob||'').slice(0,6),
+      childDobs : childMs.map(m=>m.dob||'').slice(0,4),
     }
   };
 }
@@ -2652,10 +2697,17 @@ function mapMcParamsToRealForm(params) {
   const m = params.members || {};
   const adultAges = m.adultAges || [];
   const childAges = m.childAges || [];
+  const adultGenders = m.adultGenders || [];
+  const childGenders = m.childGenders || [];
   return {
     adults: Math.max(1, adultAges.length || m.adults || 1),
     kids: Math.max(0, childAges.length || m.children || 0),
     ages: adultAges.concat(childAges),
+    // Same adult-then-child concatenation order as `ages` above — confirmed
+    // live the page's own gender <select> for row i sits in the exact same
+    // Adult1/Adult2/Child1 row as the age input at index i, so one shared
+    // index lines both arrays up (see mc_fill_script.js).
+    genders: adultGenders.concat(childGenders).map((g) => (g === 'F' ? 'FEMALE' : 'MALE')),
     pincode: params.pincode || '',
   };
 }

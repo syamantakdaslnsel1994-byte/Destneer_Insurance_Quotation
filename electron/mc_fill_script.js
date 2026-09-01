@@ -1,7 +1,7 @@
 // Builds the page-JS snippets used to auto-fill a slice of ManipalCigna's
-// REAL live Sarvah entry form — Adults/Kids counts, per-member Age, and
-// Pincode. Deliberately does NOT touch Gender or click "Ok"/"GET QUOTES" —
-// see the note at the bottom of this file for why.
+// REAL live Sarvah entry form — Adults/Kids counts, per-member Age,
+// Gender, and Pincode. Still deliberately does NOT click "Ok"/"GET
+// QUOTES" — see the note at the bottom of this file for why.
 //
 // IMPORTANT ARCHITECTURE NOTE: the Age and Pincode fields cannot be filled
 // via injected-JS synthetic events (`el.value = x; el.dispatchEvent(new
@@ -59,6 +59,27 @@ function buildMcSetupScript(params) {
     trigger.click();
     await sleep(1500); // panel open + settle — confirmed live this needs to be generous, not the 600ms tried earlier
 
+    // Gender: confirmed live (unlike Age/Pincode) a pure synthetic set holds
+    // on this page — native property setter + a dispatched 'change' event,
+    // no trusted sendInputEvent needed. Confirmed live for MULTIPLE members
+    // in one panel, not just one: select index i sits in the same Adult1/
+    // Adult2/Child1 row as the age input at index i, so P.genders lines up
+    // with the age fields index-for-index (mapMcParamsToRealForm() builds
+    // it the same adults-then-kids order as P.ages).
+    const genders = Array.isArray(P.genders) ? P.genders : [];
+    if (genders.length) {
+      const selects = Array.from(document.querySelectorAll('select.form-select')).filter((e) => e.offsetParent);
+      const nativeSetter = Object.getOwnPropertyDescriptor(window.HTMLSelectElement.prototype, 'value').set;
+      genders.forEach((g, i) => {
+        const sel = selects[i];
+        if (!sel) { errors.push({ field: 'gender[' + i + ']', reason: 'select not found' }); return; }
+        const value = g === 'FEMALE' ? 'FEMALE' : g === 'OTHER' ? 'OTHER' : 'MALE';
+        nativeSetter.call(sel, value);
+        sel.dispatchEvent(new Event('change', { bubbles: true }));
+        applied.push('gender[' + i + ']=' + value);
+      });
+    }
+
     const ageFieldCount = Array.from(document.querySelectorAll('input[placeholder="Enter Age"]')).filter((e) => e.offsetParent).length;
     return { ok: true, applied, errors, ageFieldCount };
   } catch (e) {
@@ -101,19 +122,30 @@ function buildMcVerifyScript(ageCount) {
   return `
 (() => {
   const ages = Array.from(document.querySelectorAll('input[placeholder="Enter Age"]')).filter((e) => e.offsetParent).map((e) => e.value);
+  const genders = Array.from(document.querySelectorAll('select.form-select')).filter((e) => e.offsetParent).map((e) => e.value);
   const pin = document.querySelector('input[placeholder="Enter Pincode"]');
-  return { ages, pincode: pin ? pin.value : null };
+  return { ages, genders, pincode: pin ? pin.value : null };
 })()`;
 }
 
 module.exports = { buildMcSetupScript, buildMcAgeRectScript, buildMcPincodeRectScript, buildMcVerifyScript };
 
-// Gender and the "Ok"/"GET QUOTES" buttons are deliberately left untouched:
-// - Gender has never reliably survived automation on this page across four
-//   different techniques tried this session.
-// - A live test found clicking "Ok" automatically WHILE Gender is still
-//   empty triggers the page's own validation error toast ("Please provide
-//   required information") and, as a side effect, silently clears the
+// Gender WAS left untouched across four earlier attempts this session, all
+// of which generalized the Age/Pincode finding above ("synthetic writes get
+// silently reverted on this page") to the whole AGE & Gender panel without
+// separately testing the Gender control itself. Re-verified live: Gender is
+// a plain native `<select class="form-select form-select-sm">`, not the
+// same kind of validated controlled text input Age/Pincode are — a pure
+// synthetic set (native property setter + dispatched 'change' event, no
+// trusted sendInputEvent) sets it and it holds, confirmed live for multiple
+// members in one panel. See the Gender block in buildMcSetupScript() above.
+//
+// The "Ok"/"GET QUOTES" buttons are still deliberately left unclicked:
+// - A live test found clicking "Ok" automatically WHILE Gender was still
+//   empty triggered the page's own validation error toast ("Please provide
+//   required information") and, as a side effect, silently cleared the
 //   first age field back to blank — actively destructive, not just a
-//   no-op. So the panel is left open with Age/Pincode filled in and Gender
-//   dropdowns visible, for the operator to complete and close themselves.
+//   no-op. Gender no longer being empty removes the specific trigger for
+//   that failure, but final submission is still left to the operator by
+//   design, not just because it was once unsafe — this pass didn't revisit
+//   that call.
