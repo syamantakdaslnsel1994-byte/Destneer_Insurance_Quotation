@@ -179,9 +179,9 @@ html,body{height:100%;overflow:hidden;font-family:'Inter',system-ui,sans-serif;b
 .inp-sm:focus{outline:none;border-color:#3b82f6}
 .inp-sm::placeholder{color:#475569}
 .del-member{
-  position:absolute;top:8px;right:8px;width:20px;height:20px;
+  flex-shrink:0;width:20px;height:20px;
   background:transparent;border:none;cursor:pointer;
-  color:#4b5563;font-size:14px;display:flex;align-items:center;justify-content:center;
+  color:#94a3b8;font-size:14px;display:flex;align-items:center;justify-content:center;
   border-radius:4px;transition:all .15s;
 }
 .del-member:hover{background:#7f1d1d;color:#fca5a5}
@@ -761,29 +761,114 @@ html,body{height:100%;overflow:hidden;font-family:'Inter',system-ui,sans-serif;b
     <div class="right-content">
 
       <!-- Care Health -->
-      <div class="r-panel active" id="rp-care">
-        <div class="calc-frame-wrap" style="height:100%">
+      <div class="r-panel active" id="rp-care" style="display:flex;flex-direction:column">
+        <div id="care-fallback-banner" style="display:none;background:#fff3cd;color:#664d03;padding:8px 14px;font-size:13px;border-bottom:1px solid #ffe69c">
+          Live Care page unavailable — showing offline calculator.
+        </div>
+        <!-- Sits above care-frame-wrap, so it's never covered by the
+             BrowserView (that's positioned to care-frame-wrap's own rect,
+             not this whole panel). Explicit add-to-comparison, matching
+             how Niva/ManipalCigna/Star Health already work — deliberately
+             NOT automatic, since auto-adding on every add-on toggle while
+             the operator is just exploring pricing created a flood of
+             near-duplicate comparison rows. -->
+        <div id="care-add-toolbar" style="display:flex;align-items:center;gap:10px;padding:6px 14px;background:#0f172a;border-bottom:1px solid #1e293b;flex-shrink:0">
+          <button id="care-add-btn" onclick="addCareToComparison()" disabled
+            style="padding:6px 14px;background:#065f46;color:#6ee7b7;border:1px solid #059669;border-radius:7px;font-size:11.5px;font-weight:600;cursor:pointer;opacity:.5">
+            + Add to Comparison
+          </button>
+          <span id="care-add-hint" style="font-size:11px;color:#94a3b8">Calculate a premium on the page below first</span>
+        </div>
+        <div class="calc-frame-wrap" id="care-frame-wrap" style="flex:1;min-height:0">
           <iframe class="calc-iframe" src="http://localhost:3005" loading="lazy"></iframe>
         </div>
       </div>
 
       <!-- Niva Bupa -->
-      <div class="r-panel" id="rp-niva">
-        <div class="calc-frame-wrap" style="height:100%">
+      <div class="r-panel" id="rp-niva" style="display:flex;flex-direction:column">
+        <div id="niva-fallback-banner" style="display:none;background:#fff3cd;color:#664d03;padding:8px 14px;font-size:13px;border-bottom:1px solid #ffe69c">
+          Live Niva page unavailable — showing offline calculator.
+        </div>
+        <!-- Same explicit add-to-comparison pattern as Care Health — auto-
+             fill only covers Step 1 (Basic Details: member counts, DOB —
+             see electron/niva_fill_script.js), so the operator finishes
+             Steps 2-4 by hand on the real page, and the amount shown is
+             what the generic result-detector last found there. -->
+        <div id="niva-add-toolbar" style="display:flex;align-items:center;gap:10px;padding:6px 14px;background:#0f172a;border-bottom:1px solid #1e293b;flex-shrink:0">
+          <button id="niva-add-btn" onclick="addNivaToComparison()" disabled
+            style="padding:6px 14px;background:#065f46;color:#6ee7b7;border:1px solid #059669;border-radius:7px;font-size:11.5px;font-weight:600;cursor:pointer;opacity:.5">
+            + Add to Comparison
+          </button>
+          <span id="niva-add-hint" style="font-size:11px;color:#94a3b8">Calculate a premium on the page below first</span>
+        </div>
+        <div class="calc-frame-wrap" id="niva-frame-wrap" style="flex:1;min-height:0">
           <iframe class="calc-iframe" src="http://localhost:3002" loading="lazy"></iframe>
         </div>
       </div>
 
       <!-- ManipalCigna -->
-      <div class="r-panel" id="rp-mc">
-        <div class="calc-frame-wrap" style="height:100%">
+      <div class="r-panel" id="rp-mc" style="display:flex;flex-direction:column">
+        <div id="mc-fallback-banner" style="display:none;background:#fff3cd;color:#664d03;padding:8px 14px;font-size:13px;border-bottom:1px solid #ffe69c">
+          Live ManipalCigna page unavailable — showing offline calculator.
+        </div>
+        <!-- MC's real flow is genuinely multi-page (product picker -> a
+             per-product entry form -> presumably a results page beyond
+             that) and the BrowserView has no browser chrome of its own —
+             confirmed the operator had no way back once they navigated
+             forward. Back/Forward drive the real page's own navigation
+             history (electron/mc-view.js); Home always returns to the
+             product picker regardless of how deep they went. -->
+        <div id="mc-nav-toolbar" style="display:flex;align-items:center;gap:6px;padding:6px 14px;background:#0f172a;border-bottom:1px solid #1e293b;flex-shrink:0">
+          <button id="mc-nav-back" onclick="window.mcView && window.mcView.goBack()" disabled
+            title="Back" style="padding:5px 10px;background:#1e293b;color:#93c5fd;border:1px solid #334155;border-radius:6px;font-size:11.5px;font-weight:600;cursor:pointer;opacity:.5">
+            ← Back
+          </button>
+          <button id="mc-nav-forward" onclick="window.mcView && window.mcView.goForward()" disabled
+            title="Forward" style="padding:5px 10px;background:#1e293b;color:#93c5fd;border:1px solid #334155;border-radius:6px;font-size:11.5px;font-weight:600;cursor:pointer;opacity:.5">
+            Forward →
+          </button>
+          <button id="mc-nav-home" onclick="window.mcView && window.mcView.goHome()"
+            title="Back to the product picker" style="padding:5px 10px;background:#1e293b;color:#93c5fd;border:1px solid #334155;border-radius:6px;font-size:11.5px;font-weight:600;cursor:pointer">
+            ⌂ Product List
+          </button>
+        </div>
+        <!-- Same explicit add-to-comparison pattern as Care Health — the
+             operator fills MC's own real page by hand (DOM automation on
+             it proved unreliable across three separate techniques this
+             session), and the amount shown is what the generic
+             result-detector last found on the real page, so the operator
+             can confirm it before it's added. -->
+        <div id="mc-add-toolbar" style="display:flex;align-items:center;gap:10px;padding:6px 14px;background:#0f172a;border-bottom:1px solid #1e293b;flex-shrink:0">
+          <button id="mc-add-btn" onclick="addMcToComparison()" disabled
+            style="padding:6px 14px;background:#065f46;color:#6ee7b7;border:1px solid #059669;border-radius:7px;font-size:11.5px;font-weight:600;cursor:pointer;opacity:.5">
+            + Add to Comparison
+          </button>
+          <span id="mc-add-hint" style="font-size:11px;color:#94a3b8">Get a quote on the page below first</span>
+        </div>
+        <div class="calc-frame-wrap" id="mc-frame-wrap" style="flex:1;min-height:0">
           <iframe class="calc-iframe" src="http://localhost:3003/multi" loading="lazy"></iframe>
         </div>
       </div>
 
       <!-- Star Health -->
-      <div class="r-panel" id="rp-star">
-        <div class="calc-frame-wrap" style="height:100%">
+      <div class="r-panel" id="rp-star" style="display:flex;flex-direction:column">
+        <div id="star-fallback-banner" style="display:none;background:#fff3cd;color:#664d03;padding:8px 14px;font-size:13px;border-bottom:1px solid #ffe69c">
+          Live Star Health page unavailable — showing offline calculator.
+        </div>
+        <!-- Same explicit add-to-comparison pattern as Care/Niva, but the
+             button stays inert here — auto-fill and result capture aren't
+             built yet (electron/star-view.js's real portal appears to sit
+             behind a login wall with no confirmed guest path), so nothing
+             ever calls setProvStatus('star','ready') or enables this
+             button today. Wired now so it's ready once that's resolved. -->
+        <div id="star-add-toolbar" style="display:flex;align-items:center;gap:10px;padding:6px 14px;background:#0f172a;border-bottom:1px solid #1e293b;flex-shrink:0">
+          <button id="star-add-btn" onclick="addStarToComparison()" disabled
+            style="padding:6px 14px;background:#065f46;color:#6ee7b7;border:1px solid #059669;border-radius:7px;font-size:11.5px;font-weight:600;cursor:pointer;opacity:.5">
+            + Add to Comparison
+          </button>
+          <span id="star-add-hint" style="font-size:11px;color:#94a3b8">Calculate a premium on the page below first</span>
+        </div>
+        <div class="calc-frame-wrap" id="star-frame-wrap" style="flex:1;min-height:0">
           <iframe class="calc-iframe" src="http://localhost:3004" loading="lazy"></iframe>
         </div>
       </div>
@@ -1209,6 +1294,17 @@ function switchRight(key, btn) {
   document.querySelectorAll('.rt').forEach(b=>b.classList.remove('active'));
   document.getElementById('rp-'+key).classList.add('active');
   if(btn) btn.classList.add('active');
+  // Care Health's and ManipalCigna's real-page BrowserViews (see
+  // electron/care-view.js, electron/mc-view.js) are native views layered
+  // on top of this window, not part of the DOM — each has to be explicitly
+  // shown/hidden in step with the tab switch, or it'd stay visible on top
+  // of whichever other tab the operator switches to. Routed through
+  // updateCareVisibility()/updateMcVisibility() (not a direct setActive
+  // call here) so tab-state and modal-state share one source of truth.
+  if (window.careView) updateCareVisibility();
+  if (window.mcView) updateMcVisibility();
+  if (window.nivaView) updateNivaVisibility();
+  if (window.starView) updateStarVisibility();
   // Step pill updates
   if(CALC_PANELS.includes(key)) {
     document.getElementById('sp-3').classList.add('active');
@@ -1226,6 +1322,574 @@ function switchRight(key, btn) {
     document.querySelectorAll('.step-pill').forEach(p=>p.classList.remove('active'));
     histRefresh();
   }
+}
+
+// ════════════════════════════════════════════════════════════════
+//  CARE HEALTH — real-page BrowserView integration (electron/care-view.js)
+// ════════════════════════════════════════════════════════════════
+// Everything here is a no-op when window.careView doesn't exist — e.g. when
+// this page is opened in a plain browser for dev, or before the preload
+// attaches it. The Care panel just falls back to its replica iframe, same
+// as it always has.
+function reportCareBounds() {
+  if (!window.careView) return;
+  const wrap = document.getElementById('care-frame-wrap');
+  if (!wrap) return;
+  // getBoundingClientRect() returns a DOMRect, whose x/y/width/height are
+  // inherited getters, not own properties — confirmed live that sending
+  // one straight through contextBridge/IPC serializes to
+  // {x:null,y:null,width:null,height:null}, not the real numbers. Copy
+  // into a plain object first so the actual values survive the crossing.
+  const r = wrap.getBoundingClientRect();
+  window.careView.reportBounds({ x: r.x, y: r.y, width: r.width, height: r.height });
+}
+
+// electron.BrowserView always paints ABOVE this page's own DOM content —
+// it isn't part of the page's stacking context at all, so no z-index can
+// put a modal on top of it. Confirmed live: the "Pick Plan Names" dialog
+// rendered visually behind the Care panel. These are the 3 full-screen
+// overlay modals in this file (two different toggle-class conventions —
+// account modal uses "show", the other two use "open").
+const CARE_MODAL_OVERLAY_IDS = ['acct-overlay', 'pcm-overlay', 'psel-overlay'];
+function anyModalOpen() {
+  return CARE_MODAL_OVERLAY_IDS.some(id => {
+    const el = document.getElementById(id);
+    return el && (el.classList.contains('show') || el.classList.contains('open'));
+  });
+}
+// Single source of truth for whether the Care BrowserView should be
+// showing — driven by BOTH tab state and modal state, called from both,
+// so the two can never fight each other via independent setActive calls.
+function updateCareVisibility() {
+  if (!window.careView) return;
+  const careTabActive = document.getElementById('rp-care').classList.contains('active');
+  const visible = careTabActive && !anyModalOpen();
+  window.careView.setActive(visible);
+  if (visible) reportCareBounds();
+}
+
+// Same idea, for the ManipalCigna BrowserView (electron/mc-view.js).
+function reportMcBounds() {
+  if (!window.mcView) return;
+  const wrap = document.getElementById('mc-frame-wrap');
+  if (!wrap) return;
+  const r = wrap.getBoundingClientRect();
+  window.mcView.reportBounds({ x: r.x, y: r.y, width: r.width, height: r.height });
+}
+function updateMcVisibility() {
+  if (!window.mcView) return;
+  const mcTabActive = document.getElementById('rp-mc').classList.contains('active');
+  const visible = mcTabActive && !anyModalOpen();
+  window.mcView.setActive(visible);
+  if (visible) reportMcBounds();
+}
+
+// Same idea, for the Niva Bupa BrowserView (electron/niva-view.js).
+function reportNivaBounds() {
+  if (!window.nivaView) return;
+  const wrap = document.getElementById('niva-frame-wrap');
+  if (!wrap) return;
+  const r = wrap.getBoundingClientRect();
+  window.nivaView.reportBounds({ x: r.x, y: r.y, width: r.width, height: r.height });
+}
+function updateNivaVisibility() {
+  if (!window.nivaView) return;
+  const nivaTabActive = document.getElementById('rp-niva').classList.contains('active');
+  const visible = nivaTabActive && !anyModalOpen();
+  window.nivaView.setActive(visible);
+  if (visible) reportNivaBounds();
+}
+
+// Same idea, for the Star Health BrowserView (electron/star-view.js).
+function reportStarBounds() {
+  if (!window.starView) return;
+  const wrap = document.getElementById('star-frame-wrap');
+  if (!wrap) return;
+  const r = wrap.getBoundingClientRect();
+  window.starView.reportBounds({ x: r.x, y: r.y, width: r.width, height: r.height });
+}
+function updateStarVisibility() {
+  if (!window.starView) return;
+  const starTabActive = document.getElementById('rp-star').classList.contains('active');
+  const visible = starTabActive && !anyModalOpen();
+  window.starView.setActive(visible);
+  if (visible) reportStarBounds();
+}
+
+// Shared by both views — a modal opening/closing has to hide/reveal
+// whichever real-page view is currently showing, not just one of them.
+// Attached once, unconditionally (not gated on either view existing),
+// deferred to DOMContentLoaded for the same reason the original Care-only
+// version had to be: this script tag sits BEFORE #pcm-overlay (~line 4342)
+// and #psel-overlay (~line 4911) in the document, so looking them up
+// synchronously during HTML parsing would silently find nothing.
+function updateEmbeddedViewsVisibility() {
+  if (window.careView) updateCareVisibility();
+  if (window.mcView) updateMcVisibility();
+  if (window.nivaView) updateNivaVisibility();
+  if (window.starView) updateStarVisibility();
+}
+const attachEmbeddedModalObservers = () => {
+  CARE_MODAL_OVERLAY_IDS.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) new MutationObserver(updateEmbeddedViewsVisibility).observe(el, { attributes: true, attributeFilter: ['class'] });
+    else console.warn('[EmbeddedView] modal overlay #' + id + ' not found — visibility won\'t react to it');
+  });
+};
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', attachEmbeddedModalObservers);
+} else {
+  attachEmbeddedModalObservers(); // document already finished parsing (e.g. script ran late)
+}
+
+if (window.careView) {
+  // Care Health is the default active tab (class="r-panel active" on
+  // #rp-care in the static HTML) — switchRight('care', ...) is what
+  // normally calls setActive(true), but that only fires when a tab is
+  // actually CLICKED. Nothing clicks the Care tab on a plain fresh
+  // launch, so without this the BrowserView never attaches and the
+  // operator just sees the replica iframe sitting underneath it.
+  // Report bounds BEFORE activating — these are two independent IPC
+  // messages, and if activation is processed first, the BrowserView
+  // attaches with no bounds set at all (Electron defaults a BrowserView
+  // to zero size until setBounds is called), invisible until whatever
+  // bounds report eventually lands. main process also asks for a fresh
+  // one via care-request-bounds as a backstop either way.
+  reportCareBounds();
+  updateCareVisibility();
+  window.careView.onRequestBounds(reportCareBounds);
+
+  let resizeTimer = null;
+  const wrap = document.getElementById('care-frame-wrap');
+  if (wrap && window.ResizeObserver) {
+    new ResizeObserver(() => {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(reportCareBounds, 50);
+    }).observe(wrap);
+  }
+  window.addEventListener('resize', () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(reportCareBounds, 50);
+  });
+
+  const banner = document.getElementById('care-fallback-banner');
+  window.careView.onStatus((status) => {
+    if (banner) banner.style.display = (status === 'unreachable' || status === 'suspect') ? '' : 'none';
+    setProvStatus('care', status === 'ready' ? 'idle' : (status === 'loading' ? 'loading' : 'failed'));
+  });
+
+  // Fires for BOTH the auto-fill path and the operator finishing a quote
+  // manually on Care's real page without auto-fill — see care-view.js.
+  // Deliberately does NOT call addQuote() itself — it used to, but that
+  // meant every add-on toggled while the operator was just exploring
+  // pricing added a new (near-duplicate) comparison row. It now only
+  // caches the latest captured state and arms the explicit "Add to
+  // Comparison" button below — the operator decides when a result is
+  // the one worth keeping, same as the other 3 insurers' own buttons.
+  window.careView.onResult((captured) => {
+    const btn = document.getElementById('care-add-btn');
+    const hint = document.getElementById('care-add-hint');
+    if (!captured || !captured.ok) {
+      _careLastCaptured = null;
+      if (btn) { btn.disabled = true; btn.style.opacity = '.5'; }
+      if (hint) hint.textContent = 'Calculate a premium on the page below first';
+      setProvStatus('care', 'idle');
+      return;
+    }
+    _careLastCaptured = captured;
+    if (btn) { btn.disabled = false; btn.style.opacity = '1'; }
+    if (hint) hint.textContent = 'Ready — premium ₹' + (captured.grandTotal || captured.discounted || '—');
+    setProvStatus('care', 'ready');
+  });
+}
+
+// Cached by the onResult listener above; used (not re-captured) when the
+// operator clicks "+ Add to Comparison" — deliberate, explicit action.
+let _careLastCaptured = null;
+function addCareToComparison() {
+  const captured = _careLastCaptured;
+  if (!captured || !captured.ok) return;
+  // Prefer the plan actually reflected on Care's real page right now — its
+  // own hidden plan_id field, already parsed by parsePremium (see
+  // server/care_scrapers.js) and carried through onResult as
+  // captured.planId — over the hub's pending-params label. The
+  // pending-params label only ever gets set by "Pick Plan Names & Fill"
+  // (see fillCalculator()); it stays blank if the operator never used
+  // that flow, and goes stale if they picked/changed the plan directly on
+  // the embedded real page afterward — confirmed to be exactly why
+  // planName was showing up blank in the comparison table.
+  const planFromPage = captured.planId && CARE_PLAN_META[String(captured.planId)];
+  const planName = (planFromPage && planFromPage.name)
+    || (_pendingParams.care && _pendingParams.care.planLabel)
+    || '—';
+  // grandTotal (the real page's own "Total Premium", after add-ons) —
+  // NOT discounted (the base premium radio button, before add-ons).
+  // Confirmed live: these are two genuinely different numbers on Care's
+  // real page, and the earlier version of this code had the priority
+  // backwards, capturing the wrong (lower, pre-add-on) figure.
+  // Same fix as planName just above, same reason: captured.selectedSI
+  // (Care's own field_2 hidden value, in Lakhs — e.g. "10") reflects the
+  // real page's current SI slider position, which is what actually
+  // determines the premium just captured. The hub's pending-params value
+  // only exists if "Pick Plan Names & Fill" was used and goes stale the
+  // moment the operator changes the slider on the real page directly —
+  // confirmed via the Excel report's own warning ("sum insured — is not
+  // one of the report bands") that this was blank for exactly that reason.
+  const sumAssured = captured.selectedSI || (_pendingParams.care && _pendingParams.care.si) || '—';
+  addQuote({
+    company: 'Care Health',
+    planName,
+    sumAssured,
+    premium: captured.grandTotal || captured.discounted || '—',
+    addons: (captured.addons || []).filter(a => a.checked).map(a => a.label).join(', '),
+    coverType: (_pendingParams.care && _pendingParams.care.coverType) || '',
+    tenure: (_pendingParams.care && _pendingParams.care.tenure) || '',
+  });
+}
+
+// ════════════════════════════════════════════════════════════════
+//  MANIPALCIGNA — real-page BrowserView integration (electron/mc-view.js)
+// ════════════════════════════════════════════════════════════════
+// No auto-fill here (unlike Care) — the operator fills MC's real
+// quick-quote SPA by hand; this only shows/hides the view in step with
+// the MC tab and captures whatever the generic result-detector finds.
+if (window.mcView) {
+  reportMcBounds();
+  updateMcVisibility();
+  window.mcView.onRequestBounds(reportMcBounds);
+
+  let mcResizeTimer = null;
+  const mcWrap = document.getElementById('mc-frame-wrap');
+  if (mcWrap && window.ResizeObserver) {
+    new ResizeObserver(() => {
+      clearTimeout(mcResizeTimer);
+      mcResizeTimer = setTimeout(reportMcBounds, 50);
+    }).observe(mcWrap);
+  }
+  window.addEventListener('resize', () => {
+    clearTimeout(mcResizeTimer);
+    mcResizeTimer = setTimeout(reportMcBounds, 50);
+  });
+
+  const mcBanner = document.getElementById('mc-fallback-banner');
+  window.mcView.onStatus((status) => {
+    if (mcBanner) mcBanner.style.display = (status === 'unreachable' || status === 'suspect') ? '' : 'none';
+    setProvStatus('mc', status === 'ready' ? 'idle' : (status === 'loading' ? 'loading' : 'failed'));
+  });
+
+  // Back/Forward reflect the real page's own navigation history — main
+  // process pushes canGoBack/canGoForward on every navigation (including
+  // the picker's client-side SPA route changes, not just full loads).
+  window.mcView.onNavState((state) => {
+    const back = document.getElementById('mc-nav-back');
+    const fwd = document.getElementById('mc-nav-forward');
+    if (back) { back.disabled = !state.canGoBack; back.style.opacity = state.canGoBack ? '1' : '.5'; }
+    if (fwd) { fwd.disabled = !state.canGoForward; fwd.style.opacity = state.canGoForward ? '1' : '.5'; }
+  });
+
+  // The detector is generic (scans rendered text for a Rupee amount near a
+  // "premium" keyword — see mc_result_script.js) rather than a per-product
+  // selector, since MC's real results-page shape hasn't been verified for
+  // all 8 products. The hint deliberately shows exactly what was detected
+  // (amount + surrounding text) so the operator can judge it before
+  // clicking Add, instead of trusting a possibly-wrong generic match
+  // silently.
+  window.mcView.onResult((captured) => {
+    const btn = document.getElementById('mc-add-btn');
+    const hint = document.getElementById('mc-add-hint');
+    if (!captured || !captured.ok) {
+      _mcLastCaptured = null;
+      if (btn) { btn.disabled = true; btn.style.opacity = '.5'; }
+      if (hint) hint.textContent = 'Get a quote on the page below first';
+      setProvStatus('mc', 'idle');
+      return;
+    }
+    _mcLastCaptured = captured;
+    if (btn) { btn.disabled = false; btn.style.opacity = '1'; }
+    // Surfaces everything the generic detectors found (plan name, SI,
+    // tenure, not just premium) so the operator can catch a wrong guess
+    // before it lands in the comparison table — same transparency
+    // principle the premium hint already used.
+    if (hint) {
+      const bits = ['Detected ' + captured.amount + ' near "' + captured.keyword + '"'];
+      if (captured.planName) bits.push('Plan: ' + captured.planName);
+      if (captured.selectedSI) bits.push('SI: ' + captured.selectedSI);
+      if (captured.tenure) bits.push('Tenure: ' + captured.tenure);
+      hint.textContent = bits.join(' · ') + ' — check it, then click Add';
+    }
+    setProvStatus('mc', 'ready');
+  });
+}
+
+// Cached by the onResult listener above; used (not re-captured) when the
+// operator clicks "+ Add to Comparison" — deliberate, explicit action,
+// same pattern as Care Health.
+let _mcLastCaptured = null;
+function addMcToComparison() {
+  const captured = _mcLastCaptured;
+  if (!captured || !captured.ok) return;
+  addQuote({
+    company: 'ManipalCigna',
+    // planName is document.title with recognized boilerplate stripped
+    // (see cleanPlanName() in mc_result_script.js) — falls back to the
+    // raw title if cleanup ever produces an empty string, and to '—' if
+    // neither is available, rather than showing a blank row silently.
+    planName: captured.planName || captured.pageTitle || '—',
+    // Raw snippet from the real page (e.g. "10 Lacs", "₹10,00,000") —
+    // parseSIRupees() (below) already parses every one of these formats
+    // for the other 3 insurers, so no extra parsing is needed here. Was
+    // hardcoded to '—' before, which is why the Excel report flagged every
+    // ManipalCigna quote as having no valid sum-insured band.
+    sumAssured: captured.selectedSI || '—',
+    premium: captured.amount || '—',
+    // Selected add-ons, generically detected (checked checkboxes + their
+    // Ant-Design label text) alongside the premium — see
+    // mc_result_script.js. Was hardcoded to '' before, which is why the
+    // comparison table never showed any add-ons for ManipalCigna at all.
+    addons: (captured.addons || []).join(', '),
+    coverType: '',
+    // Generic keyword-plus-"N Year(s)"-pattern detector — see
+    // collectTenure() in mc_result_script.js. Was hardcoded to '' before,
+    // so tenure never showed for any ManipalCigna quote.
+    tenure: captured.tenure || '',
+  });
+}
+
+// ════════════════════════════════════════════════════════════════
+//  NIVA BUPA — real-page BrowserView integration (electron/niva-view.js)
+// ════════════════════════════════════════════════════════════════
+// Auto-fill covers only Step 1 (Basic Details: member counts, DOB — see
+// electron/niva_fill_script.js); the operator finishes Steps 2-4 by hand,
+// and the generic result-detector (niva_result_script.js, modeled on MC's
+// own — no confirmed Plan Summary selector yet, same situation MC started
+// in) is what "+ Add to Comparison" reads from.
+if (window.nivaView) {
+  reportNivaBounds();
+  updateNivaVisibility();
+  window.nivaView.onRequestBounds(reportNivaBounds);
+
+  let nivaResizeTimer = null;
+  const nivaWrap = document.getElementById('niva-frame-wrap');
+  if (nivaWrap && window.ResizeObserver) {
+    new ResizeObserver(() => {
+      clearTimeout(nivaResizeTimer);
+      nivaResizeTimer = setTimeout(reportNivaBounds, 50);
+    }).observe(nivaWrap);
+  }
+  window.addEventListener('resize', () => {
+    clearTimeout(nivaResizeTimer);
+    nivaResizeTimer = setTimeout(reportNivaBounds, 50);
+  });
+
+  const nivaBanner = document.getElementById('niva-fallback-banner');
+  window.nivaView.onStatus((status) => {
+    if (nivaBanner) nivaBanner.style.display = (status === 'unreachable' || status === 'suspect') ? '' : 'none';
+    setProvStatus('niva', status === 'ready' ? 'idle' : (status === 'loading' ? 'loading' : 'failed'));
+  });
+
+  window.nivaView.onResult((captured) => {
+    const btn = document.getElementById('niva-add-btn');
+    const hint = document.getElementById('niva-add-hint');
+    if (!captured || !captured.ok) {
+      _nivaLastCaptured = null;
+      if (btn) { btn.disabled = true; btn.style.opacity = '.5'; }
+      if (hint) hint.textContent = 'Calculate a premium on the page below first';
+      setProvStatus('niva', 'idle');
+      return;
+    }
+    _nivaLastCaptured = captured;
+    if (btn) { btn.disabled = false; btn.style.opacity = '1'; }
+    if (hint) {
+      hint.textContent = 'Detected ' + captured.amount + (captured.term ? ' (' + captured.term + ')' : '')
+        + (captured.planName ? ' · Plan: ' + captured.planName : '')
+        + (captured.sumInsured ? ' · SI: ' + captured.sumInsured : '')
+        + (captured.addons ? ' · Add-ons: ' + captured.addons : '')
+        + ' — check it, then click Add';
+    }
+    setProvStatus('niva', 'ready');
+  });
+}
+
+let _nivaLastCaptured = null;
+function addNivaToComparison() {
+  const captured = _nivaLastCaptured;
+  if (!captured || !captured.ok) return;
+  addQuote({
+    company: 'Niva Bupa',
+    planName: captured.planName || captured.pageTitle || '—',
+    sumAssured: captured.sumInsured || '—',
+    premium: captured.amount || '—',
+    addons: captured.addons || '',
+    coverType: '',
+    tenure: captured.term || '',
+  });
+}
+
+// Step-1-only auto-fill entry point (member counts + DOB — see
+// electron/niva_fill_script.js). Called from the same send-paths
+// driveCareRealPage()/driveMcRealPage() already are.
+function driveNivaRealPage(params) {
+  if (!window.nivaView) return;
+  window.nivaView.autoFill(mapNivaParamsToBasicDetails(params)).then((result) => {
+    if (!result || !result.ok) {
+      console.warn('[Niva] auto-fill on real page had errors:', result && result.errors);
+    }
+  });
+}
+
+// Converts the hub's generic set-params shape into what
+// electron/niva_fill_script.js expects — adults/kids counts plus a DOB
+// {day,month,year} per member, adults then kids (matching the real page's
+// own row order — confirmed live: "Adult1 DOB", then "Child1 DOB" etc.).
+// The hub only stores each member's AGE, not a birth date, so DOB is
+// derived from age via today's date — an approximation (the exact day/
+// month within the birth year is invented, only the resulting age is
+// guaranteed correct), same limitation as any age-only input would have
+// against a real DOB-driven form.
+function mapNivaParamsToBasicDetails(params) {
+  const m = params.members || {};
+  const adultAges = m.adultAges || [];
+  const childAges = m.childAges || [];
+  const today = new Date();
+  const dobFromAge = (age) => ({
+    day: today.getDate(),
+    month: today.getMonth() + 1,
+    year: today.getFullYear() - (parseInt(age, 10) || 30),
+  });
+  return {
+    adults: Math.max(1, adultAges.length || m.adults || 1),
+    kids: Math.max(0, childAges.length || m.children || 0),
+    // Niva's real page renders fixed Adult1-4 / Child1-5 DOB slots at all
+    // times (confirmed live) — adult and child dates must be targeted by
+    // their own label, not one merged sequential list (electron/
+    // niva_fill_script.js's findDobInputByLabel), so they're kept separate
+    // here rather than concatenated.
+    adultDobs: adultAges.map(dobFromAge),
+    childDobs: childAges.map(dobFromAge),
+  };
+}
+
+// ════════════════════════════════════════════════════════════════
+//  STAR HEALTH — real-page BrowserView integration (electron/star-view.js)
+// ════════════════════════════════════════════════════════════════
+// Embed only for now — auto-fill and result capture aren't built yet.
+// Star's real portal (atompro.starhealth.in) appears to sit behind a
+// login wall with no confirmed guest path (unlike Niva's "GUEST USER"
+// bypass), so star-view.js's autoFill() always resolves { ok: false }
+// and nothing ever sends a 'star-result' — onResult below is wired for
+// parity but will never actually fire until that's resolved.
+if (window.starView) {
+  reportStarBounds();
+  updateStarVisibility();
+  window.starView.onRequestBounds(reportStarBounds);
+
+  let starResizeTimer = null;
+  const starWrap = document.getElementById('star-frame-wrap');
+  if (starWrap && window.ResizeObserver) {
+    new ResizeObserver(() => {
+      clearTimeout(starResizeTimer);
+      starResizeTimer = setTimeout(reportStarBounds, 50);
+    }).observe(starWrap);
+  }
+  window.addEventListener('resize', () => {
+    clearTimeout(starResizeTimer);
+    starResizeTimer = setTimeout(reportStarBounds, 50);
+  });
+
+  const starBanner = document.getElementById('star-fallback-banner');
+  window.starView.onStatus((status) => {
+    if (starBanner) starBanner.style.display = (status === 'unreachable' || status === 'suspect') ? '' : 'none';
+    setProvStatus('star', status === 'ready' ? 'idle' : (status === 'loading' ? 'loading' : 'failed'));
+  });
+
+  // Star's "Get Quote" step shows several real product cards at once, but
+  // there is no single quote to read from THAT screen — the operator has
+  // to pick one (click "Proceed" on a card) before its own detail screen
+  // (Premium Breakup + Additional Covers) exists at all. star_result_
+  // script.js only ever reports once that detail screen is showing, so
+  // this is a single captured quote, same shape as Care/MC/Niva. An
+  // earlier version of this reported an array and added every
+  // recommendation-list card at once — the user reported that was wrong.
+  window.starView.onResult((captured) => {
+    const btn = document.getElementById('star-add-btn');
+    const hint = document.getElementById('star-add-hint');
+    if (!captured || !captured.ok) {
+      _starLastCaptured = null;
+      if (btn) { btn.disabled = true; btn.style.opacity = '.5'; }
+      if (hint) hint.textContent = 'Calculate a premium on the page below first';
+      setProvStatus('star', 'idle');
+      return;
+    }
+    _starLastCaptured = captured;
+    if (btn) { btn.disabled = false; btn.style.opacity = '1'; }
+    if (hint) {
+      hint.textContent = 'Detected ' + captured.amount + (captured.term ? ' (' + captured.term + ')' : '')
+        + (captured.planName ? ' · Plan: ' + captured.planName : '')
+        + (captured.sumInsured ? ' · SI: ' + captured.sumInsured : '')
+        + (captured.addons ? ' · Add-ons: ' + captured.addons : '')
+        + ' — check it, then click Add';
+    }
+    setProvStatus('star', 'ready');
+  });
+}
+
+let _starLastCaptured = null;
+function addStarToComparison() {
+  const captured = _starLastCaptured;
+  if (!captured || !captured.ok) return;
+  addQuote({
+    company: 'Star Health',
+    planName: captured.planName || captured.pageTitle || '—',
+    sumAssured: captured.sumInsured || '—',
+    premium: captured.amount || '—',
+    addons: captured.addons || '',
+    coverType: '',
+    tenure: captured.term || '',
+  });
+}
+
+// Wired into the same send-paths driveCareRealPage()/driveNivaRealPage()
+// already are, for structural parity — but window.starView.autoFill()
+// always resolves { ok: false, ... } right now (see star-view.js), so
+// this currently only ever logs a console warning, never fills anything.
+function driveStarRealPage(params) {
+  if (!window.starView) return;
+  window.starView.autoFill(mapStarParamsToBasicDetails(params)).then((result) => {
+    if (!result || !result.ok) {
+      console.warn('[Star] auto-fill on real page had errors:', result && result.errors);
+    }
+  });
+}
+
+// Placeholder shape only — Star's real form fields haven't been seen yet
+// (see star-view.js's header comment), so this can't be more than a guess
+// at what a future star_fill_script.js might expect. Kept intentionally
+// minimal rather than inventing a detailed shape with no ground truth.
+function mapStarParamsToBasicDetails(params) {
+  const m = params.members || {};
+  // Product category, product, and policy plan are left unset on purpose —
+  // star_fill_script.js only touches a field when given a value, so
+  // leaving these out keeps the site's own defaults (Health / Recommend Me
+  // / Fresh), which is the more useful starting point than guessing at a
+  // "right" product to force. params.plan DOES carry a real Star product
+  // code when the operator picked one via the Plan Config popup (same
+  // _planSel.star value buildParamsForProvider() already resolves for the
+  // replica calculator), so that case is honored when present.
+  const hasPED = members.some((mem) => mem.ped && mem.ped.trim() && mem.ped.trim().toLowerCase() !== 'nil');
+  return {
+    pincode: params.pincode || '',
+    product: /^(BPRD-\d+|REC\d+)$/.test(params.plan || '') ? params.plan : undefined,
+    // Star's form only offers Floater/Individual (no "multiple individual"
+    // concept) — only override the site's own Individual default when the
+    // hub's own coverType explicitly says Family Floater.
+    policyType: params.coverType === 'ff' ? 'FLOATER' : undefined,
+    parents: 0, // the hub has no "parent" member category distinct from adult
+    adults: Math.max(1, (m.adultAges || []).length || m.adults || 1),
+    children: Math.max(0, (m.childAges || []).length || m.children || 0),
+    adultAges: m.adultAges || [],
+    childAges: m.childAges || [],
+    ped: hasPED ? 'yes' : 'no',
+  };
 }
 
 // ════════════════════════════════════════════════════════════════
@@ -1294,11 +1958,11 @@ function renderMembers() {
     if(isChild)  ageCls+=' child';
     const badgeStyle=age!==null?'':'display:none';
     return `<div class="member-card">
-      <button class="del-member" onclick="removeMember(${m.id})">×</button>
       <div class="member-card-hdr">
         <div class="member-num">${i+1}</div>
         <div class="member-rel-badge" id="mrel-${m.id}">${m.relation||'Member '+(i+1)}</div>
         <div class="${ageCls}" id="mbadge-${m.id}" style="${badgeStyle}">${age!==null?age+' yrs':''}</div>
+        <button class="del-member" onclick="removeMember(${m.id})" title="Remove member">×</button>
       </div>
       <div class="member-grid">
         <div class="full">
@@ -1893,6 +2557,10 @@ function fillCalculator(key, autoCalc) {
   if(!members.length){showToast('⚠️ Add at least one member first');return;}
   delete _clampLog[key]; renderClampNotice();
   const params = paramsForProvider(key);
+  if (key === 'care' && params.plan && typeof CARE_PLAN_META !== 'undefined') {
+    const meta = CARE_PLAN_META[String(params.plan)];
+    params.planLabel = meta ? meta.name : '';
+  }
   _pendingParams[key] = params;
   _pendingAutoCalc = !!autoCalc;
   const sel = CALC_IFRAME[key];
@@ -1907,6 +2575,118 @@ function fillCalculator(key, autoCalc) {
     const label = {care:'Care Health',niva:'Niva Bupa',mc:'ManipalCigna',star:'Star Health'}[key]||key;
     showToast('✅ Parameters sent to '+label);
   }
+  if (key === 'care') driveCareRealPage(params);
+  if (key === 'mc') driveMcRealPage(params);
+  if (key === 'niva') driveNivaRealPage(params);
+  if (key === 'star') driveStarRealPage(params);
+}
+
+// Care Health's real page (electron/care-view.js) isn't a same-origin
+// iframe, so it can't receive a postMessage — it has to be driven via the
+// main process instead, injecting the same values into the real form.
+// This used to live inline inside fillCalculator() only, which is why
+// every OTHER way to send params to Care Health (Fill All, the Plan
+// Config popup, the Pick Plan Names & Fill popup) never actually touched
+// the real page at all — confirmed live this was exactly why Fill "did
+// nothing" for Care Health outside the one sidebar button. Now called
+// from every send-path below so a future 7th path can't silently repeat
+// the same gap.
+function driveCareRealPage(params) {
+  if (!window.careView) return;
+  window.careView.autoFill(mapCareParamsToRunQuote(params)).then((result) => {
+    if (!result || !result.ok) {
+      console.warn('[Care] auto-fill on real page had errors:', result && result.errors);
+    }
+  });
+}
+
+// ManipalCigna's equivalent of driveCareRealPage — NOT full DOM
+// automation on the real page (three separate techniques all proved
+// unreliable this session for the whole form; the real page's own
+// member-list state resets unpredictably regardless of interaction
+// method). This used to ALSO call server/mc_server.js's raw-API backend
+// to show an instant computed-quote preview, but that panel was removed:
+// it was a one-shot snapshot taken at Fill-click time using whatever SI/
+// Tenure the hub had then, and never sent Tenure or Plan Type
+// (Family Float vs Individual) at all — so the moment the operator
+// changed Sum Insured, Tenure, or Plan Type directly on the real page
+// afterward (which they can, and did — confirmed live via a real
+// mismatch: the panel kept showing ₹17,856.8/₹24,518.8 while the real
+// page, reconfigured to a 2-year Family Float 50L quote, showed
+// ₹44,294.81/₹58,279.88), the two could silently disagree. The
+// "+ Add to Comparison" hint bar (mc_result_script.js's result-observer,
+// wired up separately) already reads the real page's OWN displayed
+// premium directly, so it can't drift from what's actually shown —
+// that's the one source of truth for MC's real quote now.
+async function driveMcRealPage(params) {
+  if (!window.mcView) return;
+  let planId;
+  try {
+    planId = await window.mcView.getCurrentPlanId();
+  } catch (e) { return; } // no real MC view in this context (dev/browser) — silently skip
+  if (!planId) return;
+  // Partial DOM auto-fill of the real page's own visible fields —
+  // Adults/Kids/Age/Pincode only, Gender left for the operator (see
+  // electron/mc_fill_script.js for why). Confirmed live only against
+  // Sarvah's entry form; gated to just that product until the other 4
+  // products' entry forms are individually verified to have the same
+  // Adults/Kids-counter + Age/Gender-panel shape, rather than assuming
+  // it generalizes.
+  if (planId === 'sarvah' && window.mcView.autoFill) {
+    window.mcView.autoFill(mapMcParamsToRealForm(params)).then((result) => {
+      if (!result || !result.ok) {
+        console.warn('[MC] partial auto-fill on real page had errors:', result && result.errors);
+      }
+    });
+  }
+}
+
+// Converts the hub's generic set-params shape into the shape
+// electron/mc_fill_script.js expects — just adults/kids/ages/pincode,
+// since that's all this partial fill touches (no cover-type/tenure/SI
+// field exists to place on this specific real-page form). Ages are
+// concatenated adults-then-kids to match the real page's own row order
+// (confirmed live: "Adult 01, Adult 02, ..., Child 01, ..." in exactly
+// that sequence).
+function mapMcParamsToRealForm(params) {
+  const m = params.members || {};
+  const adultAges = m.adultAges || [];
+  const childAges = m.childAges || [];
+  return {
+    adults: Math.max(1, adultAges.length || m.adults || 1),
+    kids: Math.max(0, childAges.length || m.children || 0),
+    ages: adultAges.concat(childAges),
+    pincode: params.pincode || '',
+  };
+}
+
+// Converts the hub's generic set-params shape (buildParams()/paramsForProvider())
+// into the field-name vocabulary server/care_automation.js and
+// electron/care_fill_script.js already use (field_1, field_2, newMem_N, etc.
+// under the hood) — see care_server.js's /calculate handler for the same
+// shape. Best-effort: name/relation/gender have no Care field at all and
+// are never sent (see the plan notes) — this only maps what Care actually
+// asks for.
+function mapCareParamsToRunQuote(d) {
+  const adults = Math.max(1, (d.members && d.members.adults) || 1);
+  const children = Math.max(0, (d.members && d.members.children) || 0);
+  const totalMembers = Math.min(6, adults + children);
+  const allAges = [...((d.members && d.members.adultAges) || []), ...((d.members && d.members.childAges) || [])];
+  const out = {
+    abacusId: d.plan ? String(d.plan) : undefined,
+    coverType: d.coverType === 'individual' ? 'Individual' : 'Floater',
+    totalMembers: String(totalMembers),
+    children: String(Math.min(children, 4)),
+    eldestAge: String(allAges[0] || 30),
+    sumInsured: String(Math.round(((d.si || 1000000) / 100000) * 100) / 100),
+    tenure: (parseInt(d.tenure, 10) || 1) + ' Year',
+    pincode: d.pincode || undefined,
+    planType: d.planType || undefined,
+  };
+  for (let n = 2; n <= totalMembers; n++) {
+    if (allAges[n - 1] != null) out['member' + n + 'Age'] = String(allAges[n - 1]);
+  }
+  return out;
 }
 
 function fillAllCalculators(autoCalc) {
@@ -1921,6 +2701,10 @@ function fillAllCalculators(autoCalc) {
       _pendingParams[key] = p;
       iframeEl.contentWindow.postMessage({ type:'set-params', data:p, autoCalc:!!autoCalc, autoAdd:_autoAddOn }, '*');
       setProvStatus(key, autoCalc ? 'loading' : 'sent');
+      if (key === 'care') driveCareRealPage(p);
+      if (key === 'mc') driveMcRealPage(p);
+      if (key === 'niva') driveNivaRealPage(p);
+      if (key === 'star') driveStarRealPage(p);
       sent++;
     }
   });
@@ -1970,6 +2754,10 @@ window.addEventListener('message', function(e) {
           const p = Object.assign({}, _pendingParams[calcKey]);
           if(!p.plan && _planSel[calcKey]) p.plan = _planSel[calcKey];
           iframeEl.contentWindow.postMessage({ type:'set-params', data:p, autoCalc:_pendingAutoCalc, autoAdd:_autoAddOn }, '*');
+          if (calcKey === 'care') driveCareRealPage(p);
+          if (calcKey === 'mc') driveMcRealPage(p);
+          if (calcKey === 'niva') driveNivaRealPage(p);
+          if (calcKey === 'star') driveStarRealPage(p);
         }
       }
     }
@@ -4977,6 +5765,10 @@ function applyAndFill(key) {
     const label = {care:'Care Health',niva:'Niva Bupa',mc:'ManipalCigna',star:'Star Health'}[key];
     showToast('✅ Params sent to ' + label);
     switchRight(key, document.getElementById('rt-' + key));
+    if (key === 'care') driveCareRealPage(params);
+    if (key === 'mc') driveMcRealPage(params);
+    if (key === 'niva') driveNivaRealPage(params);
+    if (key === 'star') driveStarRealPage(params);
   }
   closePlanConfig();
 }
@@ -4994,6 +5786,10 @@ function applyAndFillAll() {
     if (iframeEl && iframeEl.contentWindow) {
       iframeEl.contentWindow.postMessage({ type:'set-params', data:params, autoCalc:true, autoAdd:_autoAddOn }, '*');
       setProvStatus(key, 'loading');
+      if (key === 'care') driveCareRealPage(params);
+      if (key === 'mc') driveMcRealPage(params);
+      if (key === 'niva') driveNivaRealPage(params);
+      if (key === 'star') driveStarRealPage(params);
       sent++;
     }
   });
@@ -5609,6 +6405,14 @@ function pselSend(key, autoCalc){
   _pendingParams[key]  = params;
   _pendingAutoCalc     = !!autoCalc;
   delete _clampLog[key]; renderClampNotice();
+  // Independent of the replica iframe below — Care's real page isn't a
+  // same-origin iframe at all, so it has to be driven this way regardless
+  // of whether the (now hidden) replica iframe is even present. Same for
+  // MC's API-based auto-fill — it never touches the replica either.
+  if (key === 'care') driveCareRealPage(params);
+  if (key === 'mc') driveMcRealPage(params);
+  if (key === 'niva') driveNivaRealPage(params);
+  if (key === 'star') driveStarRealPage(params);
   const iframeEl = document.querySelector(CALC_IFRAME[key] || '');
   if (!iframeEl || !iframeEl.contentWindow) return false;
   iframeEl.contentWindow.postMessage({ type:'set-params', data:params,

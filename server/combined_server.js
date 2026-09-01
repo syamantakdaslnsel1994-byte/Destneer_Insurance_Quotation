@@ -24,4 +24,10 @@ app.use('/',     require('./care_server.js'));
 const PORT = Number(process.env.PORT) || 3000;
 app.listen(PORT, '127.0.0.1', () => {
   console.log(`✅  Combined server (Care + Niva + MC + Star) on http://localhost:${PORT}`);
+}).on('error', err => {
+  if (err.code === 'EADDRINUSE') {
+    console.error(`❌  Port ${PORT} is already in use by another program on this computer.`);
+  } else {
+    console.error(`❌  Combined server failed to start: ${err.message}`);
+  }
 });

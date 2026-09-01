@@ -9,6 +9,10 @@ mc_captures.txt
 # Dependencies
 node_modules/
 
+# Electron desktop build output
+/dist/
+/build/
+
 # Generated quotations and reports
 *.xls
 *.xlsx

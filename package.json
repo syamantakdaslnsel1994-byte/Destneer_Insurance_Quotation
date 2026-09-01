@@ -2,8 +2,8 @@
   "name": "insurance-premium-hub",
   "version": "1.1.0",
   "private": true,
-  "description": "Health insurance premium comparison \u2014 Care, Niva Bupa, ManipalCigna and Star Health calculators behind one hub",
-  "main": "server/care_server.js",
+  "description": "Health insurance premium comparison — Care, Niva Bupa, ManipalCigna and Star Health calculators behind one hub",
+  "main": "electron/main.js",
   "scripts": {
     "start": "node server/care_server.js",
     "care": "node server/care_server.js",
@@ -12,6 +12,9 @@
     "star": "node server/sh_server.js",
     "care:v1": "node server/legacy/server.js",
     "combined": "node server/combined_server.js",
+    "icon": "node scripts/build/make-icon.js",
+    "electron:dev": "electron .",
+    "dist:win": "npm run icon && electron-builder --win nsis",
     "audit:care": "node scripts/audit/care_audit.js",
     "verify:excel": "node scripts/verify/verify_excel_fixture.js && python scripts/verify/verify_excel_format.py _test_output.xlsx",
     "verify:picker": "node scripts/verify/verify_plan_picker.js",
@@ -29,9 +32,40 @@
     "exceljs": "^4.4.0",
     "express": "^4.18.2",
     "jspdf": "^2.5.1",
-    "node-fetch": "^2.7.0"
+    "node-fetch": "^2.7.0",
+    "playwright": "^1.62.1"
+  },
+  "devDependencies": {
+    "electron": "^31.7.7",
+    "electron-builder": "^24.13.3",
+    "jimp": "^0.22.12",
+    "png-to-ico": "^2.1.8"
   },
   "engines": {
     "node": ">=18"
+  },
+  "build": {
+    "appId": "com.leeandnee.insurancepremiumhub",
+    "productName": "Insurance Premium Hub",
+    "asar": false,
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "electron/**",
+      "server/**",
+      "public/**",
+      "data/**",
+      ".env",
+      "package.json",
+      "node_modules/**/*"
+    ],
+    "win": {
+      "icon": "build/icon.ico",
+      "target": "nsis"
+    },
+    "nsis": {
+      "artifactName": "Insurance Premium Hub Setup ${version}.exe"
+    }
   }
 }
