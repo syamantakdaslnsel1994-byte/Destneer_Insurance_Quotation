@@ -3883,6 +3883,7 @@ let STAR_LIVE_FEATURES = null;
 // FEATURE_MASTER always has all 4 provider keys, loaded or not.
 let FEATURE_MASTER = {
   customFeatures: [],
+  customPlans: { care:[], niva:[], mc:[], star:[] },
   overrides: { care:{}, niva:{}, mc:{}, star:{} },
   selectedPlan: { care:null, niva:null, mc:null, star:null },
 };
@@ -3893,6 +3894,10 @@ let FEATURE_MASTER = {
     const d = await r.json();
     FEATURE_MASTER = {
       customFeatures: Array.isArray(d.customFeatures) ? d.customFeatures : [],
+      customPlans: {
+        care: (d.customPlans && d.customPlans.care) || [], niva: (d.customPlans && d.customPlans.niva) || [],
+        mc:   (d.customPlans && d.customPlans.mc)   || [], star: (d.customPlans && d.customPlans.star) || [],
+      },
       overrides: {
         care: (d.overrides && d.overrides.care) || {}, niva: (d.overrides && d.overrides.niva) || {},
         mc:   (d.overrides && d.overrides.mc)   || {}, star: (d.overrides && d.overrides.star) || {},
@@ -3949,7 +3954,13 @@ function allFeatureRows(){
 function resolveMasterPlanRows(provider, planKey){
   if (!planKey) return null;
   let name = planKey, autoRows = {};
-  if (provider === 'mc' && planKey === 'sarvah-param') {
+  const custom = (FEATURE_MASTER.customPlans[provider] || []).find(p => p.key === planKey);
+  if (custom) {
+    // A hand-typed plan (see fmAddPlan()) — not in any insurer's scraped
+    // catalogue at all, so there is no auto-mapped source to read; every
+    // value comes from the override below, same as a custom FEATURE row.
+    name = custom.label;
+  } else if (provider === 'mc' && planKey === 'sarvah-param') {
     name = 'Sarvah Param';
     const col = FEATURE_DATA && (FEATURE_DATA.plans || []).find(p => p.provider === 'mc' && p.plan === 'Sarvah Param');
     const idx = col && FEATURE_DATA.plans.indexOf(col);
@@ -3991,6 +4002,9 @@ function fmPlanList(provider){
     });
   }
   if (provider === 'mc') out.unshift({ key:'sarvah-param', label:'Sarvah Param' });
+  // Hand-typed plans (fmAddPlan()) — a real plan the insurer offers that
+  // just isn't in the auto-scraped catalogue at all yet.
+  (FEATURE_MASTER.customPlans[provider] || []).forEach(p => out.push({ key:p.key, label:p.label, custom:true }));
   out.sort((a,b) => a.label.localeCompare(b.label));
   return out;
 }
@@ -4024,6 +4038,36 @@ function fmEditValue(provider, planKey, featureName, value){
   FEATURE_MASTER.overrides[provider][planKey][featureName] = value;
 }
 
+// Lets the operator open (and start editing) a plan that isn't in the
+// auto-scraped catalogue at all — a brand new product, or one that failed
+// to scrape — by typing its real name directly, rather than being limited
+// to whatever the dropdown above already offers. If the typed name matches
+// a plan that already exists (auto-scraped, Sarvah Param, or an earlier
+// custom one), this just switches to editing that one instead of creating
+// a confusing near-duplicate.
+function fmAddPlan(provider){
+  const input = document.getElementById('fm-plan-name-input');
+  const label = input && input.value.trim();
+  if (!label) return;
+  const existing = fmPlanList(provider).find(p => p.label.toLowerCase() === label.toLowerCase());
+  if (existing) {
+    _fmEditingPlan[provider] = existing.key;
+    showToast('ℹ️ "' + label + '" already exists — now editing it');
+    fmRenderAll();
+    return;
+  }
+  const slug = base => String(base||'').toLowerCase().trim()
+    .replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'') || 'plan';
+  const used = new Set(fmPlanList(provider).map(p => p.key));
+  let key = 'custom-' + slug(label), n = 2;
+  while (used.has(key)) key = 'custom-' + slug(label) + '-' + (n++);
+  if (!FEATURE_MASTER.customPlans[provider]) FEATURE_MASTER.customPlans[provider] = [];
+  FEATURE_MASTER.customPlans[provider].push({ key, label });
+  _fmEditingPlan[provider] = key;
+  if (input) input.value = '';
+  fmRenderAll();
+}
+
 function fmAddFeature(){
   const name = prompt('New feature name (this becomes a new row for every insurer/plan):');
   if (!name || !name.trim()) return;
@@ -4038,9 +4082,16 @@ async function fmSave(){
   if (statusEl) statusEl.textContent = 'Saving…';
   try {
     const r = await fetch('feature_master_overrides.json', {
-      method: 'POST', headers: { 'Content-Type':'application/json' },
+      // The server's authRequired reads the login token ONLY from the
+      // Authorization header (see server/care_server.js's authWhois()) —
+      // there is no cookie session in this app. Every other authenticated
+      // save (quotations, save-destination) already sends it via
+      // hubAuthHeaders(); this one didn't, so it failed "Not signed in"
+      // even for an operator who genuinely was.
+      method: 'POST', headers: hubAuthHeaders({ 'Content-Type':'application/json' }),
       body: JSON.stringify(FEATURE_MASTER),
     });
+    if (r.status === 401) { hubHandle401(r); throw new Error('Not signed in — redirecting to login…'); }
     if (!r.ok) { const d = await r.json().catch(()=>({})); throw new Error(d.error || ('save failed (' + r.status + ')')); }
     if (statusEl) statusEl.textContent = '✅ Saved ' + new Date().toLocaleTimeString();
     showToast('✅ Feature Master saved');
@@ -4057,10 +4108,14 @@ function fmRenderAll(){
 
   const provider = _fmActiveProvider;
   const plans = fmPlanList(provider);
-  if ((!_fmEditingPlan[provider] || !plans.some(p => p.key === _fmEditingPlan[provider])) && plans.length)
-    _fmEditingPlan[provider] = plans[0].key;
-  const editingKey = _fmEditingPlan[provider];
   const selectedKey = FEATURE_MASTER.selectedPlan[provider];
+  if ((!_fmEditingPlan[provider] || !plans.some(p => p.key === _fmEditingPlan[provider])) && plans.length)
+    // Default the editor to whichever plan is already selected for the
+    // report, not just the alphabetically-first one — a fresh page load
+    // (selectedPlan persists across reloads, _fmEditingPlan doesn't) used
+    // to open on an arbitrary plan instead of the one actually in use.
+    _fmEditingPlan[provider] = (selectedKey && plans.some(p => p.key === selectedKey)) ? selectedKey : plans[0].key;
+  const editingKey = _fmEditingPlan[provider];
 
   const options = plans.map(p =>
     `<option value="${fmEsc(p.key)}" ${p.key===editingKey?'selected':''}>${fmEsc(p.label)}</option>`).join('');
@@ -4076,6 +4131,13 @@ function fmRenderAll(){
       </button>
       ${selectedKey ? `<button class="filt-chip" onclick="fmClearSelected('${provider}')">Clear selection</button>` : ''}
       <span style="color:#94a3b8">${usingLabel}</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:12.5px;margin-top:8px">
+      <label style="color:#94a3b8">Or type a plan name manually:</label>
+      <input type="text" id="fm-plan-name-input" placeholder="e.g. a plan not in the list above yet"
+        style="min-width:260px;background:transparent;color:inherit;border:1px solid #334155;border-radius:6px;padding:5px 8px;font:inherit"
+        onkeydown="if(event.key==='Enter'){event.preventDefault();fmAddPlan('${provider}');}">
+      <button class="filt-chip" onclick="fmAddPlan('${provider}')">+ Add / Edit this plan</button>
     </div>`;
 
   if (!editingKey) {
