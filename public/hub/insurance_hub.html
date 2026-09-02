@@ -748,6 +748,9 @@ html,body{height:100%;overflow:hidden;font-family:'Inter',system-ui,sans-serif;b
         <button class="rt" style="--rt-color:#10b981" onclick="switchRight('compare',this)" id="rt-compare">
           📊 Comparison <span class="rt-badge green" id="rt-cmp-badge" style="display:none">0</span>
         </button>
+        <button class="rt" style="--rt-color:#0ea5e9" onclick="switchRight('featmaster',this)" id="rt-featmaster">
+          🧩 Feature Master
+        </button>
         <button class="rt" style="--rt-color:#f59e0b" onclick="switchRight('report',this)" id="rt-report">
           📄 Report
         </button>
@@ -913,6 +916,37 @@ html,body{height:100%;overflow:hidden;font-family:'Inter',system-ui,sans-serif;b
             <div style="font-size:12.5px">Use the calculator tabs, get a premium,<br>and click <strong>Add to Comparison</strong></div>
           </div>
 
+        </div>
+      </div>
+
+      <!-- Feature Master -->
+      <div class="r-panel" id="rp-featmaster">
+        <div style="padding:16px">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:12px;flex-wrap:wrap">
+            <div>
+              <div style="font-size:15px;font-weight:700">🧩 Feature Master</div>
+              <div style="font-size:12px;color:#94a3b8;max-width:640px">
+                Pick a plan per insurer to use in the Feature Comparison sheet, and edit or add
+                feature rows. Edits are additive — nothing here overwrites the auto-scraped data,
+                and an insurer you don't pick a plan for keeps using automatic plan matching.
+              </div>
+            </div>
+            <div style="display:flex;gap:8px;align-items:center;white-space:nowrap">
+              <button class="filt-chip" onclick="fmAddFeature()">+ Add Feature</button>
+              <button class="filt-chip on" onclick="fmSave()">💾 Save Feature Master</button>
+            </div>
+          </div>
+          <div id="fm-save-status" style="font-size:12px;color:#94a3b8;margin-bottom:10px"></div>
+
+          <div class="cmp-filter" style="margin-bottom:10px">
+            <button class="filt-chip on fm-ptab" onclick="fmSwitchProvider('care',this)">Care Health</button>
+            <button class="filt-chip fm-ptab" onclick="fmSwitchProvider('niva',this)">Niva Bupa</button>
+            <button class="filt-chip fm-ptab" onclick="fmSwitchProvider('mc',this)">ManipalCigna</button>
+            <button class="filt-chip fm-ptab" onclick="fmSwitchProvider('star',this)">Star Health</button>
+          </div>
+
+          <div id="fm-plan-picker" style="margin-bottom:12px"></div>
+          <div id="fm-table-wrap" style="overflow-x:auto"></div>
         </div>
       </div>
 
@@ -1322,6 +1356,12 @@ function switchRight(key, btn) {
     // Not a step in the workflow — it looks backwards at what was already sent.
     document.querySelectorAll('.step-pill').forEach(p=>p.classList.remove('active'));
     histRefresh();
+  } else if(key==='featmaster') {
+    // Not a step in the workflow either, same reasoning as History — it's
+    // reference/master-data upkeep, not a stage the operator passes through
+    // once per quotation.
+    document.querySelectorAll('.step-pill').forEach(p=>p.classList.remove('active'));
+    fmRenderAll();
   }
 }
 
@@ -3832,6 +3872,232 @@ let STAR_LIVE_FEATURES = null;
   } catch (e) { /* Star's column falls back to the "no data held" placeholder when unavailable */ }
 })();
 
+// Feature Master — operator edits/additions from the Feature Master tab,
+// layered on top of the static reference sheet and the 4 insurers' auto-
+// scraped live data (see resolveMasterPlanRows()/allFeatureRows() below).
+// Additive only: never written by any build_*_feature_mapping.js script,
+// so a re-scrape can never silently wipe an operator's correction or a
+// newly added feature row — see server/care_server.js's own comment on the
+// GET/POST /feature_master_overrides.json routes this loads from and saves
+// to. Starts as this exact empty shape so every consumer below can assume
+// FEATURE_MASTER always has all 4 provider keys, loaded or not.
+let FEATURE_MASTER = {
+  customFeatures: [],
+  overrides: { care:{}, niva:{}, mc:{}, star:{} },
+  selectedPlan: { care:null, niva:null, mc:null, star:null },
+};
+(async function loadFeatureMaster(){
+  try {
+    const r = await fetch('feature_master_overrides.json');
+    if (!r.ok) return;
+    const d = await r.json();
+    FEATURE_MASTER = {
+      customFeatures: Array.isArray(d.customFeatures) ? d.customFeatures : [],
+      overrides: {
+        care: (d.overrides && d.overrides.care) || {}, niva: (d.overrides && d.overrides.niva) || {},
+        mc:   (d.overrides && d.overrides.mc)   || {}, star: (d.overrides && d.overrides.star) || {},
+      },
+      selectedPlan: {
+        care: (d.selectedPlan && d.selectedPlan.care) || null, niva: (d.selectedPlan && d.selectedPlan.niva) || null,
+        mc:   (d.selectedPlan && d.selectedPlan.mc)   || null, star: (d.selectedPlan && d.selectedPlan.star) || null,
+      },
+    };
+    if (typeof fmRenderAll === 'function') fmRenderAll();
+  } catch (e) { /* Feature Master edits unavailable this session — everything falls back to automatic matching */ }
+})();
+
+// Only Care's mapped data carries a real product `.name` — Niva/MC/Star's
+// mapped entries are keyed by their slug/tierKey with no separate display
+// name (confirmed against the actual shipped data/*_features_mapped.json
+// files), so a raw key like "lifetime-global" would otherwise show up
+// verbatim as the exported column header. Shared by resolveMasterPlanRows()
+// and fmPlanList() so the editor's dropdown and the exported label always
+// agree on what a plan is called.
+function fmPrettyPlanKey(key){
+  return String(key||'').replace(/[-_]+/g,' ').replace(/\b\w/g, c => c.toUpperCase());
+}
+
+// Feature Master lets the operator add new rows beyond the 16 canonical
+// ones from feature_comparison.json — this is the single combined row list
+// every renderer (apply*LiveOverlay below, xlBuildFeatureSheet,
+// pdfBuildFeatureSection, and Feature Master's own editable table) iterates,
+// so a custom row appears everywhere an existing one does through the exact
+// same code, never a parallel rendering path. A function, not a value
+// computed once — FEATURE_DATA/FEATURE_MASTER both load asynchronously, so
+// this always has to read whatever's currently loaded, not a stale snapshot
+// from before either fetch resolved.
+function allFeatureRows(){
+  const base = (FEATURE_DATA && FEATURE_DATA.features) || [];
+  const custom = (FEATURE_MASTER.customFeatures || []).map(c => ({
+    feature: c.feature, rows: [{ sub:null, values:['','','','',''] }],
+  }));
+  return base.concat(custom);
+}
+
+// Resolves one specific plan's feature-row values, merging its auto-mapped
+// data (Care/Niva/MC/Star's scraped-and-normalized live data, or — for MC's
+// Sarvah Param, which has no live entry at all, see resolveLiveMcPlan's own
+// comment — the static feature_comparison.json column instead) with any
+// Feature Master overrides for that exact plan. Override wins PER FEATURE,
+// not per whole plan, so editing one row in Feature Master doesn't discard
+// the rest of the plan's auto-mapped data — and it's the only way a custom
+// feature (which has no auto-mapped source at all) ever gets a value.
+// Returns {name, rows} in the exact same shape resolveLive{Care,Niva,Mc,
+// Star}Plan() already return, so featureColumns() can substitute this in
+// for those calls with zero changes to the overlay/column-splicing logic
+// that already consumes that shape.
+function resolveMasterPlanRows(provider, planKey){
+  if (!planKey) return null;
+  let name = planKey, autoRows = {};
+  if (provider === 'mc' && planKey === 'sarvah-param') {
+    name = 'Sarvah Param';
+    const col = FEATURE_DATA && (FEATURE_DATA.plans || []).find(p => p.provider === 'mc' && p.plan === 'Sarvah Param');
+    const idx = col && FEATURE_DATA.plans.indexOf(col);
+    if (col && idx >= 0) {
+      (FEATURE_DATA.features || []).forEach(f => {
+        autoRows[f.feature] = (f.rows[0] && f.rows[0].values[idx]) || '';
+      });
+    }
+  } else {
+    const LIVE = { care:CARE_LIVE_FEATURES, niva:NIVA_LIVE_FEATURES, mc:MC_LIVE_FEATURES, star:STAR_LIVE_FEATURES }[provider];
+    const entry = LIVE && LIVE.plans && LIVE.plans[planKey];
+    if (entry && entry.rows) { name = entry.name || fmPrettyPlanKey(planKey); autoRows = entry.rows; }
+  }
+  const override = (FEATURE_MASTER.overrides[provider] || {})[planKey] || {};
+  return { name, rows: Object.assign({}, autoRows, override) };
+}
+
+// ════════════════════════════════════════════════════════════════
+//  FEATURE MASTER — the editor tab (view/edit/add feature rows, pick
+//  which plan wins the report per insurer). Pure UI layer on top of
+//  FEATURE_MASTER/resolveMasterPlanRows()/allFeatureRows() above —
+//  nothing here is read by the Excel/PDF export directly.
+// ════════════════════════════════════════════════════════════════
+const fmEsc = t => String(t == null ? '' : t)
+  .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+
+// Every plan an insurer already has feature data for (live-mapped, plus
+// MC's Sarvah Param which is static-only — see resolveMasterPlanRows).
+// Unmapped entries (rows:null, e.g. Niva's 4 "no brochure link found"
+// slugs) are left out — nothing to view or edit for those yet.
+function fmPlanList(provider){
+  const LIVE = { care:CARE_LIVE_FEATURES, niva:NIVA_LIVE_FEATURES, mc:MC_LIVE_FEATURES, star:STAR_LIVE_FEATURES }[provider];
+  const out = [];
+  if (LIVE && LIVE.plans) {
+    Object.keys(LIVE.plans).forEach(key => {
+      const entry = LIVE.plans[key];
+      if (!entry || !entry.rows) return;
+      out.push({ key, label: entry.name || fmPrettyPlanKey(key) });
+    });
+  }
+  if (provider === 'mc') out.unshift({ key:'sarvah-param', label:'Sarvah Param' });
+  out.sort((a,b) => a.label.localeCompare(b.label));
+  return out;
+}
+
+let _fmActiveProvider = 'care';
+// Which plan is currently open for viewing/editing per provider — distinct
+// from FEATURE_MASTER.selectedPlan (which plan WINS for the report): the
+// operator can browse and correct any plan's data without that plan having
+// to be the one currently selected for export.
+let _fmEditingPlan = { care:null, niva:null, mc:null, star:null };
+
+function fmSwitchProvider(provider, btn){
+  _fmActiveProvider = provider;
+  document.querySelectorAll('.fm-ptab').forEach(b => b.classList.remove('on'));
+  if (btn) btn.classList.add('on');
+  fmRenderAll();
+}
+
+function fmEditingPlanChanged(provider, key){ _fmEditingPlan[provider] = key; fmRenderAll(); }
+
+function fmToggleSelected(provider){
+  const editingKey = _fmEditingPlan[provider];
+  FEATURE_MASTER.selectedPlan[provider] = (FEATURE_MASTER.selectedPlan[provider] === editingKey) ? null : editingKey;
+  fmRenderAll();
+}
+function fmClearSelected(provider){ FEATURE_MASTER.selectedPlan[provider] = null; fmRenderAll(); }
+
+function fmEditValue(provider, planKey, featureName, value){
+  if (!FEATURE_MASTER.overrides[provider]) FEATURE_MASTER.overrides[provider] = {};
+  if (!FEATURE_MASTER.overrides[provider][planKey]) FEATURE_MASTER.overrides[provider][planKey] = {};
+  FEATURE_MASTER.overrides[provider][planKey][featureName] = value;
+}
+
+function fmAddFeature(){
+  const name = prompt('New feature name (this becomes a new row for every insurer/plan):');
+  if (!name || !name.trim()) return;
+  const clean = name.trim();
+  if (allFeatureRows().some(f => f.feature === clean)) { showToast('⚠️ A feature named "'+clean+'" already exists'); return; }
+  FEATURE_MASTER.customFeatures.push({ feature: clean });
+  fmRenderAll();
+}
+
+async function fmSave(){
+  const statusEl = document.getElementById('fm-save-status');
+  if (statusEl) statusEl.textContent = 'Saving…';
+  try {
+    const r = await fetch('feature_master_overrides.json', {
+      method: 'POST', headers: { 'Content-Type':'application/json' },
+      body: JSON.stringify(FEATURE_MASTER),
+    });
+    if (!r.ok) { const d = await r.json().catch(()=>({})); throw new Error(d.error || ('save failed (' + r.status + ')')); }
+    if (statusEl) statusEl.textContent = '✅ Saved ' + new Date().toLocaleTimeString();
+    showToast('✅ Feature Master saved');
+  } catch (e) {
+    if (statusEl) statusEl.textContent = '⚠️ Save failed: ' + e.message;
+    showToast('⚠️ Feature Master save failed: ' + e.message, 6000);
+  }
+}
+
+function fmRenderAll(){
+  const pickerEl = document.getElementById('fm-plan-picker');
+  const tableEl = document.getElementById('fm-table-wrap');
+  if (!pickerEl || !tableEl) return; // panel not in the DOM yet on first load
+
+  const provider = _fmActiveProvider;
+  const plans = fmPlanList(provider);
+  if ((!_fmEditingPlan[provider] || !plans.some(p => p.key === _fmEditingPlan[provider])) && plans.length)
+    _fmEditingPlan[provider] = plans[0].key;
+  const editingKey = _fmEditingPlan[provider];
+  const selectedKey = FEATURE_MASTER.selectedPlan[provider];
+
+  const options = plans.map(p =>
+    `<option value="${fmEsc(p.key)}" ${p.key===editingKey?'selected':''}>${fmEsc(p.label)}</option>`).join('');
+  const usingLabel = selectedKey
+    ? '✅ Report uses <strong>' + fmEsc((plans.find(p=>p.key===selectedKey)||{}).label || selectedKey) + '</strong> (manual)'
+    : '🔄 Report uses automatic plan matching';
+  pickerEl.innerHTML = `
+    <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:12.5px">
+      <label style="color:#94a3b8">Editing plan:</label>
+      <select onchange="fmEditingPlanChanged('${provider}', this.value)">${options || '<option>No plans with feature data yet</option>'}</select>
+      <button class="filt-chip ${selectedKey===editingKey && editingKey ? 'on' : ''}" onclick="fmToggleSelected('${provider}')" ${editingKey?'':'disabled'}>
+        ${selectedKey===editingKey && editingKey ? '✓ Selected for report' : 'Use this plan for the report'}
+      </button>
+      ${selectedKey ? `<button class="filt-chip" onclick="fmClearSelected('${provider}')">Clear selection</button>` : ''}
+      <span style="color:#94a3b8">${usingLabel}</span>
+    </div>`;
+
+  if (!editingKey) {
+    tableEl.innerHTML = '<div style="color:#94a3b8;padding:16px 4px">No plans with feature data held for this insurer yet.</div>';
+    return;
+  }
+  const resolved = resolveMasterPlanRows(provider, editingKey) || { rows:{} };
+  const rowsHtml = allFeatureRows().map(f => {
+    const val = resolved.rows[f.feature] || '';
+    const pk = fmEsc(editingKey).replace(/'/g, "\\'");
+    const fn = fmEsc(f.feature).replace(/'/g, "\\'");
+    return `<tr>
+      <td style="font-weight:600;white-space:nowrap;padding:6px 10px;border-bottom:1px solid #1e293b;vertical-align:top">${fmEsc(f.feature)}</td>
+      <td style="padding:4px 10px;border-bottom:1px solid #1e293b">
+        <textarea rows="1" style="width:100%;min-width:280px;background:transparent;color:inherit;border:1px solid #334155;border-radius:6px;padding:5px 8px;font:inherit;resize:vertical"
+          onchange="fmEditValue('${provider}','${pk}','${fn}', this.value)">${fmEsc(val)}</textarea>
+      </td>
+    </tr>`;
+  }).join('');
+  tableEl.innerHTML = `<table style="width:100%;border-collapse:collapse;font-size:13px"><tbody>${rowsHtml}</tbody></table>`;
+}
+
 // ── Which feature columns belong in this report ─────────────────────────────
 // The five columns were transcribed from one client's quotation, so they are a
 // fixed set of specific products: two ManipalCigna plans, one Niva, one Care
@@ -3864,7 +4130,7 @@ const CARE_LIVE_SOURCE_INDEX = 5;
 // distinguish by room type either, confirmed live against Care's own
 // product pages, which show one flat "Up to SI" for the whole feature).
 function applyCareLiveOverlay(liveRows){
-  (FEATURE_DATA.features || []).forEach(f => {
+  allFeatureRows().forEach(f => {
     // 'N/A' (not null) when a plan IS live-mapped but this particular row
     // wasn't found on its page — confirmed with the user this is expected
     // for some rows (Co-pay, Add ons, etc. aren't published in a matching
@@ -3902,7 +4168,7 @@ function resolveLiveCarePlan(quotedCareNames){
 const NIVA_LIVE_SOURCE_INDEX = 6;
 
 function applyNivaLiveOverlay(liveRows){
-  (FEATURE_DATA.features || []).forEach(f => {
+  allFeatureRows().forEach(f => {
     const value = liveRows ? (liveRows[f.feature] || 'N/A') : null;
     f.rows.forEach(row => {
       row.values = row.values || [];
@@ -3979,7 +4245,7 @@ function resolveLiveNivaPlan(quotedNivaNames){
 const MC_LIVE_SOURCE_INDEX = 7;
 
 function applyMcLiveOverlay(liveRows){
-  (FEATURE_DATA.features || []).forEach(f => {
+  allFeatureRows().forEach(f => {
     const value = liveRows ? (liveRows[f.feature] || 'N/A') : null;
     f.rows.forEach(row => {
       row.values = row.values || [];
@@ -4027,7 +4293,7 @@ function resolveLiveMcPlan(quotedMcNames){
 const STAR_LIVE_SOURCE_INDEX = 8;
 
 function applyStarLiveOverlay(liveRows){
-  (FEATURE_DATA.features || []).forEach(f => {
+  allFeatureRows().forEach(f => {
     const value = liveRows ? (liveRows[f.feature] || 'N/A') : null;
     f.rows.forEach(row => {
       row.values = row.values || [];
@@ -4156,7 +4422,13 @@ function featureColumns(rows){
   // build_care_feature_mapping.js. Falls back to the static column
   // (already correctly caveated by its own exactMatch guard) when there's
   // no live match, rather than showing nothing for Care.
-  const liveCare = resolveLiveCarePlan(quoted.care);
+  // A Feature Master manual pick wins over automatic matching when set —
+  // resolveMasterPlanRows() returns the exact same {name, rows} shape
+  // resolveLiveCarePlan() does, so nothing below this line needs to know
+  // which one produced it.
+  const liveCare = FEATURE_MASTER.selectedPlan.care
+    ? resolveMasterPlanRows('care', FEATURE_MASTER.selectedPlan.care)
+    : resolveLiveCarePlan(quoted.care);
   applyCareLiveOverlay(liveCare && liveCare.rows);   // always reset first — see CARE_LIVE_SOURCE_INDEX
   if (liveCare) {
     const staticIdx = out.findIndex(c => c.provider === 'care' && !c.missing);
@@ -4176,7 +4448,9 @@ function featureColumns(rows){
   // (Niva's real captured plan-name format hasn't been confirmed live
   // this pass), so this is a step better than the static caveat but not
   // as certain as Care's exact-name match.
-  const liveNiva = resolveLiveNivaPlan(quoted.niva);
+  const liveNiva = FEATURE_MASTER.selectedPlan.niva
+    ? resolveMasterPlanRows('niva', FEATURE_MASTER.selectedPlan.niva)
+    : resolveLiveNivaPlan(quoted.niva);
   applyNivaLiveOverlay(liveNiva && liveNiva.rows);   // always reset first — see NIVA_LIVE_SOURCE_INDEX
   if (liveNiva) {
     const staticIdx = out.findIndex(c => c.provider === 'niva' && !c.missing);
@@ -4197,12 +4471,23 @@ function featureColumns(rows){
   // see resolveLiveMcPlan's comment). ProHealth Prime/Super Top-up/Prime
   // Senior have no existing static column at all, so a live match for
   // those is ADDED as a new column rather than replacing anything.
-  const liveMc = resolveLiveMcPlan(quoted.mc);
+  const liveMc = FEATURE_MASTER.selectedPlan.mc
+    ? resolveMasterPlanRows('mc', FEATURE_MASTER.selectedPlan.mc)
+    : resolveLiveMcPlan(quoted.mc);
   applyMcLiveOverlay(liveMc && liveMc.rows);   // always reset first — see MC_LIVE_SOURCE_INDEX
   if (liveMc) {
-    const staticIdx = liveMc.isLifetime
-      ? out.findIndex(c => c.provider === 'mc' && c.plan === 'Lifetime Health' && !c.missing)
-      : -1;
+    // A manual Feature Master pick replaces WHATEVER MC column already
+    // exists (Sarvah Param or Lifetime Health, matched or not) — it always
+    // wins, so there is no reason to leave a second, now-redundant static
+    // column sitting alongside it. Automatic matching keeps the narrower
+    // isLifetime rule: an auto-matched non-Lifetime tier (ProHealth Prime/
+    // Super Top-up/Prime Senior) has no static column to begin with, so it
+    // is correctly ADDED rather than replacing Sarvah Param's unrelated one.
+    const staticIdx = FEATURE_MASTER.selectedPlan.mc
+      ? out.findIndex(c => c.provider === 'mc' && !c.missing)
+      : liveMc.isLifetime
+        ? out.findIndex(c => c.provider === 'mc' && c.plan === 'Lifetime Health' && !c.missing)
+        : -1;
     const staticCol = staticIdx >= 0 ? out[staticIdx] : null;
     const liveCol = {
       label: liveMc.name, width: (staticCol && staticCol.width) || 19,
@@ -4220,7 +4505,9 @@ function featureColumns(rows){
   // "No feature data held for Star Health" note) — a live match replaces
   // THAT placeholder, same splice pattern as Care/Niva replacing their
   // static entries.
-  const liveStar = resolveLiveStarPlan(quoted.star);
+  const liveStar = FEATURE_MASTER.selectedPlan.star
+    ? resolveMasterPlanRows('star', FEATURE_MASTER.selectedPlan.star)
+    : resolveLiveStarPlan(quoted.star);
   applyStarLiveOverlay(liveStar && liveStar.rows);   // always reset first — see STAR_LIVE_SOURCE_INDEX
   if (liveStar) {
     const missingIdx = out.findIndex(c => c.provider === 'star' && c.missing);
@@ -4328,7 +4615,7 @@ function xlBuildFeatureSheet(wb, used, rows){
   }
   const shift = r - 2;                    // row heights were captured without the note row
 
-  FEATURE_DATA.features.forEach(f => {
+  allFeatureRows().forEach(f => {
     const span = f.rows.length;
     f.rows.forEach((row, ri) => {
       // Feature name in A; when a feature has sub-rows the name is merged down
@@ -4725,7 +5012,7 @@ function pdfBuildFeatureSection(P, rows){
     pdfRow(P, cells, cols, { lineH: PDF.featureLineH, height: h });
   }
 
-  FEATURE_DATA.features.forEach(f => {
+  allFeatureRows().forEach(f => {
     f.rows.forEach((row, ri) => {
       const cells = [
         { v: ri === 0 ? f.feature : null, fill: st.featureFill, bold: true, align: 'left', size: FS },
