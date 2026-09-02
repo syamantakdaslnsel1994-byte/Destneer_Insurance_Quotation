@@ -1111,6 +1111,7 @@ let rpRows    = [];
 let rpId      = 1;
 let _memberTag = {};   // quote id → member id ('' = family scope), persists across rpSync
 let _ptOverride = {};  // quote id → plan type the operator set by hand, persists across rpSync
+let _tenOverride = {}; // quote id → tenure (year) the operator set by hand, persists across rpSync
 // Named subsets of members, each producing its own worksheet.
 let _memberGroups = [];   // [{ id, name, memberIds:[] }]
 let _mgId = 1;
@@ -2947,7 +2948,7 @@ function removeQuote(id) {
 function clearAll() {
   if(!quotes.length) return;
   if(!confirm('Remove all '+quotes.length+' quotes?')) return;
-  quotes=[]; _memberTag={}; _ptOverride={};
+  quotes=[]; _memberTag={}; _ptOverride={}; _tenOverride={};
   renderComparison();
   document.getElementById('rt-cmp-badge').style.display='none';
   rpSync();     // keep the report table and its warning in step with the reset
@@ -3151,9 +3152,15 @@ function rpSync() {
     const co=coKey(q.company);
     const siKey=getSIKey(q.sumAssured);
     const prem=parseInt(String(q.premium||'').replace(/[^0-9.]/g,''))||0;
-    const yr=parseInt(String(q.tenure||'1').replace(/[^0-9]/g,''))||1;
-    // Use the cover mode captured with the quote, or the operator's own
-    // correction from the table — never the hub's current global toggle.
+    const capturedYr=parseInt(String(q.tenure||'1').replace(/[^0-9]/g,''))||1;
+    // Use the cover mode/tenure captured with the quote, or the operator's
+    // own correction from the table — never the hub's current global toggle.
+    // Tenor used to always reset to whatever was captured at add-time on
+    // every rpSync() (which fires on every visit to the Report tab), so an
+    // edit in the table silently reverted back to "1 Yr" the moment the
+    // operator navigated away and back — same bug class _ptOverride/
+    // _memberTag already exist to prevent, just missing for this field.
+    const yr=_tenOverride[q.id]!=null?_tenOverride[q.id]:capturedYr;
     const ptLabel=_ptOverride[q.id]||q.planType||resolveSmartPlanType();
     rpRows.push({_id:rpId++,qid:q.id,member:_memberTag[q.id]||'',company:co,planType:ptLabel,planName:String(q.planName||co),
       siKey,sumAssured:siKey?RP_SI_LIST.find(s=>s.key===siKey)?.value||q.sumAssured:q.sumAssured,
@@ -3285,9 +3292,11 @@ function rpUpd(id,field,val){
   r[field]=val;
   if(field==='member'   && r.qid!=null) _memberTag[r.qid]=val;    // persist across rpSync
   if(field==='planType' && r.qid!=null) _ptOverride[r.qid]=val;   // persist across rpSync
-  // Changing the sum insured or premium can move a row in or out of the
-  // report bands — keep the exclusion notice honest as they edit.
-  if(field==='siKey'||field==='premium'){
+  if(field==='tenor'    && r.qid!=null) _tenOverride[r.qid]=val;  // persist across rpSync
+  // Changing the sum insured, premium, or tenure can move a row in or out
+  // of the report bands, or into/out of a collision with another row — keep
+  // the exclusion notice honest as they edit.
+  if(field==='siKey'||field==='premium'||field==='tenor'){
     if(field==='siKey'){
       const b=RP_SI_LIST.find(s=>s.key===val);
       if(b) r.sumAssured=b.value;
