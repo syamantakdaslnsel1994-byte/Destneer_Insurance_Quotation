@@ -34,12 +34,13 @@
     {
       "label": "Niva Bupa ReAssure 2.0 Bronze",
       "provider": "niva",
-      "plan": "ReAssure 2.0 Bronze",
+      "plan": "ReAssure2.0 Bronze",
       "planMatch": [
         "reassure2.0",
         "reassure 2.0"
       ],
-      "_knownRisk": "Not hardened with exactMatch this pass, unlike the other columns — investigated but left alone deliberately. Niva was never brought into this session's real-page-capture work, so there's no live evidence of what public/calculators/niva_index.html's #resultProduct actually displays for a real ReAssure 2.0 Bronze quote today. Worse, the one real data point available — scripts/verify/verify_excel_fixture.js's own reference transcription (the actual source quotation this file was seeded from) — writes the plan name as \"Reassure2.0 Bronze\" (no space before \"2.0\"), which would NOT equality-match this column's \"ReAssure 2.0 Bronze\" (with a space) under featureColumns()'s norm(). Naively adding exactMatch here could break a currently-working match instead of fixing anything. If ReAssure 2.0 turns out to have sibling tiers (Silver/Gold/Platinum etc.) that collide the same way Care Supreme/Sarvah/Lifetime did, this needs a live-verified capture format first, not a guess.",
+      "exactMatch": true,
+      "_exactMatchNote": "Was previously left as a loose planMatch on 'reassure2.0'/'reassure 2.0' — meaning ANY ReAssure 2.0 tier (Silver/Gold/Platinum/Titanium+, which have materially different benefits) silently reported as a confident match to this Bronze-tier data whenever the live per-tier feature lookup (resolveLiveNivaPlan/NIVA_SLUG_KEYWORDS) wasn't available, the same false-positive class already fixed for Care Supreme/Sarvah/Lifetime, except with NO caveat shown at all since the loose match reported matches:true. The real captured plan-name format is now confirmed from two independent sources — electron/niva_result_script.js's own live-DOM comment ('ReAssure2.0 Titanium+', no space before '2.0') and scripts/verify/verify_excel_fixture.js's repeated reference transcription ('Reassure2.0 Bronze', same no-space spacing) — both agree there is no space before \"2.0\", so \"plan\" now matches that exactly and exactMatch is safe to enable. planMatch is kept only as the (now unused unless exactMatch is later removed) loose fallback list.",
       "fill": {
         "theme": 6,
         "tint": 0.6

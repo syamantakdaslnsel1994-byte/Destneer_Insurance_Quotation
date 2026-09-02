@@ -4190,6 +4190,29 @@ function featureColumns(rows){
     else out.push(liveCol);
   }
 
+  // Never show a column captioned "features shown are for a DIFFERENT plan
+  // than you quoted" — confirmed live this reads as "the wrong plan was
+  // picked," not as a caveat, especially when a provider has more than one
+  // static column (MC has two: Sarvah Param and Lifetime Health) and NEITHER
+  // matches (e.g. a real Sarvah Uttam quote, which resolveLiveMcPlan
+  // deliberately never live-matches — see its own comment) — both wrong
+  // plans then appeared side by side. Rather than trying to judge when a
+  // caveated substitute is "close enough" to show, every column for a
+  // provider that doesn't match the actual quoted plan (and wasn't replaced
+  // by a genuine live-data match above) is removed and replaced with one
+  // honest "no feature data held for this plan" placeholder — the SAME
+  // placeholder Star already used when it has no static entry at all.
+  const byProvider = {};
+  out.forEach(c => { (byProvider[c.provider] = byProvider[c.provider] || []).push(c); });
+  Object.keys(byProvider).forEach(k => {
+    const cols = byProvider[k];
+    if (cols.some(c => c.matches || c.live)) return;
+    cols.forEach(c => { const i = out.indexOf(c); if (i >= 0) out.splice(i, 1); });
+    out.push({ label:(FEATURE_PROVIDER_LABEL[k] || k), width:21, fill:null,
+               provider:k, plan:null, matches:false, missing:true,
+               quotedPlans:[...new Set(cols.flatMap(c => c.quotedPlans))] });
+  });
+
   return out;
 }
 
