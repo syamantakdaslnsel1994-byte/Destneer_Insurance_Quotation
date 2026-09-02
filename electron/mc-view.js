@@ -5,16 +5,18 @@
 // navigation (confirmed live).
 //
 // Partial DOM auto-fill exists (Adults/Kids counts, per-member Age,
-// Pincode — see mc_fill_script.js) after a live spike found the specific
-// sequencing that avoids the reset bug three earlier full-auto-fill
-// attempts hit. Gender is deliberately left for the operator — it's the
-// one piece that has never reliably survived automation on this page.
+// Gender, Pincode — see mc_fill_script.js) after a live spike found the
+// specific sequencing that avoids the reset bug three earlier full-auto-
+// fill attempts hit. Gender specifically must be set LAST, after Age and
+// Pincode are typed — see mc_fill_script.js's trailing comment for why
+// (it silently reverts otherwise, on this page's own React re-renders).
 const { app, BrowserView, session, ipcMain } = require('electron');
 const path = require('path');
 const fs = require('fs');
 const { RESULT_OBSERVER_SCRIPT } = require('./mc_result_script');
 const {
   buildMcSetupScript,
+  buildMcGenderScript,
   buildMcAgeRectScript,
   buildMcPincodeRectScript,
   buildMcVerifyScript,
@@ -364,6 +366,13 @@ function registerIpc() {
           if (!outcome.ok) errors.push({ field: 'pincode', reason: `did not hold after ${outcome.attempts} attempts` });
         }
       }
+
+      // Gender MUST be set after Age/Pincode, not before — confirmed live it
+      // gets silently wiped by the React re-renders those trusted keystrokes
+      // trigger if set any earlier (see mc_fill_script.js's trailing
+      // comment). This is the last DOM write before reading anything back.
+      const genderResult = await mcView.webContents.executeJavaScript(buildMcGenderScript(params && params.genders));
+      if (genderResult && genderResult.errors) errors.push(...genderResult.errors);
 
       // Read back the REAL DOM values rather than trusting that issuing the
       // input events means they held — this is what the earlier version of

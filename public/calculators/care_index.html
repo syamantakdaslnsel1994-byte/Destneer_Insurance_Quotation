@@ -2462,14 +2462,15 @@ window.addEventListener('message', async function(ev) {
     if (pinEl && d.pincode) { pinEl.value = d.pincode; accepted.push('pincode'); }
 
     // ── Cover type ─────────────────────────────────────────────
+    // 'mi' (Multi Individual) is Care's real Individual product with 2+
+    // members — confirmed live against the real portal (field_9=Individual
+    // + field_1>1 returns a valid multi-member premium) — not a
+    // clamped-down Floater quote as this used to assume.
     const coverSel = document.getElementById('sel-cover');
+    const isIndividual = d.coverType === 'individual' || d.coverType === 'mi';
     if (coverSel && d.coverType) {
-      coverSel.value = (d.coverType === 'individual') ? 'Individual' : 'Floater';
+      coverSel.value = isIndividual ? 'Individual' : 'Floater';
       accepted.push('coverType');
-      if (d.coverType === 'mi') {
-        clamped.push({ field:'coverType', requested:'mi', used:'Floater',
-                       reason:'Care prices individual or floater only' });
-      }
     }
 
     // ── Member count ───────────────────────────────────────────
@@ -2485,17 +2486,27 @@ window.addEventListener('message', async function(ev) {
       ? Math.max(...Array.from(childSel.options, o => +o.value)) : 3;
 
     const adults   = Math.max(1, d.members?.adults   || 1);
-    const children = Math.max(0, d.members?.children || 0);
+    // Individual/Multi Individual drops children as members entirely, not
+    // just the standalone children-count field — confirmed live: a child's
+    // age sent into a member-age slot under Individual cover isn't a valid
+    // option there at all (Individual member slots only offer adult ages),
+    // so it isn't just a display simplification, the real portal genuinely
+    // has no way to include a child in an Individual/Multi Individual quote.
+    const childrenReq = Math.max(0, d.members?.children || 0);
+    const children = isIndividual ? 0 : childrenReq;
     const wanted   = adults + children;
     const totalM   = Math.min(maxMembers, wanted);
-    if (wanted > maxMembers) {
+    if (isIndividual && childrenReq > 0) {
+      clamped.push({ field:'children', requested:childrenReq, used:0,
+                     reason:'Care does not price children under Individual/Multi Individual cover' });
+    } else if (wanted > maxMembers) {
       clamped.push({ field:'members', requested:wanted, used:totalM,
                      reason:'this plan supports at most ' + maxMembers + ' members' });
     } else if (d.members) { accepted.push('members'); }
     if (memberSel) memberSel.value = String(totalM);
     if (childSel) {
       childSel.value = String(Math.min(maxChildren, children));
-      if (children > maxChildren) {
+      if (!isIndividual && children > maxChildren) {
         clamped.push({ field:'children', requested:children, used:maxChildren,
                        reason:'at most ' + maxChildren + ' children on this plan' });
       }

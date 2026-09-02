@@ -2150,14 +2150,17 @@ function coverLabel() {
   return selCover==='individual'?'Individual':selCover==='ff'?'Family Floater':'Multi Individual';
 }
 
-// Smart plan-type resolver for reports and comparison drawer:
-// • 1 member  → Individual
-// • 2+ members + FF cover → Family Floater
-// • 2+ members + Individual cover → Multi Individual
+// Fallback plan-type for reports and the comparison drawer, used only when
+// a captured quote didn't tell us its own cover type (planTypeFromCover()
+// returned null) — i.e. for MC/Niva/Star, whose result-capture never learns
+// a cover mode from the live page. Deliberately just echoes coverLabel():
+// whatever the operator has the Cover Type chip set to right now IS the
+// label, with no member-count adjustment — this used to turn a plain
+// "Individual" selection into "Multi Individual" for any 2+-member quote,
+// which meant the Report/Comparison could show a different cover type than
+// what was actually selected.
 function resolveSmartPlanType() {
-  if (members.length === 1) return 'Individual';
-  if (selCover === 'ff')    return 'Family Floater';
-  return 'Multi Individual';
+  return coverLabel();
 }
 
 function updateRefSummary() {
@@ -2638,6 +2641,14 @@ function fillCalculator(key, autoCalc) {
 // the same gap.
 function driveCareRealPage(params) {
   if (!window.careView) return;
+  // Individual/Multi Individual drops children from the quote entirely —
+  // see mapCareParamsToRunQuote()'s comment. Surface that here rather than
+  // let the premium silently look like it covers a child it doesn't.
+  const isIndividual = params.coverType === 'individual' || params.coverType === 'mi';
+  const childCount = (params.members && params.members.children) || 0;
+  if (isIndividual && childCount > 0) {
+    showToast('⚠️ Care Health: children are not priced under Individual/Multi Individual cover — quoting adults only', 6000);
+  }
   window.careView.autoFill(mapCareParamsToRunQuote(params)).then((result) => {
     if (!result || !result.ok) {
       console.warn('[Care] auto-fill on real page had errors:', result && result.errors);
@@ -2722,13 +2733,26 @@ function mapMcParamsToRealForm(params) {
 function mapCareParamsToRunQuote(d) {
   const adults = Math.max(1, (d.members && d.members.adults) || 1);
   const children = Math.max(0, (d.members && d.members.children) || 0);
-  const totalMembers = Math.min(6, adults + children);
-  const allAges = [...((d.members && d.members.adultAges) || []), ...((d.members && d.members.childAges) || [])];
+  // 'mi' (Multi Individual) is Care's real Individual product with 2+
+  // members — confirmed live (field_9=Individual + field_1>1 returns a
+  // valid multi-member premium). But Individual cover does not merely hide
+  // the Children field, it removes children as members entirely: a live
+  // test sending a child's age into a member-age slot under Individual
+  // cover hung for 30s because that age isn't in the real portal's option
+  // list for that slot (Individual member slots only offer adult ages).
+  // So under Individual/Multi Individual, children are dropped from the
+  // quote altogether, not just from the standalone children-count field —
+  // matching care_index.html's own confirmed-live "hides Children" note.
+  const isIndividual = d.coverType === 'individual' || d.coverType === 'mi';
+  const totalMembers = Math.min(6, isIndividual ? adults : adults + children);
+  const adultAges = (d.members && d.members.adultAges) || [];
+  const childAges = (d.members && d.members.childAges) || [];
+  const allAges = isIndividual ? [...adultAges] : [...adultAges, ...childAges];
   const out = {
     abacusId: d.plan ? String(d.plan) : undefined,
-    coverType: d.coverType === 'individual' ? 'Individual' : 'Floater',
+    coverType: isIndividual ? 'Individual' : 'Floater',
     totalMembers: String(totalMembers),
-    children: String(Math.min(children, 4)),
+    children: isIndividual ? '0' : String(Math.min(children, 4)),
     eldestAge: String(allAges[0] || 30),
     sumInsured: String(Math.round(((d.si || 1000000) / 100000) * 100) / 100),
     tenure: (parseInt(d.tenure, 10) || 1) + ' Year',
@@ -2872,12 +2896,19 @@ function currentTenureFor(company){
 // Translate a calculator's own cover-type wording into a report plan type.
 // Returns null when the calculator did not tell us, so the caller can fall
 // back to the hub's current selection.
+// Deliberately literal, not member-count-adjusted: whatever cover type was
+// actually selected is what gets shown — 'individual' always reports
+// 'Individual' and 'mi' always reports 'Multi Individual', regardless of
+// how many members are on the quote. This used to promote/demote between
+// the two based on members.length, which meant the Report could show a
+// different cover type than the one the operator actually picked.
 function planTypeFromCover(cover){
   if(!cover) return null;
   const c=String(cover).toLowerCase();
+  if(c==='mi'||c.includes('multi'))    return 'Multi Individual';
   if(c.includes('floater')||c==='ff')  return 'Family Floater';
-  if(c.includes('individual')||c==='mi')
-    return members.length>1 ? 'Multi Individual' : 'Individual';
+  if(c.includes('individual'))
+    return 'Individual';
   return null;
 }
 

@@ -59,32 +59,41 @@ function buildMcSetupScript(params) {
     trigger.click();
     await sleep(1500); // panel open + settle — confirmed live this needs to be generous, not the 600ms tried earlier
 
-    // Gender: confirmed live (unlike Age/Pincode) a pure synthetic set holds
-    // on this page — native property setter + a dispatched 'change' event,
-    // no trusted sendInputEvent needed. Confirmed live for MULTIPLE members
-    // in one panel, not just one: select index i sits in the same Adult1/
-    // Adult2/Child1 row as the age input at index i, so P.genders lines up
-    // with the age fields index-for-index (mapMcParamsToRealForm() builds
-    // it the same adults-then-kids order as P.ages).
-    const genders = Array.isArray(P.genders) ? P.genders : [];
-    if (genders.length) {
-      const selects = Array.from(document.querySelectorAll('select.form-select')).filter((e) => e.offsetParent);
-      const nativeSetter = Object.getOwnPropertyDescriptor(window.HTMLSelectElement.prototype, 'value').set;
-      genders.forEach((g, i) => {
-        const sel = selects[i];
-        if (!sel) { errors.push({ field: 'gender[' + i + ']', reason: 'select not found' }); return; }
-        const value = g === 'FEMALE' ? 'FEMALE' : g === 'OTHER' ? 'OTHER' : 'MALE';
-        nativeSetter.call(sel, value);
-        sel.dispatchEvent(new Event('change', { bubbles: true }));
-        applied.push('gender[' + i + ']=' + value);
-      });
-    }
+    // Gender is deliberately NOT set here — see buildMcGenderScript() below
+    // and this file's trailing comment for why it has to run LAST, after
+    // Age/Pincode are typed, not during this setup step.
 
     const ageFieldCount = Array.from(document.querySelectorAll('input[placeholder="Enter Age"]')).filter((e) => e.offsetParent).length;
     return { ok: true, applied, errors, ageFieldCount };
   } catch (e) {
     return { ok: false, applied, errors: errors.concat([{ field: '(setup)', reason: String(e && e.message || e) }]) };
   }
+})()`;
+}
+
+// Sets each visible Gender <select> — MUST run after Age/Pincode have
+// already been typed (see the trailing comment for why), never during
+// buildMcSetupScript(). A pure synthetic set (native property setter +
+// dispatched 'change' event, no trusted sendInputEvent) is enough — this
+// part was never the problem, only the timing was.
+function buildMcGenderScript(genders) {
+  const json = JSON.stringify(Array.isArray(genders) ? genders : []);
+  return `
+(() => {
+  const genders = ${json};
+  const applied = [];
+  const errors = [];
+  const selects = Array.from(document.querySelectorAll('select.form-select')).filter((e) => e.offsetParent);
+  const nativeSetter = Object.getOwnPropertyDescriptor(window.HTMLSelectElement.prototype, 'value').set;
+  genders.forEach((g, i) => {
+    const sel = selects[i];
+    if (!sel) { errors.push({ field: 'gender[' + i + ']', reason: 'select not found' }); return; }
+    const value = g === 'FEMALE' ? 'FEMALE' : g === 'OTHER' ? 'OTHER' : 'MALE';
+    nativeSetter.call(sel, value);
+    sel.dispatchEvent(new Event('change', { bubbles: true }));
+    applied.push('gender[' + i + ']=' + value);
+  });
+  return { ok: errors.length === 0, applied, errors };
 })()`;
 }
 
@@ -128,17 +137,37 @@ function buildMcVerifyScript(ageCount) {
 })()`;
 }
 
-module.exports = { buildMcSetupScript, buildMcAgeRectScript, buildMcPincodeRectScript, buildMcVerifyScript };
+module.exports = { buildMcSetupScript, buildMcGenderScript, buildMcAgeRectScript, buildMcPincodeRectScript, buildMcVerifyScript };
 
 // Gender WAS left untouched across four earlier attempts this session, all
 // of which generalized the Age/Pincode finding above ("synthetic writes get
 // silently reverted on this page") to the whole AGE & Gender panel without
-// separately testing the Gender control itself. Re-verified live: Gender is
-// a plain native `<select class="form-select form-select-sm">`, not the
-// same kind of validated controlled text input Age/Pincode are — a pure
-// synthetic set (native property setter + dispatched 'change' event, no
-// trusted sendInputEvent) sets it and it holds, confirmed live for multiple
-// members in one panel. See the Gender block in buildMcSetupScript() above.
+// separately testing the Gender control itself. Gender is a plain native
+// `<select class="form-select form-select-sm">`, not the same kind of
+// validated controlled text input Age/Pincode are, and a pure synthetic set
+// (native property setter + dispatched 'change' event) does set it.
+//
+// CORRECTION, found on a later live re-test while chasing a different bug
+// (ManipalCigna's Multi Individual capture): setting Gender that way DURING
+// buildMcSetupScript() — i.e. before Age/Pincode are typed — does NOT
+// actually survive. It looked like it held in isolation (read back right
+// after setting it, nothing else happening), but confirmed live in the
+// REAL end-to-end sequence: each subsequent trusted keystroke into Age or
+// Pincode triggers a fresh React re-render, and Gender gets silently wiped
+// back to empty one field at a time as those re-renders land — by the time
+// Pincode is done, both Gender selects are back to blank. React's own
+// component state was never updated by the synthetic 'change' event (only
+// the DOM was), so each re-render "corrects" the select back to what React
+// believes it is: unset. This is the exact same class of problem as Age/
+// Pincode's own untrusted-write issue, just with a wider blast radius that
+// an isolated one-shot readback test didn't expose.
+//
+// Fix: set Gender LAST, strictly after Age and Pincode are both typed and
+// no further trusted-input-triggered re-render is expected — confirmed live
+// this holds cleanly, including after a settle period with nothing else
+// touching the page. `buildMcGenderScript()` above is the isolated,
+// last-step version of this; `electron/mc-view.js`'s `mc-autofill` handler
+// calls it after the Age/Pincode typing loop, not inside setup.
 //
 // The "Ok"/"GET QUOTES" buttons are still deliberately left unclicked:
 // - A live test found clicking "Ok" automatically WHILE Gender was still
