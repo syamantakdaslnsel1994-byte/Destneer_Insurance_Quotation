@@ -3175,11 +3175,18 @@ function renderExclusionWarning(warn){
   if(!ex.length){ warn.style.display='none'; warn.innerHTML=''; return; }
   const lines=ex.map(e=>'<li><strong>'+coKey(e.row.company)+' — '
     +String(e.row.planName||'—')+'</strong>: '+e.reason+'</li>').join('');
+  // Two different causes land in the same list — the hint has to match
+  // whichever actually apply here, or a collision-only warning would tell
+  // the operator to fix a Sum Insured column that was never the problem.
+  const hasBandIssue=ex.some(e=>e.reason.indexOf('report bands')!==-1||e.reason.indexOf('no premium')!==-1);
+  const hasCollision=ex.some(e=>e.reason.indexOf('overwrote this one')!==-1);
+  const hints=[];
+  if(hasBandIssue) hints.push('changing the Sum Insured column to a report band, or re-quoting at 10 / 15 / 25 / 50 L or 1 Cr');
+  if(hasCollision) hints.push('removing the duplicate quote, or changing its Plan Type/Tenor/Sum Insured so it no longer matches another quote exactly');
   warn.innerHTML='<strong>⚠️ '+ex.length+' quote'+(ex.length>1?'s':'')
     +' will not appear in the Excel report</strong>'
     +'<ul style="margin:6px 0 0;padding-left:18px">'+lines+'</ul>'
-    +'<div style="margin-top:7px;color:#fcd34d">Fix by changing the Sum Insured column '
-    +'to a report band, or re-quote at 10 / 15 / 25 / 50 L or 1 Cr.</div>';
+    +'<div style="margin-top:7px;color:#fcd34d">Fix by '+hints.join(', or ')+'.</div>';
   warn.style.display='';
 }
 
@@ -3305,6 +3312,33 @@ function rpDel(id){rpRows=rpRows.filter(r=>r._id!==id);rpRender();}
 // ── Shared helpers (report scope, aggregation, formatting) ──────────────────
 // Used by both the report table and the workbook writer.
 
+// _buildDataMap() gives each company exactly one row per cover-type block,
+// with up to 3 tenure-premium cells (1/2/3 Yr) — the report format itself
+// has no second cell for a SECOND quote at the same {SI band, company, plan
+// name, cover type, tenure}. When the operator adds two quotes for that
+// exact combination, _buildDataMap's own d.mi[idx]=prem/d.ff[idx]=prem
+// simply overwrites the earlier one — mechanically "last added wins," but
+// nothing said so. This walks the same rows in the same order and reports
+// every row that a LATER row will silently overwrite, so it can be surfaced
+// the same way rpExclusions() already surfaces SI-band/zero-premium drops
+// instead of a quote just vanishing with no explanation.
+function rpSlotCollisions(rows){
+  const seen={}, out=[];
+  (rows||rpRows).forEach(row=>{
+    const siKey=row.siKey||getSIKey(row.sumAssured);
+    if(!siKey) return; // already reported separately, below
+    const prem=parseInt(String(row.premium||'').replace(/[^0-9.]/g,''))||0;
+    if(prem<=0) return; // already reported separately, below
+    const yr=Math.max(1,Math.min(3,parseInt(String(row.tenor||1))||1));
+    const cover=row.planType==='Multi Individual'?'mi':'ff';
+    const slotKey=siKey+'|||'+row.company+'|||'+String(row.planName||row.company)+'|||'+cover+'|||'+yr;
+    if(seen[slotKey]) out.push({row:seen[slotKey],
+      reason:'a later quote for the same company, plan, cover type, tenure and Sum Insured overwrote this one — only the most recently added is kept'});
+    seen[slotKey]=row;
+  });
+  return out;
+}
+
 function rpExclusions(rows){
   const out=[];
   (rows||rpRows).forEach(row=>{
@@ -3317,7 +3351,7 @@ function rpExclusions(rows){
       out.push({row, reason:'no premium captured'});
     }
   });
-  return out;
+  return out.concat(rpSlotCollisions(rows));
 }
 
 function _buildDataMap(rows){
