@@ -4224,27 +4224,33 @@ function featureColumns(rows){
     else out.push(liveCol);
   }
 
-  // Never show a column captioned "features shown are for a DIFFERENT plan
-  // than you quoted" — confirmed live this reads as "the wrong plan was
-  // picked," not as a caveat, especially when a provider has more than one
-  // static column (MC has two: Sarvah Param and Lifetime Health) and NEITHER
-  // matches (e.g. a real Sarvah Uttam quote, which resolveLiveMcPlan
-  // deliberately never live-matches — see its own comment) — both wrong
-  // plans then appeared side by side. Rather than trying to judge when a
-  // caveated substitute is "close enough" to show, every column for a
-  // provider that doesn't match the actual quoted plan (and wasn't replaced
-  // by a genuine live-data match above) is removed and replaced with one
-  // honest "no feature data held for this plan" placeholder — the SAME
-  // placeholder Star already used when it has no static entry at all.
+  // Never show a column for a plan that was not actually quoted — confirmed
+  // live (a real export) this reads as "the wrong plan was picked," not as
+  // a caveat, and it happens even when a SIBLING column for the same
+  // provider genuinely matched: a real MC quote for "Sarvah Param" still
+  // showed a second "MANIPAL CIGNA_Lifetime Plan" column captioned
+  // "Features shown are for Lifetime Health. You quoted Sarvah Param." —
+  // Lifetime Health was never quoted at all, so it has no business
+  // appearing just because it happens to share a provider with a plan that
+  // WAS quoted. Every column that doesn't match the actual quoted plan(s)
+  // (and wasn't replaced by a genuine live-data match above) is removed
+  // outright — unconditionally, not only when every column for that
+  // provider fails to match. Only if NOTHING survives for a provider that
+  // was actually quoted does it get one honest "no feature data held for
+  // this plan" placeholder — the SAME placeholder Star already used when it
+  // has no static entry at all.
   const byProvider = {};
   out.forEach(c => { (byProvider[c.provider] = byProvider[c.provider] || []).push(c); });
   Object.keys(byProvider).forEach(k => {
     const cols = byProvider[k];
-    if (cols.some(c => c.matches || c.live)) return;
-    cols.forEach(c => { const i = out.indexOf(c); if (i >= 0) out.splice(i, 1); });
-    out.push({ label:(FEATURE_PROVIDER_LABEL[k] || k), width:21, fill:null,
-               provider:k, plan:null, matches:false, missing:true,
-               quotedPlans:[...new Set(cols.flatMap(c => c.quotedPlans))] });
+    const bad = cols.filter(c => !(c.matches || c.live));
+    if (!bad.length) return; // every column for this provider already matches — nothing to remove
+    bad.forEach(c => { const i = out.indexOf(c); if (i >= 0) out.splice(i, 1); });
+    if (cols.length === bad.length) {
+      out.push({ label:(FEATURE_PROVIDER_LABEL[k] || k), width:21, fill:null,
+                 provider:k, plan:null, matches:false, missing:true,
+                 quotedPlans:[...new Set(bad.flatMap(c => c.quotedPlans))] });
+    }
   });
 
   return out;
