@@ -53,7 +53,23 @@ function parsePremium(html, sess) {
   const discPctM = html.match(/data-basepremiumdiscountpercent="([^"]+)"/);
   const discPct  = discPctM?.[1] ?? null;
 
-  return { planId, selectedSI, discounted, original, grandTotal, base, discPct, needsPincode, ok: !!discounted };
+  // Tenure (field_4) — which radio is actually CHECKED right now, not just
+  // which values are on offer. parseFields() below already collects the
+  // available options (tenureOptions), but never checked which one is
+  // selected, and that was never wired into the captured-quote object at
+  // all — confirmed this is why a comparison row's tenure never reflected
+  // what the operator had picked on the real page, only the hub's own
+  // tenure chip from whenever the fill happened. Same "read the page's own
+  // live state" fix already applied to selectedSI above.
+  const tenureInputs = [...html.matchAll(/<input[^>]*name="PartnerPreviewForm\[input\]\[field_4\][^"]*"[^>]*>/gi)];
+  let tenure = null;
+  for (const m of tenureInputs) {
+    if (!/\bchecked\b/i.test(m[0])) continue;
+    const vm = m[0].match(/value="([^"]+)"/);
+    if (vm && /year/i.test(vm[1])) { tenure = vm[1]; break; }
+  }
+
+  return { planId, selectedSI, discounted, original, grandTotal, base, discPct, needsPincode, tenure, ok: !!discounted };
 }
 
 const FIELD_LABELS = {

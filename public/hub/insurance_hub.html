@@ -1584,7 +1584,13 @@ function addCareToComparison() {
     premium: captured.grandTotal || captured.discounted || '—',
     addons: (captured.addons || []).filter(a => a.checked).map(a => a.label).join(', '),
     coverType: (_pendingParams.care && _pendingParams.care.coverType) || '',
-    tenure: (_pendingParams.care && _pendingParams.care.tenure) || '',
+    // Prefer the tenure radio actually checked on Care's real page right
+    // now (captured.tenure, from server/care_scrapers.js's parsePremium())
+    // over the hub's own pending-params snapshot — same staleness problem
+    // as planName/coverType above: _pendingParams.care.tenure is frozen at
+    // whenever "Pick Plan Names & Fill" last ran and never reflects the
+    // operator changing tenure directly on the real page afterward.
+    tenure: captured.tenure || (_pendingParams.care && _pendingParams.care.tenure) || '',
   });
 }
 
@@ -2957,7 +2963,13 @@ function addQuote(data) {
   // Prefer the tenure the calculator actually priced. Only fall back to the
   // hub's term chip when a calculator does not report one — the chip can have
   // moved since the quote was run.
-  const dt=parseInt(String(data.tenure||''));
+  // Extract the first digit run ANYWHERE in the string, not parseInt() on
+  // the whole thing — Niva's real captured tenure text is "For 1 Year"
+  // (confirmed live in niva_result_script.js), and parseInt() requires a
+  // digit-leading string, so it always returned NaN for Niva and silently
+  // fell through to the hub's chip regardless of what was actually quoted.
+  const tm=String(data.tenure||'').match(/(\d+)/);
+  const dt=tm?parseInt(tm[1],10):NaN;
   const tenure=(dt>=1&&dt<=3)?String(dt):currentTenureFor(data.company);
   // Same for cover mode. Stamping the hub's current global at export time
   // meant every row inherited whatever the toggle said then, which is why
@@ -3884,6 +3896,8 @@ let STAR_LIVE_FEATURES = null;
 let FEATURE_MASTER = {
   customFeatures: [],
   customPlans: { care:[], niva:[], mc:[], star:[] },
+  hiddenFeatures: [],
+  featureRenames: {},
   overrides: { care:{}, niva:{}, mc:{}, star:{} },
   selectedPlan: { care:null, niva:null, mc:null, star:null },
 };
@@ -3898,6 +3912,8 @@ let FEATURE_MASTER = {
         care: (d.customPlans && d.customPlans.care) || [], niva: (d.customPlans && d.customPlans.niva) || [],
         mc:   (d.customPlans && d.customPlans.mc)   || [], star: (d.customPlans && d.customPlans.star) || [],
       },
+      hiddenFeatures: Array.isArray(d.hiddenFeatures) ? d.hiddenFeatures : [],
+      featureRenames: (d.featureRenames && typeof d.featureRenames === 'object') ? d.featureRenames : {},
       overrides: {
         care: (d.overrides && d.overrides.care) || {}, niva: (d.overrides && d.overrides.niva) || {},
         mc:   (d.overrides && d.overrides.mc)   || {}, star: (d.overrides && d.overrides.star) || {},
@@ -3922,6 +3938,35 @@ function fmPrettyPlanKey(key){
   return String(key||'').replace(/[-_]+/g,' ').replace(/\b\w/g, c => c.toUpperCase());
 }
 
+// A feature with sub-rows (only "Room Rent" today — Shared/Single AC room/
+// Suite) needs each sub-row individually addressable in overrides/auto-
+// mapped data, since the underlying real values CAN differ per sub-row
+// (confirmed by feature_comparison.json's own schema, even though today's
+// actual static values happen to be identical across all 3). A feature with
+// no sub-row (`sub` is null/undefined) is addressed by its plain name, same
+// as before this change — nothing about the no-sub case changes.
+function fmRowKey(feature, sub){ return sub ? (feature + ' — ' + sub) : feature; }
+
+// Looks up one row's value out of a resolveMasterPlanRows() `rows` object:
+// the sub-specific key first (an operator override, or the static Sarvah
+// Param fallback, both of which ARE sub-row-aware), then the plain feature
+// key (auto-scraped live data, which is NOT sub-row-aware — confirmed live
+// earlier this session the real product pages don't distinguish room type
+// either, so every sub-row correctly shares that one value).
+function fmRowValue(rows, feature, sub){
+  if (!rows) return '';
+  return rows[fmRowKey(feature, sub)] || rows[feature] || '';
+}
+
+// The display label for a feature, honoring an operator rename
+// (FEATURE_MASTER.featureRenames) — but every internal lookup (overrides,
+// auto-mapped ROW_RULES-driven data) keeps keying off the ORIGINAL name
+// passed in here, never the renamed one, so renaming a canonical row's
+// label can't silently disconnect it from its real data.
+function fmFeatureLabel(feature){
+  return (FEATURE_MASTER.featureRenames && FEATURE_MASTER.featureRenames[feature]) || feature;
+}
+
 // Feature Master lets the operator add new rows beyond the 16 canonical
 // ones from feature_comparison.json — this is the single combined row list
 // every renderer (apply*LiveOverlay below, xlBuildFeatureSheet,
@@ -3936,7 +3981,12 @@ function allFeatureRows(){
   const custom = (FEATURE_MASTER.customFeatures || []).map(c => ({
     feature: c.feature, rows: [{ sub:null, values:['','','','',''] }],
   }));
-  return base.concat(custom);
+  const hidden = new Set(FEATURE_MASTER.hiddenFeatures || []);
+  // "Delete" in Feature Master hides a row rather than mutating
+  // feature_comparison.json/customFeatures — additive and reversible,
+  // consistent with everything else this override file does, and it works
+  // identically for a canonical row or an operator-added one.
+  return base.concat(custom).filter(f => !hidden.has(f.feature));
 }
 
 // Resolves one specific plan's feature-row values, merging its auto-mapped
@@ -3965,8 +4015,14 @@ function resolveMasterPlanRows(provider, planKey){
     const col = FEATURE_DATA && (FEATURE_DATA.plans || []).find(p => p.provider === 'mc' && p.plan === 'Sarvah Param');
     const idx = col && FEATURE_DATA.plans.indexOf(col);
     if (col && idx >= 0) {
+      // Every sub-row, not just rows[0] — the static sheet's own schema
+      // stores Room Rent's Shared/Single AC room/Suite as 3 distinct
+      // values (even though today's actual data happens to be identical
+      // across all 3), so this has to read each one, not just "Shared".
       (FEATURE_DATA.features || []).forEach(f => {
-        autoRows[f.feature] = (f.rows[0] && f.rows[0].values[idx]) || '';
+        f.rows.forEach(r => {
+          autoRows[fmRowKey(f.feature, r.sub)] = (r.values && r.values[idx]) || '';
+        });
       });
     }
   } else {
@@ -4032,10 +4088,34 @@ function fmToggleSelected(provider){
 }
 function fmClearSelected(provider){ FEATURE_MASTER.selectedPlan[provider] = null; fmRenderAll(); }
 
-function fmEditValue(provider, planKey, featureName, value){
+// rowKey is fmRowKey(feature, sub) — a plain feature name for a no-sub
+// feature, or "feature — sub" for one of Room Rent's 3 sub-rows.
+function fmEditValue(provider, planKey, rowKey, value){
   if (!FEATURE_MASTER.overrides[provider]) FEATURE_MASTER.overrides[provider] = {};
   if (!FEATURE_MASTER.overrides[provider][planKey]) FEATURE_MASTER.overrides[provider][planKey] = {};
-  FEATURE_MASTER.overrides[provider][planKey][featureName] = value;
+  FEATURE_MASTER.overrides[provider][planKey][rowKey] = value;
+}
+
+// Hides a feature row everywhere (Feature Master's own table, and the
+// exported Excel/PDF) without deleting its underlying definition — see
+// allFeatureRows(). Works for a canonical row or an operator-added one.
+function fmDeleteFeature(feature){
+  if (!confirm('Remove "' + fmFeatureLabel(feature) + '" from the Feature Comparison sheet?\n\nThis only hides it — it can be restored by an administrator if needed.')) return;
+  if (!FEATURE_MASTER.hiddenFeatures.includes(feature)) FEATURE_MASTER.hiddenFeatures.push(feature);
+  fmRenderAll();
+}
+
+// Renames a feature's DISPLAY label only (see fmFeatureLabel()) — every
+// override/auto-mapped lookup keeps using the original name internally, so
+// this can't disconnect a canonical row from its real scraped data.
+function fmRenameFeature(feature){
+  const current = fmFeatureLabel(feature);
+  const next = prompt('Rename "' + current + '" to:', current);
+  if (next == null) return; // cancelled
+  const clean = next.trim();
+  if (!clean || clean === feature) { delete FEATURE_MASTER.featureRenames[feature]; fmRenderAll(); return; }
+  FEATURE_MASTER.featureRenames[feature] = clean;
+  fmRenderAll();
 }
 
 // Lets the operator open (and start editing) a plan that isn't in the
@@ -4072,7 +4152,9 @@ function fmAddFeature(){
   const name = prompt('New feature name (this becomes a new row for every insurer/plan):');
   if (!name || !name.trim()) return;
   const clean = name.trim();
-  if (allFeatureRows().some(f => f.feature === clean)) { showToast('⚠️ A feature named "'+clean+'" already exists'); return; }
+  if (allFeatureRows().some(f => f.feature === clean || fmFeatureLabel(f.feature) === clean)) {
+    showToast('⚠️ A feature named "'+clean+'" already exists'); return;
+  }
   FEATURE_MASTER.customFeatures.push({ feature: clean });
   fmRenderAll();
 }
@@ -4145,17 +4227,32 @@ function fmRenderAll(){
     return;
   }
   const resolved = resolveMasterPlanRows(provider, editingKey) || { rows:{} };
+  const pk = fmEsc(editingKey).replace(/'/g, "\\'");
   const rowsHtml = allFeatureRows().map(f => {
-    const val = resolved.rows[f.feature] || '';
-    const pk = fmEsc(editingKey).replace(/'/g, "\\'");
     const fn = fmEsc(f.feature).replace(/'/g, "\\'");
-    return `<tr>
-      <td style="font-weight:600;white-space:nowrap;padding:6px 10px;border-bottom:1px solid #1e293b;vertical-align:top">${fmEsc(f.feature)}</td>
-      <td style="padding:4px 10px;border-bottom:1px solid #1e293b">
-        <textarea rows="1" style="width:100%;min-width:280px;background:transparent;color:inherit;border:1px solid #334155;border-radius:6px;padding:5px 8px;font:inherit;resize:vertical"
-          onchange="fmEditValue('${provider}','${pk}','${fn}', this.value)">${fmEsc(val)}</textarea>
-      </td>
-    </tr>`;
+    // One <tr> per SUB-row (Room Rent gets 3: Shared/Single AC room/Suite,
+    // per the user's attached screenshot), not one per feature — each is
+    // independently editable via its own composite fmRowKey(). The rename/
+    // delete controls only appear once, on the feature's first sub-row.
+    return f.rows.map((row, ri) => {
+      const val = fmRowValue(resolved.rows, f.feature, row.sub);
+      const rk = fmEsc(fmRowKey(f.feature, row.sub)).replace(/'/g, "\\'");
+      const labelCell = ri === 0
+        ? `${fmEsc(fmFeatureLabel(f.feature))}
+           <button type="button" title="Rename" onclick="fmRenameFeature('${fn}')"
+             style="background:none;border:none;color:#64748b;cursor:pointer;padding:0 2px;font-size:12px">✏</button>
+           <button type="button" title="Remove this feature" onclick="fmDeleteFeature('${fn}')"
+             style="background:none;border:none;color:#ef4444;cursor:pointer;padding:0 2px;font-size:12px">✕</button>`
+        : '';
+      return `<tr>
+        <td style="font-weight:600;white-space:nowrap;padding:6px 10px;border-bottom:1px solid #1e293b;vertical-align:top">${labelCell}</td>
+        <td style="white-space:nowrap;padding:6px 10px;border-bottom:1px solid #1e293b;vertical-align:top;color:#94a3b8">${row.sub ? fmEsc(row.sub) : ''}</td>
+        <td style="padding:4px 10px;border-bottom:1px solid #1e293b">
+          <textarea rows="1" style="width:100%;min-width:280px;background:transparent;color:inherit;border:1px solid #334155;border-radius:6px;padding:5px 8px;font:inherit;resize:vertical"
+            onchange="fmEditValue('${provider}','${pk}','${rk}', this.value)">${fmEsc(val)}</textarea>
+        </td>
+      </tr>`;
+    }).join('');
   }).join('');
   tableEl.innerHTML = `<table style="width:100%;border-collapse:collapse;font-size:13px"><tbody>${rowsHtml}</tbody></table>`;
 }
@@ -4200,10 +4297,9 @@ function applyCareLiveOverlay(liveRows){
     // there", not a blank cell that could be misread as "nothing captured
     // at all". Plain null (blank) only when no live plan is shown in this
     // report to begin with.
-    const value = liveRows ? (liveRows[f.feature] || 'N/A') : null;
     f.rows.forEach(row => {
       row.values = row.values || [];
-      row.values[CARE_LIVE_SOURCE_INDEX] = value;
+      row.values[CARE_LIVE_SOURCE_INDEX] = liveRows ? (fmRowValue(liveRows, f.feature, row.sub) || 'N/A') : null;
     });
   });
 }
@@ -4231,10 +4327,9 @@ const NIVA_LIVE_SOURCE_INDEX = 6;
 
 function applyNivaLiveOverlay(liveRows){
   allFeatureRows().forEach(f => {
-    const value = liveRows ? (liveRows[f.feature] || 'N/A') : null;
     f.rows.forEach(row => {
       row.values = row.values || [];
-      row.values[NIVA_LIVE_SOURCE_INDEX] = value;
+      row.values[NIVA_LIVE_SOURCE_INDEX] = liveRows ? (fmRowValue(liveRows, f.feature, row.sub) || 'N/A') : null;
     });
   });
 }
@@ -4308,10 +4403,9 @@ const MC_LIVE_SOURCE_INDEX = 7;
 
 function applyMcLiveOverlay(liveRows){
   allFeatureRows().forEach(f => {
-    const value = liveRows ? (liveRows[f.feature] || 'N/A') : null;
     f.rows.forEach(row => {
       row.values = row.values || [];
-      row.values[MC_LIVE_SOURCE_INDEX] = value;
+      row.values[MC_LIVE_SOURCE_INDEX] = liveRows ? (fmRowValue(liveRows, f.feature, row.sub) || 'N/A') : null;
     });
   });
 }
@@ -4356,10 +4450,9 @@ const STAR_LIVE_SOURCE_INDEX = 8;
 
 function applyStarLiveOverlay(liveRows){
   allFeatureRows().forEach(f => {
-    const value = liveRows ? (liveRows[f.feature] || 'N/A') : null;
     f.rows.forEach(row => {
       row.values = row.values || [];
-      row.values[STAR_LIVE_SOURCE_INDEX] = value;
+      row.values[STAR_LIVE_SOURCE_INDEX] = liveRows ? (fmRowValue(liveRows, f.feature, row.sub) || 'N/A') : null;
     });
   });
 }
@@ -4682,7 +4775,7 @@ function xlBuildFeatureSheet(wb, used, rows){
     f.rows.forEach((row, ri) => {
       // Feature name in A; when a feature has sub-rows the name is merged down
       // and B carries the qualifier, otherwise A:B is merged across.
-      xlSet(ws, r, 1, ri === 0 ? f.feature : null,
+      xlSet(ws, r, 1, ri === 0 ? fmFeatureLabel(f.feature) : null,
             { bold: true, wrap: true, size: FS, fill: st.featureFill || 'FFFBE5D6' });
       xlSet(ws, r, 2, row.sub || null,
             { bold: true, wrap: true, size: FS, fill: st.featureFill || 'FFFBE5D6' });
@@ -5077,7 +5170,7 @@ function pdfBuildFeatureSection(P, rows){
   allFeatureRows().forEach(f => {
     f.rows.forEach((row, ri) => {
       const cells = [
-        { v: ri === 0 ? f.feature : null, fill: st.featureFill, bold: true, align: 'left', size: FS },
+        { v: ri === 0 ? fmFeatureLabel(f.feature) : null, fill: st.featureFill, bold: true, align: 'left', size: FS },
         { v: row.sub || null,             fill: st.featureFill, bold: true, size: FS },
       ].concat(fcols.map((c, i) => {
         // Same rule as the sheet: read the original column slot, never the
@@ -5099,7 +5192,13 @@ async function generatePdfReport(){
   if (btn) { btn.disabled = true; btn.innerHTML = '⏳ Generating…'; }
 
   try {
-    if (!rpRows.length) { showToast('⚠️ No quotes — add quotes from the calculators first'); return; }
+    // A Feature Master plan selection is enough on its own to generate a
+    // report — the Feature Comparison section doesn't need any quotes,
+    // and featureColumns() already produces a column for a manually
+    // selected plan regardless of rpRows (confirmed by tracing it: the
+    // selectedPlan branch never touches rows/quoted at all).
+    const hasFeatureSelection = Object.values(FEATURE_MASTER.selectedPlan).some(Boolean);
+    if (!rpRows.length && !hasFeatureSelection) { showToast('⚠️ No quotes and no Feature Master plan selected — add a quote, or pick a plan in Feature Master first'); return; }
 
     const JsPDF = await loadJsPDF();
     const { sections, clientNm } = buildReportSections();
@@ -5242,7 +5341,13 @@ async function generateReport(){
   btn.disabled = true; btn.innerHTML = '⏳ Generating…';
 
   try {
-    if (!rpRows.length) { showToast('⚠️ No quotes — add quotes from the calculators first'); return; }
+    // A Feature Master plan selection is enough on its own to generate a
+    // report — the Feature Comparison section doesn't need any quotes,
+    // and featureColumns() already produces a column for a manually
+    // selected plan regardless of rpRows (confirmed by tracing it: the
+    // selectedPlan branch never touches rows/quoted at all).
+    const hasFeatureSelection = Object.values(FEATURE_MASTER.selectedPlan).some(Boolean);
+    if (!rpRows.length && !hasFeatureSelection) { showToast('⚠️ No quotes and no Feature Master plan selected — add a quote, or pick a plan in Feature Master first'); return; }
 
     const ExcelJSLib = await loadExcelJS();
     const { sections, clientNm } = buildReportSections();
