@@ -4096,11 +4096,69 @@ function fmEditValue(provider, planKey, rowKey, value){
   FEATURE_MASTER.overrides[provider][planKey][rowKey] = value;
 }
 
+// Electron's renderer has never implemented window.prompt() — it's a
+// long-standing, still-unfixed gap (unlike alert()/confirm(), which do
+// work) — confirmed as the reason "+ Add Feature" silently did nothing:
+// it worked fine under Playwright-driven testing (a real browser, where
+// prompt() IS implemented) but never in the actual packaged app. Rather
+// than depend on ANY native dialog for Feature Master (including
+// confirm(), to stay consistent and not trip the same class of bug
+// again), these build a small in-page modal and return a Promise —
+// `await`-able the same way prompt()/confirm() would have been used.
+function fmTextPrompt(title, defaultValue){
+  return new Promise(resolve => {
+    const overlay = document.createElement('div');
+    overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:9999;display:flex;align-items:center;justify-content:center';
+    overlay.innerHTML = `
+      <div style="background:#0f172a;border:1px solid #334155;border-radius:10px;padding:20px;min-width:340px;max-width:440px;box-shadow:0 10px 40px rgba(0,0,0,.5)">
+        <div style="font-size:13px;color:#e2e8f0;margin-bottom:10px">${fmEsc(title)}</div>
+        <input type="text" id="fm-prompt-input"
+          style="width:100%;background:#1e293b;color:#e2e8f0;border:1px solid #334155;border-radius:6px;padding:8px 10px;font:inherit;box-sizing:border-box">
+        <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:14px">
+          <button type="button" id="fm-prompt-cancel" class="filt-chip">Cancel</button>
+          <button type="button" id="fm-prompt-ok" class="filt-chip on">OK</button>
+        </div>
+      </div>`;
+    document.body.appendChild(overlay);
+    const input = overlay.querySelector('#fm-prompt-input');
+    input.value = defaultValue || '';
+    input.focus(); input.select();
+    const done = (val) => { overlay.remove(); resolve(val); };
+    overlay.querySelector('#fm-prompt-ok').onclick = () => done(input.value);
+    overlay.querySelector('#fm-prompt-cancel').onclick = () => done(null);
+    overlay.addEventListener('mousedown', e => { if (e.target === overlay) done(null); });
+    input.addEventListener('keydown', e => {
+      if (e.key === 'Enter') { e.preventDefault(); done(input.value); }
+      if (e.key === 'Escape') { e.preventDefault(); done(null); }
+    });
+  });
+}
+function fmConfirmModal(message, okLabel){
+  return new Promise(resolve => {
+    const overlay = document.createElement('div');
+    overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:9999;display:flex;align-items:center;justify-content:center';
+    overlay.innerHTML = `
+      <div style="background:#0f172a;border:1px solid #334155;border-radius:10px;padding:20px;min-width:340px;max-width:440px;box-shadow:0 10px 40px rgba(0,0,0,.5)">
+        <div style="font-size:13px;color:#e2e8f0;white-space:pre-wrap;margin-bottom:14px">${fmEsc(message)}</div>
+        <div style="display:flex;justify-content:flex-end;gap:8px">
+          <button type="button" id="fm-confirm-cancel" class="filt-chip">Cancel</button>
+          <button type="button" id="fm-confirm-ok" class="filt-chip on" style="color:#ef4444">${fmEsc(okLabel || 'Remove')}</button>
+        </div>
+      </div>`;
+    document.body.appendChild(overlay);
+    const done = (val) => { overlay.remove(); resolve(val); };
+    overlay.querySelector('#fm-confirm-ok').onclick = () => done(true);
+    overlay.querySelector('#fm-confirm-cancel').onclick = () => done(false);
+    overlay.addEventListener('mousedown', e => { if (e.target === overlay) done(false); });
+  });
+}
+
 // Hides a feature row everywhere (Feature Master's own table, and the
 // exported Excel/PDF) without deleting its underlying definition — see
 // allFeatureRows(). Works for a canonical row or an operator-added one.
-function fmDeleteFeature(feature){
-  if (!confirm('Remove "' + fmFeatureLabel(feature) + '" from the Feature Comparison sheet?\n\nThis only hides it — it can be restored by an administrator if needed.')) return;
+async function fmDeleteFeature(feature){
+  const ok = await fmConfirmModal('Remove "' + fmFeatureLabel(feature) + '" from the Feature Comparison sheet?\n\nThis only hides it — it can be restored by an administrator if needed.');
+  if (!ok) return;
   if (!FEATURE_MASTER.hiddenFeatures.includes(feature)) FEATURE_MASTER.hiddenFeatures.push(feature);
   fmRenderAll();
 }
@@ -4108,9 +4166,9 @@ function fmDeleteFeature(feature){
 // Renames a feature's DISPLAY label only (see fmFeatureLabel()) — every
 // override/auto-mapped lookup keeps using the original name internally, so
 // this can't disconnect a canonical row from its real scraped data.
-function fmRenameFeature(feature){
+async function fmRenameFeature(feature){
   const current = fmFeatureLabel(feature);
-  const next = prompt('Rename "' + current + '" to:', current);
+  const next = await fmTextPrompt('Rename "' + current + '" to:', current);
   if (next == null) return; // cancelled
   const clean = next.trim();
   if (!clean || clean === feature) { delete FEATURE_MASTER.featureRenames[feature]; fmRenderAll(); return; }
@@ -4148,8 +4206,8 @@ function fmAddPlan(provider){
   fmRenderAll();
 }
 
-function fmAddFeature(){
-  const name = prompt('New feature name (this becomes a new row for every insurer/plan):');
+async function fmAddFeature(){
+  const name = await fmTextPrompt('New feature name (this becomes a new row for every insurer/plan):');
   if (!name || !name.trim()) return;
   const clean = name.trim();
   if (allFeatureRows().some(f => f.feature === clean || fmFeatureLabel(f.feature) === clean)) {
