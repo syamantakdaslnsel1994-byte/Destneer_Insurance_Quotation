@@ -929,6 +929,8 @@ html,body{height:100%;overflow:hidden;font-family:'Inter',system-ui,sans-serif;b
                 Pick a plan per insurer to use in the Feature Comparison sheet, and edit or add
                 feature rows. Edits are additive — nothing here overwrites the auto-scraped data,
                 and an insurer you don't pick a plan for keeps using automatic plan matching.
+                Changes save automatically as you go — "Save Now" is only there if you want to be
+                sure before generating a report.
               </div>
             </div>
             <div style="display:flex;gap:8px;align-items:center;white-space:nowrap;flex-wrap:wrap">
@@ -936,7 +938,7 @@ html,body{height:100%;overflow:hidden;font-family:'Inter',system-ui,sans-serif;b
               <button class="filt-chip" onclick="fmExportData()">⬇️ Export</button>
               <button class="filt-chip" onclick="document.getElementById('fm-import-file').click()">⬆️ Import</button>
               <input type="file" id="fm-import-file" accept="application/json,.json" style="display:none" onchange="fmImportFile(event)">
-              <button class="filt-chip on" onclick="fmSave()">💾 Save Feature Master</button>
+              <button class="filt-chip on" onclick="fmSave()">💾 Save Now</button>
             </div>
           </div>
           <div id="fm-save-status" style="font-size:12px;color:#94a3b8;margin-bottom:10px"></div>
@@ -4092,8 +4094,9 @@ function fmToggleSelected(provider){
   const editingKey = _fmEditingPlan[provider];
   FEATURE_MASTER.selectedPlan[provider] = (FEATURE_MASTER.selectedPlan[provider] === editingKey) ? null : editingKey;
   fmRenderAll();
+  fmScheduleSave();
 }
-function fmClearSelected(provider){ FEATURE_MASTER.selectedPlan[provider] = null; fmRenderAll(); }
+function fmClearSelected(provider){ FEATURE_MASTER.selectedPlan[provider] = null; fmRenderAll(); fmScheduleSave(); }
 
 // rowKey is fmRowKey(feature, sub) — a plain feature name for a no-sub
 // feature, or "feature — sub" for one of Room Rent's 3 sub-rows.
@@ -4101,6 +4104,7 @@ function fmEditValue(provider, planKey, rowKey, value){
   if (!FEATURE_MASTER.overrides[provider]) FEATURE_MASTER.overrides[provider] = {};
   if (!FEATURE_MASTER.overrides[provider][planKey]) FEATURE_MASTER.overrides[provider][planKey] = {};
   FEATURE_MASTER.overrides[provider][planKey][rowKey] = value;
+  fmScheduleSave();
 }
 
 // Electron's renderer has never implemented window.prompt() — it's a
@@ -4168,6 +4172,7 @@ async function fmDeleteFeature(feature){
   if (!ok) return;
   if (!FEATURE_MASTER.hiddenFeatures.includes(feature)) FEATURE_MASTER.hiddenFeatures.push(feature);
   fmRenderAll();
+  fmScheduleSave();
 }
 
 // Renames a feature's DISPLAY label only (see fmFeatureLabel()) — every
@@ -4178,9 +4183,10 @@ async function fmRenameFeature(feature){
   const next = await fmTextPrompt('Rename "' + current + '" to:', current);
   if (next == null) return; // cancelled
   const clean = next.trim();
-  if (!clean || clean === feature) { delete FEATURE_MASTER.featureRenames[feature]; fmRenderAll(); return; }
+  if (!clean || clean === feature) { delete FEATURE_MASTER.featureRenames[feature]; fmRenderAll(); fmScheduleSave(); return; }
   FEATURE_MASTER.featureRenames[feature] = clean;
   fmRenderAll();
+  fmScheduleSave();
 }
 
 // Lets the operator open (and start editing) a plan that isn't in the
@@ -4211,6 +4217,7 @@ function fmAddPlan(provider){
   _fmEditingPlan[provider] = key;
   if (input) input.value = '';
   fmRenderAll();
+  fmScheduleSave();
 }
 
 async function fmAddFeature(){
@@ -4222,31 +4229,99 @@ async function fmAddFeature(){
   }
   FEATURE_MASTER.customFeatures.push({ feature: clean });
   fmRenderAll();
+  fmScheduleSave();
 }
 
-async function fmSave(){
+// Feature Master autosaves — every mutating action below calls
+// fmScheduleSave() instead of relying on the operator to remember to click
+// "Save Now". Previously every edit here (add/rename/delete a feature, edit
+// a value, add a plan, pick a plan) only ever updated in-memory state, and
+// Sign Out (hubLogout(), below) does an immediate location.replace() with
+// zero warning — so an edit made shortly before signing out, or before just
+// closing the app, was silently lost with no indication anything was wrong.
+// Confirmed live: this reproduced the report exactly (add a feature, sign
+// out without clicking Save, reopen — gone), and data/feature_master_
+// overrides.json didn't even exist on disk yet, meaning no save had ever
+// actually landed. Debounced (1.2s) so a burst of edits becomes one save,
+// not one per change.
+let _fmDirty = false;
+let _fmSaveTimer = null;
+let _fmSaveInFlight = null;
+let _fmSaveFailedToastShown = false;
+
+function fmScheduleSave(){
+  _fmDirty = true;
+  _fmSaveFailedToastShown = false;
+  const statusEl = document.getElementById('fm-save-status');
+  if (statusEl) statusEl.textContent = '● Unsaved changes — saving…';
+  if (_fmSaveTimer) clearTimeout(_fmSaveTimer);
+  _fmSaveTimer = setTimeout(() => { _fmSaveTimer = null; fmSave({ silent: true }); }, 1200);
+}
+
+// Saves right now, bypassing the debounce, and waits for it — used before
+// Sign Out so a pending debounce window can't let a fresh edit slip through
+// unsaved. Returns true once nothing is left unsaved.
+async function fmFlushSave(){
+  if (_fmSaveTimer) { clearTimeout(_fmSaveTimer); _fmSaveTimer = null; }
+  if (_fmSaveInFlight) await _fmSaveInFlight;
+  if (_fmDirty) await fmSave({ silent: true });
+  return !_fmDirty;
+}
+
+async function fmSave(opts){
+  const silent = !!(opts && opts.silent);
   const statusEl = document.getElementById('fm-save-status');
   if (statusEl) statusEl.textContent = 'Saving…';
-  try {
-    const r = await fetch('feature_master_overrides.json', {
-      // The server's authRequired reads the login token ONLY from the
-      // Authorization header (see server/care_server.js's authWhois()) —
-      // there is no cookie session in this app. Every other authenticated
-      // save (quotations, save-destination) already sends it via
-      // hubAuthHeaders(); this one didn't, so it failed "Not signed in"
-      // even for an operator who genuinely was.
-      method: 'POST', headers: hubAuthHeaders({ 'Content-Type':'application/json' }),
-      body: JSON.stringify(FEATURE_MASTER),
-    });
-    if (r.status === 401) { hubHandle401(r); throw new Error('Not signed in — redirecting to login…'); }
-    if (!r.ok) { const d = await r.json().catch(()=>({})); throw new Error(d.error || ('save failed (' + r.status + ')')); }
-    if (statusEl) statusEl.textContent = '✅ Saved ' + new Date().toLocaleTimeString();
-    showToast('✅ Feature Master saved');
-  } catch (e) {
-    if (statusEl) statusEl.textContent = '⚠️ Save failed: ' + e.message;
-    showToast('⚠️ Feature Master save failed: ' + e.message, 6000);
-  }
+  const attempt = (async () => {
+    try {
+      const r = await fetch('feature_master_overrides.json', {
+        // The server's authRequired reads the login token ONLY from the
+        // Authorization header (see server/care_server.js's authWhois()) —
+        // there is no cookie session in this app. Every other authenticated
+        // save (quotations, save-destination) already sends it via
+        // hubAuthHeaders(); this one didn't, so it failed "Not signed in"
+        // even for an operator who genuinely was.
+        method: 'POST', headers: hubAuthHeaders({ 'Content-Type':'application/json' }),
+        body: JSON.stringify(FEATURE_MASTER),
+      });
+      if (r.status === 401) { hubHandle401(r); throw new Error('Not signed in — redirecting to login…'); }
+      if (!r.ok) { const d = await r.json().catch(()=>({})); throw new Error(d.error || ('save failed (' + r.status + ')')); }
+      _fmDirty = false;
+      if (statusEl) statusEl.textContent = '✅ Saved ' + new Date().toLocaleTimeString();
+      if (!silent) showToast('✅ Feature Master saved');
+    } catch (e) {
+      if (statusEl) statusEl.textContent = '⚠️ Save failed: ' + e.message + (silent ? ' — retrying…' : '');
+      // A transient failure (network blip, a session that just expired)
+      // shouldn't mean the edit is silently lost — keep _fmDirty true.
+      // Autosave (silent) retries in the background and only toasts once
+      // per run of failures, not on every retry, so a flaky connection
+      // doesn't spam the operator; a fresh edit (fmScheduleSave) resets
+      // this so a NEW problem is still shown. A manual "Save Now" click
+      // always toasts directly (it's a deliberate action expecting a
+      // direct answer) and does not loop — clicking again retries it.
+      if (!silent || !_fmSaveFailedToastShown) {
+        showToast('⚠️ Feature Master save failed: ' + e.message, 6000);
+        _fmSaveFailedToastShown = true;
+      }
+      if (silent) {
+        if (_fmSaveTimer) clearTimeout(_fmSaveTimer);
+        _fmSaveTimer = setTimeout(() => { _fmSaveTimer = null; fmSave({ silent: true }); }, 5000);
+      }
+    }
+  })();
+  _fmSaveInFlight = attempt;
+  await attempt;
+  _fmSaveInFlight = null;
 }
+
+// Best-effort: not awaited (beforeunload can't reliably wait on async work),
+// but an in-flight fetch often still completes even as the window closes,
+// and this at least fires it immediately instead of leaving it to the
+// debounce timer that would otherwise never get to run.
+window.addEventListener('beforeunload', () => {
+  if (_fmSaveTimer) { clearTimeout(_fmSaveTimer); _fmSaveTimer = null; }
+  if (typeof FEATURE_MASTER !== 'undefined' && _fmDirty) fmSave({ silent: true });
+});
 
 // The 5 fields Export/Import round-trip. Deliberately NOT selectedPlan —
 // which plan currently wins the Feature Comparison export per insurer is a
@@ -4344,8 +4419,9 @@ async function fmImportFile(event){
 
   const counts = fmMergeImport(imported);
   fmRenderAll();
+  fmScheduleSave();
   showToast('✅ Imported ' + counts.features + ' feature(s), ' + counts.plans + ' plan(s), '
-    + counts.overrides + ' value(s) — click "Save Feature Master" to keep it', 6000);
+    + counts.overrides + ' value(s) — saving…', 6000);
 }
 
 function fmRenderAll(){
@@ -5703,6 +5779,20 @@ function hubHandle401(r){
   return false;
 }
 async function hubLogout(){
+  // Feature Master autosaves (see fmScheduleSave()), but Sign Out used to
+  // navigate away immediately regardless — flush any save still pending
+  // (the debounce window, or a retry after a transient failure) before
+  // leaving, and warn instead of silently discarding it if that flush
+  // itself fails (e.g. genuinely offline).
+  if (typeof _fmDirty !== 'undefined' && (_fmDirty || _fmSaveTimer || _fmSaveInFlight)) {
+    const ok = await fmFlushSave();
+    if (!ok) {
+      const proceed = await fmConfirmModal(
+        'Feature Master has unsaved changes that could not be saved — check your connection.\n\nSign out anyway and lose them?',
+        'Sign out anyway');
+      if (!proceed) return;
+    }
+  }
   try { await fetch(HIST_API + '/auth/logout', { method:'POST', headers: hubAuthHeaders() }); } catch (e) {}
   hubToLogin();
 }
