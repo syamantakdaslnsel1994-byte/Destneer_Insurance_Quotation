@@ -5313,12 +5313,23 @@ function pdfBuildQuoteSectionSBS(P, sec, isFirst){
 }
 
 // ── Feature Comparison section ──────────────────────────────────────────────
-function pdfBuildFeatureSection(P, rows){
+// `isFirst` mirrors pdfBuildQuoteSection/pdfBuildQuoteSectionSBS's own
+// param — this section used to ALWAYS start with P.newPage(), which was
+// harmless while it only ever ran after at least one quote section had
+// already used page 1, but left a genuinely blank page 1 the moment a
+// Feature-Master-only export (zero quotes) made this the only section drawn.
+// `prof` (size/lineH/pad/minRow) lets the horizontal PDF request the same
+// dense look its Quotation blocks use (pass PDF_SBS) instead of the
+// full-size 11pt this section renders at by default for the vertical PDF.
+function pdfBuildFeatureSection(P, rows, isFirst, prof){
   if (!FEATURE_DATA || !FEATURE_DATA.features || !FEATURE_DATA.features.length) return false;
   const fcols = featureColumns(rows);
   if (!fcols.length) return false;
   const st = FEATURE_DATA.style || {};
-  P.newPage();
+  const pr = prof || {};
+  const FS = pr.size != null ? pr.size : PDF.featureSize;
+  const LH = pr.lineH != null ? pr.lineH : PDF.featureLineH;
+  if (!isFirst) P.newPage();
 
   // The reference's seven character widths were for two label columns plus five
   // plans. With a different number of plans, keep the label columns' share and
@@ -5329,12 +5340,13 @@ function pdfBuildFeatureSection(P, rows){
   const cols = LBL.concat(planW).map(c => c * P.usable / tot);
 
   pdfDrawLogo(P);
-  pdfTextRow(P, 'Feature Comparison', { bold: true });
+  pdfTextRow(P, 'Feature Comparison', { bold: true, size: FS, lineH: LH, pad: pr.pad, minRow: pr.minRow });
   P.y += PDF.gap / 2;
 
-  // 11pt, as the sheet has it. At 14pt these columns are narrow enough that
-  // jsPDF breaks words in the middle — "Treatments" became "Treatment" + "s".
-  const FS = PDF.featureSize, ROW = { lineH: PDF.featureLineH };
+  // 11pt, as the sheet has it (or `prof.size` for a denser variant). At 14pt
+  // these columns are narrow enough that jsPDF breaks words in the middle —
+  // "Treatments" became "Treatment" + "s".
+  const ROW = { lineH: LH, pad: pr.pad, minRow: pr.minRow };
   pdfRow(P, [
     { v: 'Feature', fill: st.labelFill, bold: true, size: FS },
     { v: null,      fill: st.labelFill, size: FS },
@@ -5347,9 +5359,9 @@ function pdfBuildFeatureSection(P, rows){
       { v: 'Please note', fill: st.labelFill, bold: true, align: 'left', size: FS },
       { v: null,          fill: st.labelFill, size: FS },
     ].concat(notes.map(n => ({ v: n || '', align: 'left', size: FS, italic: true })));
-    const h = pdfRowHeight(P, cells, cols, PDF.featureLineH);
+    const h = pdfRowHeight(P, cells, cols, LH, pr.pad, pr.minRow);
     if (P.y + h > P.bottom) P.newPage();
-    pdfRow(P, cells, cols, { lineH: PDF.featureLineH, height: h });
+    pdfRow(P, cells, cols, { lineH: LH, pad: pr.pad, height: h });
   }
 
   allFeatureRows().forEach(f => {
@@ -5363,9 +5375,9 @@ function pdfBuildFeatureSection(P, rows){
         const v = c.missing ? '—' : (row.values || [])[c.sourceIndex == null ? i : c.sourceIndex];
         return { v: v == null ? '' : v, align: 'left', size: FS };
       }));
-      const h = pdfRowHeight(P, cells, cols, PDF.featureLineH);
+      const h = pdfRowHeight(P, cells, cols, LH, pr.pad, pr.minRow);
       if (P.y + h > P.bottom) P.newPage();
-      pdfRow(P, cells, cols, { lineH: PDF.featureLineH, height: h });
+      pdfRow(P, cells, cols, { lineH: LH, pad: pr.pad, height: h });
     });
   });
   return true;
@@ -5392,7 +5404,7 @@ async function generatePdfReport(){
     let drawn = 0;
     sections.forEach(sec => {
       const ok = sec.kind === 'features'
-        ? pdfBuildFeatureSection(P, sec.rows)
+        ? pdfBuildFeatureSection(P, sec.rows, drawn === 0)
         : pdfBuildQuoteSection(P, sec, drawn === 0);
       if (ok) drawn++;
     });
@@ -5438,9 +5450,12 @@ async function generatePdfReport(){
 // The "Horizontal" variant — same report, same buildReportSections(), only
 // the quote sections draw Family Floater / Multi Individual side by side
 // (pdfBuildQuoteSectionSBS, PDF_SBS sizing) instead of stacked. The Feature
-// Comparison section is unchanged (pdfBuildFeatureSection) — its columns
-// already scale to the page width, so it has no stacking/sizing problem to
-// begin with. Otherwise a line-for-line mirror of generatePdfReport() above
+// Comparison section reuses pdfBuildFeatureSection() too, but passed PDF_SBS
+// as its density profile so it renders at the same small/tight size as the
+// Quotation blocks instead of standing out at the vertical PDF's full 11pt —
+// its columns already scale to the page width regardless of font size, so
+// there's no separate side-by-side layout problem to solve there, only a
+// density one. Otherwise a line-for-line mirror of generatePdfReport() above
 // (same guard, same page numbering, same archive/toast behaviour) — kept as
 // a separate function rather than a shared one with an if/else sprinkled
 // through it, so the existing button's code path is untouched by this one.
@@ -5459,7 +5474,7 @@ async function generatePdfReportHorizontal(){
     let drawn = 0;
     sections.forEach(sec => {
       const ok = sec.kind === 'features'
-        ? pdfBuildFeatureSection(P, sec.rows)
+        ? pdfBuildFeatureSection(P, sec.rows, drawn === 0, PDF_SBS)
         : pdfBuildQuoteSectionSBS(P, sec, drawn === 0);
       if (ok) drawn++;
     });
