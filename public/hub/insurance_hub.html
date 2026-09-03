@@ -931,8 +931,11 @@ html,body{height:100%;overflow:hidden;font-family:'Inter',system-ui,sans-serif;b
                 and an insurer you don't pick a plan for keeps using automatic plan matching.
               </div>
             </div>
-            <div style="display:flex;gap:8px;align-items:center;white-space:nowrap">
+            <div style="display:flex;gap:8px;align-items:center;white-space:nowrap;flex-wrap:wrap">
               <button class="filt-chip" onclick="fmAddFeature()">+ Add Feature</button>
+              <button class="filt-chip" onclick="fmExportData()">⬇️ Export</button>
+              <button class="filt-chip" onclick="document.getElementById('fm-import-file').click()">⬆️ Import</button>
+              <input type="file" id="fm-import-file" accept="application/json,.json" style="display:none" onchange="fmImportFile(event)">
               <button class="filt-chip on" onclick="fmSave()">💾 Save Feature Master</button>
             </div>
           </div>
@@ -4243,6 +4246,106 @@ async function fmSave(){
     if (statusEl) statusEl.textContent = '⚠️ Save failed: ' + e.message;
     showToast('⚠️ Feature Master save failed: ' + e.message, 6000);
   }
+}
+
+// The 5 fields Export/Import round-trip. Deliberately NOT selectedPlan —
+// which plan currently wins the Feature Comparison export per insurer is a
+// per-install/per-report choice, not master data meant to travel between
+// machines, even though it does persist to disk like the rest of this object.
+const FM_EXPORT_FIELDS = ['customFeatures', 'customPlans', 'hiddenFeatures', 'featureRenames', 'overrides'];
+
+function fmExportData(){
+  const data = {};
+  FM_EXPORT_FIELDS.forEach(k => { data[k] = FEATURE_MASTER[k]; });
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'feature_master_export.json';
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  showToast('⬇️ Feature Master exported');
+}
+
+// Merges an imported export into the in-memory FEATURE_MASTER: every
+// feature/plan/value the import has overwrites the matching local one;
+// anything only present locally (e.g. a plan added on this machine that
+// isn't in the imported file) is left untouched. Purely in-memory — the
+// operator still clicks "Save Feature Master" to persist it, same as any
+// other edit in this tab, so a bad import can be discarded by reloading
+// instead of saving.
+function fmMergeImport(imported){
+  const counts = { features: 0, plans: 0, overrides: 0 };
+
+  (imported.customFeatures || []).forEach(f => {
+    const name = f && f.feature;
+    if (!name) return;
+    if (!FEATURE_MASTER.customFeatures.some(x => x.feature === name)) {
+      FEATURE_MASTER.customFeatures.push({ feature: name });
+      counts.features++;
+    }
+  });
+
+  ['care', 'niva', 'mc', 'star'].forEach(provider => {
+    (imported.customPlans && imported.customPlans[provider] || []).forEach(p => {
+      if (!p || !p.key) return;
+      if (!FEATURE_MASTER.customPlans[provider]) FEATURE_MASTER.customPlans[provider] = [];
+      const existing = FEATURE_MASTER.customPlans[provider].find(x => x.key === p.key);
+      if (existing) existing.label = p.label;
+      else FEATURE_MASTER.customPlans[provider].push({ key: p.key, label: p.label });
+      counts.plans++;
+    });
+  });
+
+  // Union, not overwrite — there is no per-item "value" to conflict on, just
+  // membership, and a feature hidden by either side should stay hidden.
+  (imported.hiddenFeatures || []).forEach(name => {
+    if (!FEATURE_MASTER.hiddenFeatures.includes(name)) FEATURE_MASTER.hiddenFeatures.push(name);
+  });
+
+  Object.assign(FEATURE_MASTER.featureRenames, imported.featureRenames || {});
+
+  ['care', 'niva', 'mc', 'star'].forEach(provider => {
+    const src = imported.overrides && imported.overrides[provider];
+    if (!src) return;
+    if (!FEATURE_MASTER.overrides[provider]) FEATURE_MASTER.overrides[provider] = {};
+    Object.keys(src).forEach(planKey => {
+      if (!FEATURE_MASTER.overrides[provider][planKey]) FEATURE_MASTER.overrides[provider][planKey] = {};
+      Object.assign(FEATURE_MASTER.overrides[provider][planKey], src[planKey]);
+      counts.overrides += Object.keys(src[planKey] || {}).length;
+    });
+  });
+
+  return counts;
+}
+
+async function fmImportFile(event){
+  const input = event.target;
+  const file = input.files && input.files[0];
+  input.value = ''; // allow re-selecting the same file next time
+  if (!file) return;
+
+  let imported;
+  try {
+    imported = JSON.parse(await file.text());
+  } catch (e) {
+    showToast('⚠️ Import failed: not valid JSON (' + e.message + ')', 6000);
+    return;
+  }
+  if (!imported || typeof imported !== 'object' || Array.isArray(imported)
+      || !FM_EXPORT_FIELDS.some(k => k in imported)) {
+    showToast('⚠️ Import failed: file does not look like a Feature Master export', 6000);
+    return;
+  }
+
+  const ok = await fmConfirmModal(
+    'Importing "' + file.name + '" will overwrite any local feature, plan or value it also has. '
+    + 'Anything only present locally is left as-is. Continue?', 'Import');
+  if (!ok) return;
+
+  const counts = fmMergeImport(imported);
+  fmRenderAll();
+  showToast('✅ Imported ' + counts.features + ' feature(s), ' + counts.plans + ' plan(s), '
+    + counts.overrides + ' value(s) — click "Save Feature Master" to keep it', 6000);
 }
 
 function fmRenderAll(){
