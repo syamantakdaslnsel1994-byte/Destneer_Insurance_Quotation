@@ -4589,181 +4589,27 @@ function featureColumns(rows){
       label, legacy:true, width:null, sourceIndex:i,
       fill:(FEATURE_DATA.style && FEATURE_DATA.style.planFills || [])[i] || null }));
 
-  const quoted = {};      // provider key → the plan names quoted for it
-  (rows || []).forEach(r => {
-    const k = providerKeyOfCompany(r.company);
-    if (!k) return;
-    (quoted[k] = quoted[k] || []).push(String(r.planName || ''));
-  });
-
-  const norm = s => String(s || '').toLowerCase().replace(/\s+/g, ' ').trim();
+  // Feature Comparison is opt-in, not automatic: a column only appears for a
+  // provider when the operator has explicitly picked a plan for it in
+  // Feature Master. Matching a Feature Comparison column against whatever
+  // happened to be quoted in Comparison (the previous behavior) used to run
+  // unconditionally and put an unrequested Feature Comparison sheet/section
+  // into every export the moment auto-matching found anything — the user
+  // asked for this to stop; Feature Master is now the only path in.
+  const SOURCE_INDEX = { care:CARE_LIVE_SOURCE_INDEX, niva:NIVA_LIVE_SOURCE_INDEX, mc:MC_LIVE_SOURCE_INDEX, star:STAR_LIVE_SOURCE_INDEX };
+  const OVERLAY = { care:applyCareLiveOverlay, niva:applyNivaLiveOverlay, mc:applyMcLiveOverlay, star:applyStarLiveOverlay };
 
   const out = [];
-  FEATURE_DATA.plans.forEach((col, srcIdx) => {
-    const names = quoted[col.provider];
-    if (!names) return;                            // insurer not in this quotation
-    // exactMatch columns require the quoted name to equal `plan` exactly —
-    // confirmed live that Care's real catalogue has several distinct plans
-    // whose names contain "Care Supreme" as a plain substring (e.g. "POS
-    // Care Supreme Shine"), so a loose planMatch fragment reported a false
-    // match for those and silently attributed this plan's features to the
-    // wrong quote with no caveat. Non-flagged columns (MC's two entries,
-    // whose captured names are noisy free text but never collide with a
-    // sibling product) keep the original fragment behavior they rely on.
-    const match = col.exactMatch
-      ? names.some(n => norm(n) === norm(col.plan))
-      : (col.planMatch || []).some(frag =>
-          names.some(n => n.toLowerCase().indexOf(String(frag).toLowerCase()) !== -1));
-    // sourceIndex is load-bearing: every feature row's `values` array is
-    // positional against the ORIGINAL five columns, so a column that survives
-    // filtering must still read the slot it was transcribed into. Using the
-    // post-filter position would shift every value one column left the moment
-    // HDFC Ergo is dropped, and silently attribute one insurer's terms to
-    // another.
-    out.push({ label:col.label, width:col.width, fill:col.fill,
-               provider:col.provider, plan:col.plan, matches:match,
-               sourceIndex:srcIdx, quotedPlans:[...new Set(names)] });
-  });
-
-  // Any quoted insurer with no column of its own, so the gap is visible.
-  Object.keys(quoted).forEach(k => {
-    if (out.some(c => c.provider === k)) return;
-    out.push({ label:(FEATURE_PROVIDER_LABEL[k] || k), width:21, fill:null,
-               provider:k, plan:null, matches:false, missing:true,
-               quotedPlans:[...new Set(quoted[k])] });
-  });
-
-  // Live Care Health data replaces the static "Care Supreme" column
-  // whenever the ACTUAL quoted plan (whichever of the 48 it is) has a
-  // confident live mapping — see resolveLiveCarePlan()/
-  // build_care_feature_mapping.js. Falls back to the static column
-  // (already correctly caveated by its own exactMatch guard) when there's
-  // no live match, rather than showing nothing for Care.
-  // A Feature Master manual pick wins over automatic matching when set —
-  // resolveMasterPlanRows() returns the exact same {name, rows} shape
-  // resolveLiveCarePlan() does, so nothing below this line needs to know
-  // which one produced it.
-  const liveCare = FEATURE_MASTER.selectedPlan.care
-    ? resolveMasterPlanRows('care', FEATURE_MASTER.selectedPlan.care)
-    : resolveLiveCarePlan(quoted.care);
-  applyCareLiveOverlay(liveCare && liveCare.rows);   // always reset first — see CARE_LIVE_SOURCE_INDEX
-  if (liveCare) {
-    const staticIdx = out.findIndex(c => c.provider === 'care' && !c.missing);
-    const staticCol = staticIdx >= 0 ? out[staticIdx] : null;
-    const liveCol = {
-      label: liveCare.name, width: (staticCol && staticCol.width) || 19,
-      fill: (staticCol && staticCol.fill) || null,
-      provider: 'care', plan: liveCare.name, matches: true, live: true,
-      sourceIndex: CARE_LIVE_SOURCE_INDEX, quotedPlans: [...new Set(quoted.care)],
-    };
-    if (staticIdx >= 0) out.splice(staticIdx, 1, liveCol);
-    else out.push(liveCol);
-  }
-
-  // Same idea for Niva — see resolveLiveNivaPlan()/
-  // build_niva_feature_mapping.js. Matched by keyword, not exact name
-  // (Niva's real captured plan-name format hasn't been confirmed live
-  // this pass), so this is a step better than the static caveat but not
-  // as certain as Care's exact-name match.
-  const liveNiva = FEATURE_MASTER.selectedPlan.niva
-    ? resolveMasterPlanRows('niva', FEATURE_MASTER.selectedPlan.niva)
-    : resolveLiveNivaPlan(quoted.niva);
-  applyNivaLiveOverlay(liveNiva && liveNiva.rows);   // always reset first — see NIVA_LIVE_SOURCE_INDEX
-  if (liveNiva) {
-    const staticIdx = out.findIndex(c => c.provider === 'niva' && !c.missing);
-    const staticCol = staticIdx >= 0 ? out[staticIdx] : null;
-    const liveCol = {
-      label: liveNiva.name, width: (staticCol && staticCol.width) || 19,
-      fill: (staticCol && staticCol.fill) || null,
-      provider: 'niva', plan: liveNiva.name, matches: true, live: true,
-      sourceIndex: NIVA_LIVE_SOURCE_INDEX, quotedPlans: [...new Set(quoted.niva)],
-    };
-    if (staticIdx >= 0) out.splice(staticIdx, 1, liveCol);
-    else out.push(liveCol);
-  }
-
-  // MC — see resolveLiveMcPlan()/build_mc_feature_mapping.js. Different
-  // from Care/Niva in one way: only Lifetime Health had an existing static
-  // column to replace (Sarvah's stays untouched, no live data for it —
-  // see resolveLiveMcPlan's comment). ProHealth Prime/Super Top-up/Prime
-  // Senior have no existing static column at all, so a live match for
-  // those is ADDED as a new column rather than replacing anything.
-  const liveMc = FEATURE_MASTER.selectedPlan.mc
-    ? resolveMasterPlanRows('mc', FEATURE_MASTER.selectedPlan.mc)
-    : resolveLiveMcPlan(quoted.mc);
-  applyMcLiveOverlay(liveMc && liveMc.rows);   // always reset first — see MC_LIVE_SOURCE_INDEX
-  if (liveMc) {
-    // A manual Feature Master pick replaces WHATEVER MC column already
-    // exists (Sarvah Param or Lifetime Health, matched or not) — it always
-    // wins, so there is no reason to leave a second, now-redundant static
-    // column sitting alongside it. Automatic matching keeps the narrower
-    // isLifetime rule: an auto-matched non-Lifetime tier (ProHealth Prime/
-    // Super Top-up/Prime Senior) has no static column to begin with, so it
-    // is correctly ADDED rather than replacing Sarvah Param's unrelated one.
-    const staticIdx = FEATURE_MASTER.selectedPlan.mc
-      ? out.findIndex(c => c.provider === 'mc' && !c.missing)
-      : liveMc.isLifetime
-        ? out.findIndex(c => c.provider === 'mc' && c.plan === 'Lifetime Health' && !c.missing)
-        : -1;
-    const staticCol = staticIdx >= 0 ? out[staticIdx] : null;
-    const liveCol = {
-      label: liveMc.name, width: (staticCol && staticCol.width) || 19,
-      fill: (staticCol && staticCol.fill) || null,
-      provider: 'mc', plan: liveMc.name, matches: true, live: true,
-      sourceIndex: MC_LIVE_SOURCE_INDEX, quotedPlans: [...new Set(quoted.mc)],
-    };
-    if (staticIdx >= 0) out.splice(staticIdx, 1, liveCol);
-    else out.push(liveCol);
-  }
-
-  // Star — see resolveLiveStarPlan()/build_star_feature_mapping.js. Star
-  // has no static entry in FEATURE_DATA.plans at all, so when it's quoted
-  // the loop above always produces a "missing" placeholder column (the
-  // "No feature data held for Star Health" note) — a live match replaces
-  // THAT placeholder, same splice pattern as Care/Niva replacing their
-  // static entries.
-  const liveStar = FEATURE_MASTER.selectedPlan.star
-    ? resolveMasterPlanRows('star', FEATURE_MASTER.selectedPlan.star)
-    : resolveLiveStarPlan(quoted.star);
-  applyStarLiveOverlay(liveStar && liveStar.rows);   // always reset first — see STAR_LIVE_SOURCE_INDEX
-  if (liveStar) {
-    const missingIdx = out.findIndex(c => c.provider === 'star' && c.missing);
-    const liveCol = {
-      label: liveStar.name, width: 19, fill: null,
-      provider: 'star', plan: liveStar.name, matches: true, live: true,
-      sourceIndex: STAR_LIVE_SOURCE_INDEX, quotedPlans: [...new Set(quoted.star)],
-    };
-    if (missingIdx >= 0) out.splice(missingIdx, 1, liveCol);
-    else out.push(liveCol);
-  }
-
-  // Never show a column for a plan that was not actually quoted — confirmed
-  // live (a real export) this reads as "the wrong plan was picked," not as
-  // a caveat, and it happens even when a SIBLING column for the same
-  // provider genuinely matched: a real MC quote for "Sarvah Param" still
-  // showed a second "MANIPAL CIGNA_Lifetime Plan" column captioned
-  // "Features shown are for Lifetime Health. You quoted Sarvah Param." —
-  // Lifetime Health was never quoted at all, so it has no business
-  // appearing just because it happens to share a provider with a plan that
-  // WAS quoted. Every column that doesn't match the actual quoted plan(s)
-  // (and wasn't replaced by a genuine live-data match above) is removed
-  // outright — unconditionally, not only when every column for that
-  // provider fails to match. Only if NOTHING survives for a provider that
-  // was actually quoted does it get one honest "no feature data held for
-  // this plan" placeholder — the SAME placeholder Star already used when it
-  // has no static entry at all.
-  const byProvider = {};
-  out.forEach(c => { (byProvider[c.provider] = byProvider[c.provider] || []).push(c); });
-  Object.keys(byProvider).forEach(k => {
-    const cols = byProvider[k];
-    const bad = cols.filter(c => !(c.matches || c.live));
-    if (!bad.length) return; // every column for this provider already matches — nothing to remove
-    bad.forEach(c => { const i = out.indexOf(c); if (i >= 0) out.splice(i, 1); });
-    if (cols.length === bad.length) {
-      out.push({ label:(FEATURE_PROVIDER_LABEL[k] || k), width:21, fill:null,
-                 provider:k, plan:null, matches:false, missing:true,
-                 quotedPlans:[...new Set(bad.flatMap(c => c.quotedPlans))] });
-    }
+  ['care', 'niva', 'mc', 'star'].forEach(provider => {
+    const planKey = FEATURE_MASTER.selectedPlan[provider];
+    const resolved = planKey ? resolveMasterPlanRows(provider, planKey) : null;
+    OVERLAY[provider](resolved && resolved.rows);   // always reset first — see *_LIVE_SOURCE_INDEX
+    if (!resolved) return;
+    out.push({
+      label: resolved.name, width: 19, fill: null,
+      provider, plan: resolved.name, matches: true, live: true,
+      sourceIndex: SOURCE_INDEX[provider], quotedPlans: [],
+    });
   });
 
   return out;
@@ -4905,8 +4751,19 @@ const PDF = {
   // Column widths in points, each set summing to the usable width so every
   // table is flush with the margins. Sized to their content rather than copied
   // from the sheet, where column A is 58.7 characters wide to hold "Care".
-  quoteCols:   [102, 128, 78, 90, 90, 90, 163],       // 741 — Company fits
-                                                     // "ManipalCigna" on one line
+  quoteCols:   [102, 128, 100, 90, 90, 90, 141],      // 741 — Company fits
+                                                     // "ManipalCigna" on one line.
+                                                     // Sum Assure widened from 78
+                                                     // to 100 (taken from Addon,
+                                                     // which already wraps to
+                                                     // several lines regardless) —
+                                                     // pdfNum() now formats the
+                                                     // Indian way ("1,00,00,000"),
+                                                     // one digit-group longer than
+                                                     // the old "10,000,000" this
+                                                     // width was sized against, and
+                                                     // 78pt was letting an 8-digit
+                                                     // Sum Assure split mid-number.
   memberCols:  [150, 110, 95, 50, 236, 100],          // 741
   epCols:      [130, 180, 85, 80, 95, 90, 81],        // 741
   // Feature Comparison keeps the sheet's own proportions — those columns are
@@ -4920,25 +4777,35 @@ const PDF = {
 
 // The "Horizontal" PDF variant — Family Floater and Multi Individual blocks
 // side by side, matching the Excel sheet's own layout and the reference
-// quotation the user attached, instead of PDF's usual stacked layout (see
-// the comment above PDF's own declaration for why stacking was chosen at
-// PDF.size 14). Two 7-column blocks need to fit in the same 741pt usable
-// width the single-block layout uses entirely for one — halving the column
-// widths alone would wrap almost every cell onto 2-3 lines at 14pt, so this
-// variant also drops the font size, closing most of the 1,234-vs-741 gap
-// instead of relying purely on wrapping. A separate constant object, not a
-// modification of PDF itself — the existing "Download PDF" button's output
-// must not change at all.
+// quotation the user attached ("Vipul Khemka_Health quote...pdf"), instead of
+// PDF's usual stacked layout (see the comment above PDF's own declaration for
+// why stacking was chosen at PDF.size 14). The reference is a dense,
+// print-shrunk export — its own text runs about 3.6pt tall with roughly 5pt
+// row spacing, confirmed by extracting its real text coordinates rather than
+// eyeballing it. This variant matches that density (4pt — slightly larger
+// than the reference's measured 3.6pt, kept for print legibility, everything
+// else scaled to match) rather than the earlier 9pt, which was sized only to
+// avoid wrapping, not to match the reference's look. Column proportions
+// below follow docs/docs_reference_quotation_format.md's own char-unit
+// widths for this exact dual-block sheet (16,22,13,14,14,14,22 per block,
+// with an 8-unit gap between them) — the authoritative source for the
+// original layout this reference PDF was itself printed from. Stays on the
+// existing A4-landscape page/margins (unchanged from PDF's own) rather than
+// switching to the reference's US-Letter page — matching page proportions
+// within these columns delivers the same visual density without touching
+// the shared member-table/existing-policy column widths every quote section
+// header also depends on. A separate constant object, not a modification of
+// PDF itself — the existing "Download PDF" button's output must not change
+// at all.
 const PDF_SBS = {
-  size: 9,
-  lineH: 10.8,        // 9pt at 1.2 line spacing, same ratio as PDF.lineH
-  minRow: 12,
-  pad: 3,
-  gutter: 19,          // gap between the two blocks; 741 - 2*361 = 19
-  // Same 7 columns as PDF.quoteCols (Company/Plan/Sum Assure/1yr/2yr/3yr/
-  // Addon), scaled down to fit two per row instead of one. Each set sums to
-  // 361 — (741 - gutter) / 2.
-  quoteCols: [50, 62, 38, 44, 44, 44, 79],
+  size: 4,
+  lineH: 4.8,          // 4pt at 1.2 line spacing, same ratio as PDF.lineH
+  minRow: 5,
+  pad: 0.5,
+  gutter: 25,          // 741 - 2*358 = 25, matching the doc's 8-unit gap
+  // Company/Plan/Sum Assure/1yr/2yr/3yr/Addon, proportioned like the
+  // reference's own 16:22:13:14:14:14:22 (each block sums to 358).
+  quoteCols: [50, 68, 40, 44, 44, 44, 68],
 };
 
 // Excel stores several of these fills as a theme index plus a tint rather than a
@@ -5011,18 +4878,24 @@ function pdfSetFont(P, opts){
   P.doc.setFontSize(o.size || PDF.size);
 }
 
-// How tall a row must be to hold the tallest wrapped cell in it.
-function pdfRowHeight(P, cells, widths, lineH){
+// How tall a row must be to hold the tallest wrapped cell in it. `pad`/
+// `minRow` default to PDF's own values — pass PDF_SBS.pad/PDF_SBS.minRow for
+// the dense side-by-side layout, whose much smaller font needs both scaled
+// down too, or the fixed PDF.pad/PDF.minRow floor would swallow the gain
+// from a smaller lineH.
+function pdfRowHeight(P, cells, widths, lineH, pad, minRow){
   const LH = lineH || PDF.lineH;
+  const PAD = pad != null ? pad : PDF.pad;
+  const MIN = minRow != null ? minRow : PDF.minRow;
   let lines = 1;
   cells.forEach((c, i) => {
     if (c == null || c.v == null || c.v === '') return;
     pdfSetFont(P, c);
-    const inner = widths[i] - 2 * PDF.pad;
+    const inner = widths[i] - 2 * PAD;
     const n = P.doc.splitTextToSize(String(c.v), inner).length;
     if (n > lines) lines = n;
   });
-  return Math.max(PDF.minRow, lines * LH + 2 * PDF.pad);
+  return Math.max(MIN, lines * LH + 2 * PAD);
 }
 
 // The actual cell-drawing loop, pulled out of pdfRow() below so it can be
@@ -5035,6 +4908,7 @@ function pdfRowHeight(P, cells, widths, lineH){
 function pdfDrawRowCells(P, x0, y, h, cells, widths, rowOpts){
   const o = rowOpts || {};
   const LH = o.lineH || PDF.lineH;
+  const PAD = o.pad != null ? o.pad : PDF.pad;
   let x = x0;
   cells.forEach((c, i) => {
     const w = widths[i];
@@ -5048,15 +4922,15 @@ function pdfDrawRowCells(P, x0, y, h, cells, widths, rowOpts){
     if (cell.v != null && cell.v !== '') {
       pdfSetFont(P, cell);
       P.doc.setTextColor(0, 0, 0);
-      const inner = w - 2 * PDF.pad;
+      const inner = w - 2 * PAD;
       const lines = P.doc.splitTextToSize(String(cell.v), inner);
       const align = cell.align || 'center';
       // Vertically centre the block of lines in the row, as the sheet does.
       const blockH = lines.length * LH;
       let ty = y + (h - blockH) / 2 + (cell.size || PDF.size) * 0.85;
       lines.forEach(ln => {
-        const tx = align === 'left'  ? x + PDF.pad
-                 : align === 'right' ? x + w - PDF.pad
+        const tx = align === 'left'  ? x + PAD
+                 : align === 'right' ? x + w - PAD
                  : x + w / 2;
         P.doc.text(ln, tx, ty, { align: align === 'left' ? 'left' : align === 'right' ? 'right' : 'center' });
         if (cell.underline) {
@@ -5077,7 +4951,7 @@ function pdfDrawRowCells(P, x0, y, h, cells, widths, rowOpts){
 function pdfRow(P, cells, widths, rowOpts){
   const o = rowOpts || {};
   const LH = o.lineH || PDF.lineH;
-  const h = o.height || pdfRowHeight(P, cells, widths, LH);
+  const h = o.height || pdfRowHeight(P, cells, widths, LH, o.pad, o.minRow);
   P.room(h);
   pdfDrawRowCells(P, P.left, P.y, h, cells, widths, rowOpts);
   P.y += h;
@@ -5088,14 +4962,15 @@ function pdfRow(P, cells, widths, rowOpts){
 function pdfTextRow(P, text, opts){
   const o = opts || {};
   pdfRow(P, [{ v: text, align: o.align || 'left', bold: o.bold, underline: o.underline,
-               border: false, fill: o.fill }], [P.usable], { border: false });
+               border: false, fill: o.fill, size: o.size }], [P.usable],
+         { border: false, lineH: o.lineH, pad: o.pad, minRow: o.minRow });
 }
 
 // Premium / sum-insured formatting, matching the sheet's #,##0. "NA" and anything
 // else non-numeric prints as-is, which is the reference's own convention.
 function pdfNum(v){
   const n = (typeof v === 'number' && isFinite(v) && v > 0) ? v : null;
-  return n === null ? (v || 'NA') : n.toLocaleString('en-US');
+  return n === null ? (v || 'NA') : n.toLocaleString('en-IN');
 }
 
 // A letterhead at the top of each section. At 100pt wide the 130px source works
@@ -5115,7 +4990,15 @@ function pdfDrawLogo(P){
 // Shared by both quote-section layouts (stacked and side-by-side) — the
 // logo, sheet-name heading, greeting, member table, and existing-policy
 // table are identical in both; only the Sum-Insured block layout differs.
-function pdfDrawQuoteSectionHeader(P, sec){
+// `prof` (size/lineH/pad/minRow) lets the side-by-side layout render this
+// header at the same very dense size as its quote blocks — the reference
+// PDF this variant targets uses one uniform tiny font throughout, not a
+// full-size header over a shrunk table. Omitted (the stacked layout's own
+// call) falls back to PDF's own values, unchanged from before.
+function pdfDrawQuoteSectionHeader(P, sec, prof){
+  const pr = prof || {};
+  const SZ = pr.size != null ? pr.size : PDF.size;
+  const rowOpts = { lineH: pr.lineH, pad: pr.pad, minRow: pr.minRow };
   const ep = _epValues();
   const greeting = (document.getElementById('rp_greeting')?.value || '').trim()
                  || 'Greetings from Plan my life.';
@@ -5125,42 +5008,42 @@ function pdfDrawQuoteSectionHeader(P, sec){
   pdfDrawLogo(P);
 
   // The sheet name, as a heading — a PDF has no tabs to carry it.
-  pdfTextRow(P, sec.name, { bold: true, size: PDF.size });
+  pdfTextRow(P, sec.name, { bold: true, size: SZ, ...rowOpts });
   P.y += PDF.gap / 2;
 
-  pdfTextRow(P, 'Dear Sir/Madam,');
+  pdfTextRow(P, 'Dear Sir/Madam,', { size: SZ, ...rowOpts });
   P.y += PDF.gap / 2;
-  pdfTextRow(P, greeting);
+  pdfTextRow(P, greeting, { size: SZ, ...rowOpts });
   P.y += PDF.gap / 2;
-  pdfTextRow(P, intro);
+  pdfTextRow(P, intro, { size: SZ, ...rowOpts });
   P.y += PDF.gap;
 
   // ── Member table ──
   const MH = ['Name','Relation','D.O.B','Age','PED','Pin Code'];
-  pdfRow(P, MH.map(h => ({ v: h, fill: XL.yellow, fontName: PDF.memberFont })), PDF.memberCols);
+  pdfRow(P, MH.map(h => ({ v: h, fill: XL.yellow, fontName: PDF.memberFont, size: SZ })), PDF.memberCols, rowOpts);
   (sec.membersSubset.length ? sec.membersSubset : [null]).forEach(m => {
-    if (!m) { pdfRow(P, [{ v:'—' }, null, null, null, null, null], PDF.memberCols); return; }
+    if (!m) { pdfRow(P, [{ v:'—', size: SZ }, null, null, null, null, null], PDF.memberCols, rowOpts); return; }
     const pin = String(m.pin || '').trim();
     pdfRow(P, [
-      { v: m.name || '—' }, { v: m.relation || '—' }, { v: _fmtDob(m.dob) || '—' },
-      { v: m.age !== '' ? (parseInt(m.age) || '—') : '—' }, { v: m.ped || '—' },
-      { v: /^\d+$/.test(pin) ? pin : (pin || '—') },
-    ], PDF.memberCols);
+      { v: m.name || '—', size: SZ }, { v: m.relation || '—', size: SZ }, { v: _fmtDob(m.dob) || '—', size: SZ },
+      { v: m.age !== '' ? (parseInt(m.age) || '—') : '—', size: SZ }, { v: m.ped || '—', size: SZ },
+      { v: /^\d+$/.test(pin) ? pin : (pin || '—'), size: SZ },
+    ], PDF.memberCols, rowOpts);
   });
 
   // ── Existing policy ──
   if (ep.ep) {
     P.y += PDF.gap;
-    pdfTextRow(P, 'Existing Policy Details', { underline: true, align: 'center' });
+    pdfTextRow(P, 'Existing Policy Details', { underline: true, align: 'center', size: SZ, ...rowOpts });
     const EH = ['Company','Plan name','Sum Assure','Premium','Renewal date','Renewal Premium','Type of Cover'];
-    pdfRow(P, EH.map(h => ({ v: h, fill: XL.yellow })), PDF.epCols);
+    pdfRow(P, EH.map(h => ({ v: h, fill: XL.yellow, size: SZ })), PDF.epCols, rowOpts);
     const epNum = v => { const s = String(v || '').trim(); if (!s) return '';
                          const n = Number(s.replace(/[^0-9.]/g, ''));
-                         return isFinite(n) && n ? n.toLocaleString('en-US') : s; };
+                         return isFinite(n) && n ? n.toLocaleString('en-IN') : s; };
     pdfRow(P, [
-      { v: ep.ep || '' }, { v: ep.plan || '' }, { v: epNum(ep.si) }, { v: epNum(ep.prem) },
-      { v: ep.rDate || '' }, { v: epNum(ep.rPrem) }, { v: ep.type || '' },
-    ], PDF.epCols);
+      { v: ep.ep || '', size: SZ }, { v: ep.plan || '', size: SZ }, { v: epNum(ep.si), size: SZ }, { v: epNum(ep.prem), size: SZ },
+      { v: ep.rDate || '', size: SZ }, { v: epNum(ep.rPrem), size: SZ }, { v: ep.type || '', size: SZ },
+    ], PDF.epCols, rowOpts);
   }
 }
 
@@ -5242,7 +5125,7 @@ function pdfBuildQuoteSectionSBS(P, sec, isFirst){
   const activeSIs = RP_SI_LIST.filter(si => dataMap[si.key] && Object.keys(dataMap[si.key]).length);
   if (!activeSIs.length) return false;
 
-  pdfDrawQuoteSectionHeader(P, sec);
+  pdfDrawQuoteSectionHeader(P, sec, PDF_SBS);
 
   const leftWidth = PDF_SBS.quoteCols.reduce((a, b) => a + b, 0);
   const rightX = P.left + leftWidth + PDF_SBS.gutter;
@@ -5263,7 +5146,12 @@ function pdfBuildQuoteSectionSBS(P, sec, isFirst){
     }
 
     const leftName  = (sec.leftLabel === 'Multi Individual' ? 'Family Floater' : sec.leftLabel);
-    const leftTitle  = leftName + ' Quotation For ' + xlSiLabel(si.key, false);
+    // Unlike the stacked layout (which reproduces the ORIGINAL Vivek Bhaia
+    // reference's own left/right capitalization split — see xlSiLabel's
+    // comment), the attached Vipul Khemka reference this side-by-side layout
+    // targets writes "lacs"/"cr" lowercase on BOTH titles consistently — so
+    // both sides pass lower=true here, unlike xlSiLabel's other two callers.
+    const leftTitle  = leftName + ' Quotation For ' + xlSiLabel(si.key, true);
     const rightTitle = 'Multi Individual Quotation For ' + xlSiLabel(si.key, true);
 
     const buildRows = (valuesFor) => rowKeys.map(k => {
@@ -5274,12 +5162,12 @@ function pdfBuildQuoteSectionSBS(P, sec, isFirst){
         { v: pdfNum(v.p[0]), size: PDF_SBS.size }, { v: pdfNum(v.p[1]), size: PDF_SBS.size },
         { v: pdfNum(v.p[2]), size: PDF_SBS.size }, { v: v.addon, size: PDF_SBS.size },
       ];
-      return { cells, h: pdfRowHeight(P, cells, PDF_SBS.quoteCols, PDF_SBS.lineH) };
+      return { cells, h: pdfRowHeight(P, cells, PDF_SBS.quoteCols, PDF_SBS.lineH, PDF_SBS.pad, PDF_SBS.minRow) };
     });
     const leftRows  = buildRows(d => ({ p: d.ff, addon: pdfPickAddon(d.addonFF, d.addonMI) }));
     const rightRows = buildRows(d => ({ p: d.mi, addon: pdfPickAddon(d.addonMI, d.addonFF) }));
 
-    const headerH = pdfRowHeight(P, HEADERS_SBS, PDF_SBS.quoteCols, PDF_SBS.lineH);
+    const headerH = pdfRowHeight(P, HEADERS_SBS, PDF_SBS.quoteCols, PDF_SBS.lineH, PDF_SBS.pad, PDF_SBS.minRow);
     const firstRowH = Math.max(leftRows.length ? leftRows[0].h : PDF_SBS.minRow,
                                 rightRows.length ? rightRows[0].h : PDF_SBS.minRow);
     // Same "never strand the title/header alone at the foot of a page"
@@ -5289,16 +5177,16 @@ function pdfBuildQuoteSectionSBS(P, sec, isFirst){
     P.y += PDF.gap;
 
     const titleRowH = Math.max(
-      pdfRowHeight(P, [{ v: leftTitle, size: PDF_SBS.size }], [leftWidth], PDF_SBS.lineH),
-      pdfRowHeight(P, [{ v: rightTitle, size: PDF_SBS.size }], [leftWidth], PDF_SBS.lineH));
+      pdfRowHeight(P, [{ v: leftTitle, size: PDF_SBS.size }], [leftWidth], PDF_SBS.lineH, PDF_SBS.pad, PDF_SBS.minRow),
+      pdfRowHeight(P, [{ v: rightTitle, size: PDF_SBS.size }], [leftWidth], PDF_SBS.lineH, PDF_SBS.pad, PDF_SBS.minRow));
     const titleCellOpts = { bold: true, underline: true, fill: XL.titleFill, align: 'left', border: false, size: PDF_SBS.size };
-    pdfDrawRowCells(P, P.left, P.y, titleRowH, [{ v: leftTitle, ...titleCellOpts }], [leftWidth], { border: false, lineH: PDF_SBS.lineH });
-    pdfDrawRowCells(P, rightX, P.y, titleRowH, [{ v: rightTitle, ...titleCellOpts }], [leftWidth], { border: false, lineH: PDF_SBS.lineH });
+    pdfDrawRowCells(P, P.left, P.y, titleRowH, [{ v: leftTitle, ...titleCellOpts }], [leftWidth], { border: false, lineH: PDF_SBS.lineH, pad: PDF_SBS.pad });
+    pdfDrawRowCells(P, rightX, P.y, titleRowH, [{ v: rightTitle, ...titleCellOpts }], [leftWidth], { border: false, lineH: PDF_SBS.lineH, pad: PDF_SBS.pad });
     P.y += titleRowH;
 
     const drawHeaderPair = () => {
-      pdfDrawRowCells(P, P.left, P.y, headerH, HEADERS_SBS, PDF_SBS.quoteCols, { lineH: PDF_SBS.lineH });
-      pdfDrawRowCells(P, rightX, P.y, headerH, HEADERS_SBS, PDF_SBS.quoteCols, { lineH: PDF_SBS.lineH });
+      pdfDrawRowCells(P, P.left, P.y, headerH, HEADERS_SBS, PDF_SBS.quoteCols, { lineH: PDF_SBS.lineH, pad: PDF_SBS.pad });
+      pdfDrawRowCells(P, rightX, P.y, headerH, HEADERS_SBS, PDF_SBS.quoteCols, { lineH: PDF_SBS.lineH, pad: PDF_SBS.pad });
       P.y += headerH;
     };
     drawHeaderPair();
@@ -5313,8 +5201,8 @@ function pdfBuildQuoteSectionSBS(P, sec, isFirst){
       const lr = leftRows[i], rr = rightRows[i];
       const rowH = Math.max(lr ? lr.h : PDF_SBS.minRow, rr ? rr.h : PDF_SBS.minRow);
       if (P.y + rowH > P.bottom) { P.newPage(); drawHeaderPair(); }
-      if (lr) pdfDrawRowCells(P, P.left, P.y, rowH, lr.cells, PDF_SBS.quoteCols, { lineH: PDF_SBS.lineH });
-      if (rr) pdfDrawRowCells(P, rightX, P.y, rowH, rr.cells, PDF_SBS.quoteCols, { lineH: PDF_SBS.lineH });
+      if (lr) pdfDrawRowCells(P, P.left, P.y, rowH, lr.cells, PDF_SBS.quoteCols, { lineH: PDF_SBS.lineH, pad: PDF_SBS.pad });
+      if (rr) pdfDrawRowCells(P, rightX, P.y, rowH, rr.cells, PDF_SBS.quoteCols, { lineH: PDF_SBS.lineH, pad: PDF_SBS.pad });
       P.y += rowH;
     }
   });
