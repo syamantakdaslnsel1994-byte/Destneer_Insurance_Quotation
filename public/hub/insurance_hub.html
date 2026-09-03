@@ -1067,6 +1067,10 @@ html,body{height:100%;overflow:hidden;font-family:'Inter',system-ui,sans-serif;b
             <button class="gen-btn pdf" id="gen-pdf-btn" onclick="generatePdfReport()">
               📄 Download PDF
             </button>
+            <button class="gen-btn pdf" id="gen-pdf-hz-btn" onclick="generatePdfReportHorizontal()"
+              title="Family Floater and Multi Individual side by side per Sum Insured band, like the reference quotation — denser/smaller text to fit both">
+              📄 Download PDF (Horizontal)
+            </button>
             <span style="font-size:12px;color:#94a3b8">Same report either way —
               <strong style="color:#64748b">[ClientName]_Quote.xlsx</strong> or
               <strong style="color:#64748b">.pdf</strong></span>
@@ -4914,6 +4918,29 @@ const PDF = {
   featureCharCols: [17, 9.5, 18, 18.7, 17.4, 19.1, 21],
 };
 
+// The "Horizontal" PDF variant — Family Floater and Multi Individual blocks
+// side by side, matching the Excel sheet's own layout and the reference
+// quotation the user attached, instead of PDF's usual stacked layout (see
+// the comment above PDF's own declaration for why stacking was chosen at
+// PDF.size 14). Two 7-column blocks need to fit in the same 741pt usable
+// width the single-block layout uses entirely for one — halving the column
+// widths alone would wrap almost every cell onto 2-3 lines at 14pt, so this
+// variant also drops the font size, closing most of the 1,234-vs-741 gap
+// instead of relying purely on wrapping. A separate constant object, not a
+// modification of PDF itself — the existing "Download PDF" button's output
+// must not change at all.
+const PDF_SBS = {
+  size: 9,
+  lineH: 10.8,        // 9pt at 1.2 line spacing, same ratio as PDF.lineH
+  minRow: 12,
+  pad: 3,
+  gutter: 19,          // gap between the two blocks; 741 - 2*361 = 19
+  // Same 7 columns as PDF.quoteCols (Company/Plan/Sum Assure/1yr/2yr/3yr/
+  // Addon), scaled down to fit two per row instead of one. Each set sums to
+  // 361 — (741 - gutter) / 2.
+  quoteCols: [50, 62, 38, 44, 44, 44, 79],
+};
+
 // Excel stores several of these fills as a theme index plus a tint rather than a
 // hex value, so the PDF has to resolve them the way Excel does. This is the
 // reference workbook's own colour scheme, in Excel's theme-index order (which
@@ -4998,22 +5025,25 @@ function pdfRowHeight(P, cells, widths, lineH){
   return Math.max(PDF.minRow, lines * LH + 2 * PDF.pad);
 }
 
-// One row of cells. `cells[i]` may be null for a blank, bordered cell.
-//   { v, fill, bold, underline, fontName, align, numFmt, border:false }
-function pdfRow(P, cells, widths, rowOpts){
+// The actual cell-drawing loop, pulled out of pdfRow() below so it can be
+// reused by the side-by-side quote-block drawer (pdfBuildQuoteSectionSBS())
+// at an explicit (x, y) that ISN'T P's own cursor. Deliberately touches
+// neither P.room() nor P.y — a caller that draws two independent blocks
+// side by side needs to reserve room and advance the shared cursor ONCE for
+// the taller of the two, not once per block, or the two could end up
+// split across different pages mid-way through and badly interleaved.
+function pdfDrawRowCells(P, x0, y, h, cells, widths, rowOpts){
   const o = rowOpts || {};
   const LH = o.lineH || PDF.lineH;
-  const h = o.height || pdfRowHeight(P, cells, widths, LH);
-  P.room(h);
-  let x = P.left;
+  let x = x0;
   cells.forEach((c, i) => {
     const w = widths[i];
     const cell = c || {};
     const fillRgb = pdfColor(cell.fill || o.fill);
-    if (fillRgb) { P.doc.setFillColor.apply(P.doc, fillRgb); P.doc.rect(x, P.y, w, h, 'F'); }
+    if (fillRgb) { P.doc.setFillColor.apply(P.doc, fillRgb); P.doc.rect(x, y, w, h, 'F'); }
     if (cell.border !== false && o.border !== false) {
       P.doc.setDrawColor(0, 0, 0); P.doc.setLineWidth(0.5);
-      P.doc.rect(x, P.y, w, h, 'S');
+      P.doc.rect(x, y, w, h, 'S');
     }
     if (cell.v != null && cell.v !== '') {
       pdfSetFont(P, cell);
@@ -5023,7 +5053,7 @@ function pdfRow(P, cells, widths, rowOpts){
       const align = cell.align || 'center';
       // Vertically centre the block of lines in the row, as the sheet does.
       const blockH = lines.length * LH;
-      let ty = P.y + (h - blockH) / 2 + (cell.size || PDF.size) * 0.85;
+      let ty = y + (h - blockH) / 2 + (cell.size || PDF.size) * 0.85;
       lines.forEach(ln => {
         const tx = align === 'left'  ? x + PDF.pad
                  : align === 'right' ? x + w - PDF.pad
@@ -5040,6 +5070,16 @@ function pdfRow(P, cells, widths, rowOpts){
     }
     x += w;
   });
+}
+
+// One row of cells. `cells[i]` may be null for a blank, bordered cell.
+//   { v, fill, bold, underline, fontName, align, numFmt, border:false }
+function pdfRow(P, cells, widths, rowOpts){
+  const o = rowOpts || {};
+  const LH = o.lineH || PDF.lineH;
+  const h = o.height || pdfRowHeight(P, cells, widths, LH);
+  P.room(h);
+  pdfDrawRowCells(P, P.left, P.y, h, cells, widths, rowOpts);
   P.y += h;
   return h;
 }
@@ -5072,12 +5112,10 @@ function pdfDrawLogo(P){
 }
 
 // ── One quotation section ───────────────────────────────────────────────────
-function pdfBuildQuoteSection(P, sec, isFirst){
-  if (!isFirst) P.newPage();
-  const { dataMap, rowOrder } = _buildDataMap(sec.rows);
-  const activeSIs = RP_SI_LIST.filter(si => dataMap[si.key] && Object.keys(dataMap[si.key]).length);
-  if (!activeSIs.length) return false;
-
+// Shared by both quote-section layouts (stacked and side-by-side) — the
+// logo, sheet-name heading, greeting, member table, and existing-policy
+// table are identical in both; only the Sum-Insured block layout differs.
+function pdfDrawQuoteSectionHeader(P, sec){
   const ep = _epValues();
   const greeting = (document.getElementById('rp_greeting')?.value || '').trim()
                  || 'Greetings from Plan my life.';
@@ -5124,62 +5162,160 @@ function pdfBuildQuoteSection(P, sec, isFirst){
       { v: ep.rDate || '' }, { v: epNum(ep.rPrem) }, { v: ep.type || '' },
     ], PDF.epCols);
   }
+}
+
+const PDF_QUOTE_HEADERS = ['Company','Plan name','Sum Assure','Premium for 1 Year',
+                            'Premium for 2 Years','Premium for 3 Years','Addon'];
+const pdfPickAddon = (own, other) => ((own && own !== 'NA') ? own
+                                    : (other && other !== 'NA') ? other : 'NA');
+
+// A block is a title, a header row and its insurer rows, full page width.
+// Never leaves the title or the header stranded at the foot of a page, but
+// does let the rows continue onto the next one — with the header repeated,
+// so a continued table is still readable. Reserving the whole block instead
+// left half-empty pages whenever the add-on text made the rows tall. Shared
+// by the stacked layout (every block) and the side-by-side layout (only for
+// an SI band with just one cover type — nothing to place beside it).
+function pdfDrawFullWidthQuoteBlock(P, rowKeys, siData, si, title, valuesFor){
+  const headerRow = () => pdfRow(P, PDF_QUOTE_HEADERS.map(h => ({ v: h, fill: XL.yellow, bold: true })),
+                                 PDF.quoteCols);
+  const built = rowKeys.map(k => {
+    const d = siData[k], v = valuesFor(d);
+    const cells = [
+      { v: d.co }, { v: d.planName }, { v: pdfNum(si.value) },
+      { v: pdfNum(v.p[0]) }, { v: pdfNum(v.p[1]) }, { v: pdfNum(v.p[2]) },
+      { v: v.addon },
+    ];
+    return { cells, h: pdfRowHeight(P, cells, PDF.quoteCols) };
+  });
+  const headerH = pdfRowHeight(P, PDF_QUOTE_HEADERS.map(h => ({ v: h, bold: true })), PDF.quoteCols);
+  P.room(PDF.gap + PDF.minRow + headerH + (built.length ? built[0].h : PDF.minRow));
+  P.y += PDF.gap;
+  pdfRow(P, [{ v: title, bold: true, underline: true, fill: XL.titleFill, align: 'left', border: false }],
+         [P.usable], { border: false });
+  headerRow();
+  built.forEach(r => {
+    if (P.y + r.h > P.bottom) { P.newPage(); headerRow(); }
+    pdfRow(P, r.cells, PDF.quoteCols, { height: r.h });
+  });
+}
+
+function pdfBuildQuoteSection(P, sec, isFirst){
+  if (!isFirst) P.newPage();
+  const { dataMap, rowOrder } = _buildDataMap(sec.rows);
+  const activeSIs = RP_SI_LIST.filter(si => dataMap[si.key] && Object.keys(dataMap[si.key]).length);
+  if (!activeSIs.length) return false;
+
+  pdfDrawQuoteSectionHeader(P, sec);
 
   // ── Sum-insured blocks, stacked ──
-  const HEADERS = ['Company','Plan name','Sum Assure','Premium for 1 Year',
-                   'Premium for 2 Years','Premium for 3 Years','Addon'];
-  const pick = (own, other) => ((own && own !== 'NA') ? own
-                              : (other && other !== 'NA') ? other : 'NA');
+  activeSIs.forEach(si => {
+    const siData  = dataMap[si.key];
+    const rowKeys = rowOrder.filter(k => siData[k]);
+
+    if (sec.singleBlock) {
+      pdfDrawFullWidthQuoteBlock(P, rowKeys, siData, si,
+        (sec.leftLabel || 'Individual') + ' Quotation For ' + xlSiLabel(si.key, false), d => ({
+        p: d.ff.some(x => x > 0) ? d.ff : d.mi,
+        addon: pdfPickAddon(d.ff.some(x => x > 0) ? d.addonFF : d.addonMI,
+                             d.ff.some(x => x > 0) ? d.addonMI : d.addonFF),
+      }));
+    } else {
+      const leftName = (sec.leftLabel === 'Multi Individual' ? 'Family Floater' : sec.leftLabel);
+      pdfDrawFullWidthQuoteBlock(P, rowKeys, siData, si, leftName + ' Quotation For ' + xlSiLabel(si.key, false),
+                d => ({ p: d.ff, addon: pdfPickAddon(d.addonFF, d.addonMI) }));
+      pdfDrawFullWidthQuoteBlock(P, rowKeys, siData, si, 'Multi Individual Quotation For ' + xlSiLabel(si.key, true),
+                d => ({ p: d.mi, addon: pdfPickAddon(d.addonMI, d.addonFF) }));
+    }
+  });
+  return true;
+}
+
+// The "Horizontal" variant — Family Floater and Multi Individual side by
+// side (PDF_SBS sizing) for any SI band that has both; a band with only one
+// cover type still gets the full-width single-block treatment (PDF.quoteCols/
+// PDF.size), same as the stacked layout, since there's nothing to place
+// beside it. See PDF_SBS's own comment for why the font/columns shrink.
+function pdfBuildQuoteSectionSBS(P, sec, isFirst){
+  if (!isFirst) P.newPage();
+  const { dataMap, rowOrder } = _buildDataMap(sec.rows);
+  const activeSIs = RP_SI_LIST.filter(si => dataMap[si.key] && Object.keys(dataMap[si.key]).length);
+  if (!activeSIs.length) return false;
+
+  pdfDrawQuoteSectionHeader(P, sec);
+
+  const leftWidth = PDF_SBS.quoteCols.reduce((a, b) => a + b, 0);
+  const rightX = P.left + leftWidth + PDF_SBS.gutter;
+  const HEADERS_SBS = PDF_QUOTE_HEADERS.map(h => ({ v: h, fill: XL.yellow, bold: true, size: PDF_SBS.size }));
 
   activeSIs.forEach(si => {
     const siData  = dataMap[si.key];
     const rowKeys = rowOrder.filter(k => siData[k]);
 
-    const headerRow = () => pdfRow(P, HEADERS.map(h => ({ v: h, fill: XL.yellow, bold: true })),
-                                   PDF.quoteCols);
-
-    // A block is a title, a header row and its insurer rows. Never leave the
-    // title or the header stranded at the foot of a page, but do let the rows
-    // continue onto the next one — with the header repeated, so a continued
-    // table is still readable. Reserving the whole block instead left half-empty
-    // pages whenever the add-on text made the rows tall.
-    const drawBlock = (title, valuesFor) => {
-      // Measure first, then decide where the block starts. Add-on text makes rows
-      // two to five lines tall, so reserving a nominal row height left the yellow
-      // header stranded alone at the foot of a page with its first row overleaf.
-      const built = rowKeys.map(k => {
-        const d = siData[k], v = valuesFor(d);
-        const cells = [
-          { v: d.co }, { v: d.planName }, { v: pdfNum(si.value) },
-          { v: pdfNum(v.p[0]) }, { v: pdfNum(v.p[1]) }, { v: pdfNum(v.p[2]) },
-          { v: v.addon },
-        ];
-        return { cells, h: pdfRowHeight(P, cells, PDF.quoteCols) };
-      });
-      const headerH = pdfRowHeight(P, HEADERS.map(h => ({ v: h, bold: true })), PDF.quoteCols);
-      P.room(PDF.gap + PDF.minRow + headerH + (built.length ? built[0].h : PDF.minRow));
-      P.y += PDF.gap;
-      pdfRow(P, [{ v: title, bold: true, underline: true, fill: XL.titleFill, align: 'left', border: false }],
-             [P.usable], { border: false });
-      headerRow();
-      built.forEach(r => {
-        if (P.y + r.h > P.bottom) { P.newPage(); headerRow(); }
-        pdfRow(P, r.cells, PDF.quoteCols, { height: r.h });
-      });
-    };
-
     if (sec.singleBlock) {
-      drawBlock((sec.leftLabel || 'Individual') + ' Quotation For ' + xlSiLabel(si.key, false), d => ({
+      pdfDrawFullWidthQuoteBlock(P, rowKeys, siData, si,
+        (sec.leftLabel || 'Individual') + ' Quotation For ' + xlSiLabel(si.key, false), d => ({
         p: d.ff.some(x => x > 0) ? d.ff : d.mi,
-        addon: pick(d.ff.some(x => x > 0) ? d.addonFF : d.addonMI,
-                    d.ff.some(x => x > 0) ? d.addonMI : d.addonFF),
+        addon: pdfPickAddon(d.ff.some(x => x > 0) ? d.addonFF : d.addonMI,
+                             d.ff.some(x => x > 0) ? d.addonMI : d.addonFF),
       }));
-    } else {
-      const leftName = (sec.leftLabel === 'Multi Individual' ? 'Family Floater' : sec.leftLabel);
-      drawBlock(leftName + ' Quotation For ' + xlSiLabel(si.key, false),
-                d => ({ p: d.ff, addon: pick(d.addonFF, d.addonMI) }));
-      drawBlock('Multi Individual Quotation For ' + xlSiLabel(si.key, true),
-                d => ({ p: d.mi, addon: pick(d.addonMI, d.addonFF) }));
+      return;
+    }
+
+    const leftName  = (sec.leftLabel === 'Multi Individual' ? 'Family Floater' : sec.leftLabel);
+    const leftTitle  = leftName + ' Quotation For ' + xlSiLabel(si.key, false);
+    const rightTitle = 'Multi Individual Quotation For ' + xlSiLabel(si.key, true);
+
+    const buildRows = (valuesFor) => rowKeys.map(k => {
+      const d = siData[k], v = valuesFor(d);
+      const cells = [
+        { v: d.co, size: PDF_SBS.size }, { v: d.planName, size: PDF_SBS.size },
+        { v: pdfNum(si.value), size: PDF_SBS.size },
+        { v: pdfNum(v.p[0]), size: PDF_SBS.size }, { v: pdfNum(v.p[1]), size: PDF_SBS.size },
+        { v: pdfNum(v.p[2]), size: PDF_SBS.size }, { v: v.addon, size: PDF_SBS.size },
+      ];
+      return { cells, h: pdfRowHeight(P, cells, PDF_SBS.quoteCols, PDF_SBS.lineH) };
+    });
+    const leftRows  = buildRows(d => ({ p: d.ff, addon: pdfPickAddon(d.addonFF, d.addonMI) }));
+    const rightRows = buildRows(d => ({ p: d.mi, addon: pdfPickAddon(d.addonMI, d.addonFF) }));
+
+    const headerH = pdfRowHeight(P, HEADERS_SBS, PDF_SBS.quoteCols, PDF_SBS.lineH);
+    const firstRowH = Math.max(leftRows.length ? leftRows[0].h : PDF_SBS.minRow,
+                                rightRows.length ? rightRows[0].h : PDF_SBS.minRow);
+    // Same "never strand the title/header alone at the foot of a page"
+    // principle as pdfDrawFullWidthQuoteBlock — reserved for BOTH sides at
+    // once, since they must start on the same page together.
+    P.room(PDF.gap + PDF_SBS.minRow + headerH + firstRowH);
+    P.y += PDF.gap;
+
+    const titleRowH = Math.max(
+      pdfRowHeight(P, [{ v: leftTitle, size: PDF_SBS.size }], [leftWidth], PDF_SBS.lineH),
+      pdfRowHeight(P, [{ v: rightTitle, size: PDF_SBS.size }], [leftWidth], PDF_SBS.lineH));
+    const titleCellOpts = { bold: true, underline: true, fill: XL.titleFill, align: 'left', border: false, size: PDF_SBS.size };
+    pdfDrawRowCells(P, P.left, P.y, titleRowH, [{ v: leftTitle, ...titleCellOpts }], [leftWidth], { border: false, lineH: PDF_SBS.lineH });
+    pdfDrawRowCells(P, rightX, P.y, titleRowH, [{ v: rightTitle, ...titleCellOpts }], [leftWidth], { border: false, lineH: PDF_SBS.lineH });
+    P.y += titleRowH;
+
+    const drawHeaderPair = () => {
+      pdfDrawRowCells(P, P.left, P.y, headerH, HEADERS_SBS, PDF_SBS.quoteCols, { lineH: PDF_SBS.lineH });
+      pdfDrawRowCells(P, rightX, P.y, headerH, HEADERS_SBS, PDF_SBS.quoteCols, { lineH: PDF_SBS.lineH });
+      P.y += headerH;
+    };
+    drawHeaderPair();
+
+    // Both sides come from the same rowKeys (same companies/plans, just FF
+    // vs MI pricing), so they normally have identical row counts — Math.max
+    // is a defensive fallback, not the expected case. A page break happens
+    // for BOTH sides together, at the same row index, so they can never end
+    // up split across different pages and interleaved.
+    const maxRows = Math.max(leftRows.length, rightRows.length);
+    for (let i = 0; i < maxRows; i++) {
+      const lr = leftRows[i], rr = rightRows[i];
+      const rowH = Math.max(lr ? lr.h : PDF_SBS.minRow, rr ? rr.h : PDF_SBS.minRow);
+      if (P.y + rowH > P.bottom) { P.newPage(); drawHeaderPair(); }
+      if (lr) pdfDrawRowCells(P, P.left, P.y, rowH, lr.cells, PDF_SBS.quoteCols, { lineH: PDF_SBS.lineH });
+      if (rr) pdfDrawRowCells(P, rightX, P.y, rowH, rr.cells, PDF_SBS.quoteCols, { lineH: PDF_SBS.lineH });
+      P.y += rowH;
     }
   });
   return true;
@@ -5305,6 +5441,69 @@ async function generatePdfReport(){
     showToast('❌ Error: ' + err.message, 6000);
   } finally {
     if (btn) { btn.disabled = false; btn.innerHTML = '📄 Download PDF'; }
+  }
+}
+
+// The "Horizontal" variant — same report, same buildReportSections(), only
+// the quote sections draw Family Floater / Multi Individual side by side
+// (pdfBuildQuoteSectionSBS, PDF_SBS sizing) instead of stacked. The Feature
+// Comparison section is unchanged (pdfBuildFeatureSection) — its columns
+// already scale to the page width, so it has no stacking/sizing problem to
+// begin with. Otherwise a line-for-line mirror of generatePdfReport() above
+// (same guard, same page numbering, same archive/toast behaviour) — kept as
+// a separate function rather than a shared one with an if/else sprinkled
+// through it, so the existing button's code path is untouched by this one.
+async function generatePdfReportHorizontal(){
+  const btn = document.getElementById('gen-pdf-hz-btn');
+  if (btn) { btn.disabled = true; btn.innerHTML = '⏳ Generating…'; }
+
+  try {
+    const hasFeatureSelection = Object.values(FEATURE_MASTER.selectedPlan).some(Boolean);
+    if (!rpRows.length && !hasFeatureSelection) { showToast('⚠️ No quotes and no Feature Master plan selected — add a quote, or pick a plan in Feature Master first'); return; }
+
+    const JsPDF = await loadJsPDF();
+    const { sections, clientNm } = buildReportSections();
+
+    const P = pdfNew(JsPDF);
+    let drawn = 0;
+    sections.forEach(sec => {
+      const ok = sec.kind === 'features'
+        ? pdfBuildFeatureSection(P, sec.rows)
+        : pdfBuildQuoteSectionSBS(P, sec, drawn === 0);
+      if (ok) drawn++;
+    });
+
+    if (!drawn) { showToast('⚠️ No valid quote data found'); return; }
+
+    const total = P.doc.internal.getNumberOfPages();
+    for (let i = 1; i <= total; i++) {
+      P.doc.setPage(i);
+      P.doc.setFont(PDF.font, 'normal'); P.doc.setFontSize(9);
+      P.doc.setTextColor(120, 120, 120);
+      P.doc.text(clientNm + '  ·  page ' + i + ' of ' + total,
+                 P.doc.internal.pageSize.getWidth() - PDF.marginX,
+                 P.doc.internal.pageSize.getHeight() - PDF.marginY / 2, { align: 'right' });
+    }
+
+    const pdfName = clientNm.replace(/[^a-zA-Z0-9 _\-]/g, '_') + '_Quote_Horizontal.pdf';
+    P.doc.save(pdfName);
+
+    try { histArchive({ pdf: { name: pdfName, b64: histB64(P.doc.output('arraybuffer')) } }); }
+    catch (e) { showToast('⚠️ PDF saved but could not be archived: ' + e.message, 6000); }
+
+    const excluded = rpExclusions();
+    if (excluded.length) {
+      showToast('✅ PDF downloaded — but ' + excluded.length + ' quote'
+        + (excluded.length > 1 ? 's were' : ' was') + ' left out (see the warning above the table)', 6000);
+    } else {
+      showToast('✅ PDF downloaded — ' + total + ' page' + (total > 1 ? 's' : ''));
+    }
+
+  } catch (err) {
+    console.error(err);
+    showToast('❌ Error: ' + err.message, 6000);
+  } finally {
+    if (btn) { btn.disabled = false; btn.innerHTML = '📄 Download PDF (Horizontal)'; }
   }
 }
 
